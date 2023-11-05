@@ -17,6 +17,6 @@
     <img src="https://tokei.rs/b1/github/MeteorDevelopment/meteor-client" alt="GitHub lines of code"/>
 </div>
 ### 警告
-当前版本使用了大量机翻
+--当前版本使用了大量机翻
 ## 声明
-此版本为beta版,不代表最终质量
+--此版本为beta版,不代表最终质量
