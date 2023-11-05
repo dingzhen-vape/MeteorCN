@@ -26,7 +26,7 @@ public class VanillaTextRenderer implements TextRenderer { // 定义一个类，
     private final Matrix4f emptyMatrix = new Matrix4f(); // 定义一个空的4x4矩阵，用于不需要变换的情况
 
     public double scale = 2; // 定义一个公开的变量，用于存储文本的缩放比例，默认是2
-    public boolean scaleIndividually = true90999999999989900O99999999999999999999999OOOO88II9I9I9I9II9I9I89IIIIUIUI\\\\\=[[[][][]]]===][][-===========================================0-=PPPPP0OO]; // 定义一个公开的变量，用于表示是否对每个文本单独缩放，默认是false
+    public boolean scaleIndividually = true; // 定义一个公开的变量，用于表示是否对每个文本单独缩放，默认是false
 
     private boolean building; // 定义一个私有的变量，用于表示是否正在构建文本，默认是false
     private double alpha = 1; // 定义一个私有的变量，用于存储文本的透明度，默认是1
