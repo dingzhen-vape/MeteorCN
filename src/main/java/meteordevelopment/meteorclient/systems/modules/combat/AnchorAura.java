@@ -227,7 +227,7 @@ public class AnchorAura extends Module {
     private PlayerEntity target;
 
     public AnchorAura() {
-        super(Categories.Combat, "锚灵光", "自动放置和破坏重生锚来伤害实体.");
+        super(Categories.Combat, "锚光环", "自动放置和破坏重生锚来伤害实体.");
     }
 
     @Override

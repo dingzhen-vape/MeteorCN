@@ -23,7 +23,7 @@ public class BossStack extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<Boolean> stack = sgGeneral.add(new BoolSetting.Builder()
-        .name("计时器")
+        .name("timer")
         .description("堆叠boss条并在文本中添加一个计数器。")
         .defaultValue(true)
         .build()

@@ -76,8 +76,8 @@ public class Burrow extends Module {
     );
 
     private final Setting<Double> timer = sgGeneral.add(new DoubleSetting.Builder()
-        .name("计时器")
-        .description("计时器覆盖.")
+        .name("timer")
+        .description("timer覆盖.")
         .defaultValue(1)
         .min(0.01)
         .sliderRange(0.01, 10)

@@ -24,8 +24,8 @@ public class FastClimb extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> timerMode = sgGeneral.add(new BoolSetting.Builder()
-        .name("计时器模式")
-        .description("使用计时器.")
+        .name("timer模式")
+        .description("使用timer.")
         .defaultValue(false)
         .build()
     );
@@ -40,8 +40,8 @@ public class FastClimb extends Module {
     );
 
     private final Setting<Double> timer = sgGeneral.add(new DoubleSetting.Builder()
-        .name("计时器")
-        .description("计时器的值.")
+        .name("timer")
+        .description("timer的值.")
         .defaultValue(1.436)
         .min(1)
         .sliderMin(1)

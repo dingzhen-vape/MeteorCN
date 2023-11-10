@@ -191,7 +191,7 @@ public class BedAura extends Module {
     private int timer;
 
     public BedAura() {
-        super(Categories.Combat, "床灵光", "在下界和末地自动放置和引爆床.");
+        super(Categories.Combat, "床光环", "在下界和末地自动放置和引爆床.");
     }
 
     @Override

@@ -75,7 +75,7 @@ public class MiddleClickExtra extends Module {
     );
 
     public MiddleClickExtra() {
-        super(Categories.Player, "中键额外", "当你中键点击时，执行各种动作。");
+        super(Categories.Player, "中键额外动作", "当你中键点击时，执行各种动作。");
     }
 
     private boolean isUsing;

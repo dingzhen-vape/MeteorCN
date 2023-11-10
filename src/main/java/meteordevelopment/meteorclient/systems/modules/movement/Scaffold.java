@@ -70,7 +70,7 @@ public class Scaffold extends Module {
 
     private final Setting<Boolean> renderSwing = sgGeneral.add(new BoolSetting.Builder()
         .name("摇摆")
-        .description("渲染你的客户端摇摆。")
+        .description("渲染你的客户端手部摆动。")
         .defaultValue(false)
         .build()
     );

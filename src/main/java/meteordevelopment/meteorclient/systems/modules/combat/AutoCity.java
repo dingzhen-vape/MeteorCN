@@ -61,7 +61,7 @@ public class AutoCity extends Module {
 
     private final Setting<Boolean> support = sgGeneral.add(new BoolSetting.Builder()
         .name("支持")
-        .description("如果城市方块下面没有方块，它会在挖掘之前放置一个。")
+        .description("如果挖掘方块下面没有方块，它会在挖掘之前放置一个。")
         .defaultValue(true)
         .build()
     );
@@ -78,7 +78,7 @@ public class AutoCity extends Module {
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("自动旋转到城市方块的方向。")
+        .description("自动旋转到挖掘方块的方向。")
         .defaultValue(true)
         .build()
     );
@@ -136,7 +136,7 @@ public class AutoCity extends Module {
     private float progress;
 
     public AutoCity() {
-        super(Categories.Combat, "自动城市", "自动挖掘某人脚边的方块。");
+        super(Categories.Combat, "自动挖掘", "自动挖掘某人脚边的方块。");
     }
 
     @Override

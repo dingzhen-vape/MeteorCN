@@ -36,36 +36,36 @@ import java.util.*;
 import static meteordevelopment.meteorclient.utils.player.ChatUtils.formatCoords;
 
 public class Notifier extends Module {
-    private final SettingGroup sgTotemPops = settings.createGroup("托特姆爆炸");
+    private final SettingGroup sgTotemPops = settings.createGroup("图腾爆炸");
     private final SettingGroup sgVisualRange = settings.createGroup("视觉范围");
     private final SettingGroup sgPearl = settings.createGroup("珍珠");
 
     // Totem Pops
 
     private final Setting<Boolean> totemPops = sgTotemPops.add(new BoolSetting.Builder()
-        .name("托特姆爆炸")
-        .description("当一个玩家爆炸一个托特姆时通知你。")
+        .name("图腾爆炸")
+        .description("当一个玩家爆炸一个图腾时通知你。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> totemsIgnoreOwn = sgTotemPops.add(new BoolSetting.Builder()
         .name("忽略自己")
-        .description("忽略你自己的托特姆爆炸。")
+        .description("忽略你自己的图腾爆炸。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> totemsIgnoreFriends = sgTotemPops.add(new BoolSetting.Builder()
         .name("忽略朋友")
-        .description("忽略朋友的托特姆爆炸。")
+        .description("忽略朋友的图腾爆炸。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> totemsIgnoreOthers = sgTotemPops.add(new BoolSetting.Builder()
         .name("忽略其他人")
-        .description("忽略其他玩家的托特姆爆炸。")
+        .description("忽略其他玩家的图腾爆炸。")
         .defaultValue(false)
         .build()
     );
@@ -246,7 +246,7 @@ public class Notifier extends Module {
             int pops = totemPopMap.getOrDefault(entity.getUuid(), 0);
             totemPopMap.put(entity.getUuid(), ++pops);
 
-            ChatUtils.sendMsg(getChatId(entity), Formatting.GRAY, "(高亮)%s (默认)爆炸了 (高亮)%d (默认)%s。", entity.getEntityName(), pops, pops == 1 ? "托特姆" : "托特姆");
+            ChatUtils.sendMsg(getChatId(entity), Formatting.GRAY, "(高亮)%s (默认)爆炸了 (高亮)%d (默认)%s。", entity.getEntityName(), pops, pops == 1 ? "图腾" : "图腾");
         }
     }
 
@@ -260,7 +260,7 @@ public class Notifier extends Module {
                 if (player.deathTime > 0 || player.getHealth() <= 0) {
                     int pops = totemPopMap.removeInt(player.getUuid());
 
-                    ChatUtils.sendMsg(getChatId(player), Formatting.GRAY, "(高亮)%s (默认)在爆炸了 (高亮)%d (默认)%s后死亡。", player.getEntityName(), pops, pops == 1 ? "托特姆" : "托特姆");
+                    ChatUtils.sendMsg(getChatId(player), Formatting.GRAY, "(高亮)%s (默认)在爆炸了 (高亮)%d (默认)%s后死亡。", player.getEntityName(), pops, pops == 1 ? "图腾" : "图腾");
                     chatIdMap.removeInt(player.getUuid());
                 }
             }

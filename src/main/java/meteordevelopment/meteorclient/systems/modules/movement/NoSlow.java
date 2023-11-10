@@ -32,8 +32,8 @@ public class NoSlow extends Module {
     );
 
     private final Setting<Double> webTimer = sgGeneral.add(new DoubleSetting.Builder()
-        .name("蜘蛛网计时器")
-        .description("WebMode Timer的计时器值。")
+        .name("蜘蛛网timer")
+        .description("WebMode Timer的timer值。")
         .defaultValue(10)
         .min(1)
         .sliderMin(1)

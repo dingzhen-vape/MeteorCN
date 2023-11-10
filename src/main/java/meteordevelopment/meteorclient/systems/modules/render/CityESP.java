@@ -51,7 +51,7 @@ public class CityESP extends Module {
     private BlockPos target;
 
     public CityESP() {
-        super(Categories.Render, "城市-ESP", "显示可以被破坏来城市另一个玩家的方块。");
+        super(Categories.Render, "城市(???-ESP", "显示可以被破坏来城市(???另一个玩家的方块。");
     }
 
     @EventHandler

@@ -127,7 +127,7 @@ public class Velocity extends Module {
     );
 
     public Velocity() {
-        super(Categories.Movement, "速度", "防止你被外部力量移动。");
+        super(Categories.Movement, "防击退", "防止你被外部力量移动。");
     }
 
     @EventHandler
