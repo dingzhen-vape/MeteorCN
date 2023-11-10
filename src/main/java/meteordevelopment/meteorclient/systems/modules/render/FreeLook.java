@@ -23,21 +23,21 @@ public class FreeLook extends Module {
 
     public final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
         .name("模式")
-        .description("要旋转哪个实体。")
+        .description("要旋转的实体。")
         .defaultValue(Mode.Player)
         .build()
     );
 
     public final Setting<Boolean> togglePerspective = sgGeneral.add(new BoolSetting.Builder()
         .name("切换视角")
-        .description("更改切换视角。")
+        .description("切换时改变你的视角。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Double> sensitivity = sgGeneral.add(new DoubleSetting.Builder()
-        .name("相机灵敏度")
-        .description("相机在相机模式下移动的速度。")
+        .name("摄像机灵敏度")
+        .description("摄像机模式下摄像机移动的速度。")
         .defaultValue(8)
         .min(0)
         .sliderMax(10)
@@ -47,15 +47,15 @@ public class FreeLook extends Module {
     // Arrows
 
     public final Setting<Boolean> arrows = sgArrows.add(new BoolSetting.Builder()
-        .name("arrows-control-opposite")
-        .description("允许您使用箭头键控制其他实体旋转。")
+        .name("箭头控制相反")
+        .description("允许你用箭头键控制其他实体的旋转。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> arrowSpeed = sgArrows.add(new DoubleSetting.Builder()
-        .name("arrow-speed")
-        .description("使用箭头键旋转速度。")
+        .name("箭头速度")
+        .description("用箭头键旋转的速度。")
         .defaultValue(4)
         .min(0)
         .build()
@@ -67,7 +67,7 @@ public class FreeLook extends Module {
     private Perspective prePers;
 
     public FreeLook() {
-        super(Categories.Render, "free-look", "允许更多旋转选项以第三人称。");
+        super(Categories.Render, "free-lock|自由视角", "在第三人称中允许更多的旋转选项。");
     }
 
     @Override

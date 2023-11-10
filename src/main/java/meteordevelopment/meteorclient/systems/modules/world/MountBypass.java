@@ -17,7 +17,7 @@ public class MountBypass extends Module {
     private boolean dontCancel;
 
     public MountBypass() {
-        super(Categories.World, "mount-bypass", "允许您绕过 IllegalStacks 插件并将箱子放在实体上。");
+        super(Categories.World, "坐骑绕过", "允许你绕过IllegalStacks插件，将箱子放在实体上。");
     }
 
     @EventHandler

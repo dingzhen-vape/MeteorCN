@@ -20,100 +20,100 @@ import java.util.List;
 import java.util.Set;
 
 public class NoRender extends Module {
-    private final SettingGroup sgOverlay = settings.createGroup("Overlay");
+    private final SettingGroup sgOverlay = settings.createGroup("覆盖");
     private final SettingGroup sgHUD = settings.createGroup("HUD");
-    private final SettingGroup sgWorld = settings.createGroup("World");
-    private final SettingGroup sgEntity = settings.createGroup("Entity");
+    private final SettingGroup sgWorld = settings.createGroup("世界");
+    private final SettingGroup sgEntity = settings.createGroup("实体");
 
     // Overlay
 
     private final Setting<Boolean> noPortalOverlay = sgOverlay.add(new BoolSetting.Builder()
-        .name("portal-overlay")
-        .description("Disables rendering of the nether portal overlay.")
+        .name("传送门覆盖")
+        .description("禁用下界传送门的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noSpyglassOverlay = sgOverlay.add(new BoolSetting.Builder()
-        .name("spyglass-overlay")
-        .description("Disables rendering of the spyglass overlay.")
+        .name("望远镜覆盖")
+        .description("禁用望远镜的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noNausea = sgOverlay.add(new BoolSetting.Builder()
-        .name("nausea")
-        .description("Disables rendering of the nausea overlay.")
+        .name("恶心")
+        .description("禁用恶心的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noPumpkinOverlay = sgOverlay.add(new BoolSetting.Builder()
-        .name("pumpkin-overlay")
-        .description("Disables rendering of the pumpkin head overlay")
+        .name("南瓜头覆盖")
+        .description("禁用南瓜头的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noPowderedSnowOverlay = sgOverlay.add(new BoolSetting.Builder()
-        .name("powdered-snow-overlay")
-        .description("Disables rendering of the powdered snow overlay.")
+        .name("粉雪覆盖")
+        .description("禁用粉雪的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noFireOverlay = sgOverlay.add(new BoolSetting.Builder()
-        .name("fire-overlay")
-        .description("Disables rendering of the fire overlay.")
+        .name("火焰覆盖")
+        .description("禁用火焰的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noLiquidOverlay = sgOverlay.add(new BoolSetting.Builder()
-        .name("liquid-overlay")
-        .description("Disables rendering of the liquid overlay.")
+        .name("液体覆盖")
+        .description("禁用液体的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noInWallOverlay = sgOverlay.add(new BoolSetting.Builder()
-        .name("in-wall-overlay")
-        .description("Disables rendering of the overlay when inside blocks.")
+        .name("墙内覆盖")
+        .description("禁用在方块内时的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noVignette = sgOverlay.add(new BoolSetting.Builder()
-        .name("vignette")
-        .description("Disables rendering of the vignette overlay.")
+        .name("晕影")
+        .description("禁用晕影的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noGuiBackground = sgOverlay.add(new BoolSetting.Builder()
-        .name("gui-background")
-        .description("Disables rendering of the GUI background overlay.")
+        .name("GUI背景")
+        .description("禁用GUI背景的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noTotemAnimation = sgOverlay.add(new BoolSetting.Builder()
-        .name("totem-animation")
-        .description("Disables rendering of the totem animation when you pop a totem.")
+        .name("图腾动画")
+        .description("禁用当你使用图腾时的动画效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noEatParticles = sgOverlay.add(new BoolSetting.Builder()
-        .name("eating-particles")
-        .description("Disables rendering of eating particles.")
+        .name("吃东西的粒子")
+        .description("禁用吃东西的粒子效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noEnchantGlint = sgOverlay.add(new BoolSetting.Builder()
-        .name("enchantment-glint")
-        .description("Disables rending of the enchantment glint.")
+        .name("附魔光泽")
+        .description("禁用附魔光泽的渲染效果。")
         .defaultValue(false)
         .build()
     );
@@ -121,50 +121,50 @@ public class NoRender extends Module {
     // HUD
 
     private final Setting<Boolean> noBossBar = sgHUD.add(new BoolSetting.Builder()
-        .name("boss-bar")
-        .description("Disable rendering of boss bars.")
+        .name("Boss条")
+        .description("禁用Boss条的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noScoreboard = sgHUD.add(new BoolSetting.Builder()
-        .name("scoreboard")
-        .description("Disable rendering of the scoreboard.")
+        .name("计分板")
+        .description("禁用计分板的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noCrosshair = sgHUD.add(new BoolSetting.Builder()
-        .name("crosshair")
-        .description("Disables rendering of the crosshair.")
+        .name("准星")
+        .description("禁用准星的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noHeldItemName = sgHUD.add(new BoolSetting.Builder()
-        .name("held-item-name")
-        .description("Disables rendering of the held item name.")
+        .name("手持物品名称")
+        .description("禁用手持物品名称的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noObfuscation = sgHUD.add(new BoolSetting.Builder()
-        .name("obfuscation")
-        .description("Disables obfuscation styling of characters.")
+        .name("混淆")
+        .description("禁用字符的混淆样式。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noPotionIcons = sgHUD.add(new BoolSetting.Builder()
-        .name("potion-icons")
-        .description("Disables rendering of status effect icons.")
+        .name("药水图标")
+        .description("禁用状态效果图标的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noMessageSignatureIndicator = sgHUD.add(new BoolSetting.Builder()
-        .name("message-signature-indicator")
-        .description("Disables chat message signature indicator on the left of the message.")
+        .name("聊天消息签名指示器")
+        .description("禁用聊天消息左侧的签名指示器。")
         .defaultValue(false)
         .build()
     );
@@ -172,127 +172,127 @@ public class NoRender extends Module {
     // World
 
     private final Setting<Boolean> noWeather = sgWorld.add(new BoolSetting.Builder()
-        .name("weather")
-        .description("Disables rendering of weather.")
+        .name("天气")
+        .description("禁用天气的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noBlindness = sgWorld.add(new BoolSetting.Builder()
-        .name("blindness")
-        .description("Disables rendering of blindness.")
+        .name("失明")
+        .description("禁用失明的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noDarkness = sgWorld.add(new BoolSetting.Builder()
-        .name("darkness")
-        .description("Disables rendering of darkness.")
+        .name("黑暗")
+        .description("禁用黑暗的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noFog = sgWorld.add(new BoolSetting.Builder()
-        .name("fog")
-        .description("Disables rendering of fog.")
+        .name("雾")
+        .description("禁用雾的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noEnchTableBook = sgWorld.add(new BoolSetting.Builder()
-        .name("enchantment-table-book")
-        .description("Disables rendering of books above enchanting tables.")
+        .name("附魔台书")
+        .description("禁用附魔台上方的书的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noSignText = sgWorld.add(new BoolSetting.Builder()
-        .name("sign-text")
-        .description("Disables rendering of text on signs.")
+        .name("告示牌文本")
+        .description("禁用告示牌上的文本的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noBlockBreakParticles = sgWorld.add(new BoolSetting.Builder()
-        .name("block-break-particles")
-        .description("Disables rendering of block-break particles.")
+        .name("方块破坏粒子")
+        .description("禁用方块破坏的粒子效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noBlockBreakOverlay = sgWorld.add(new BoolSetting.Builder()
-        .name("block-break-overlay")
-        .description("Disables rendering of block-break overlay.")
+        .name("方块破坏覆盖")
+        .description("禁用方块破坏的覆盖效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noSkylightUpdates = sgWorld.add(new BoolSetting.Builder()
-        .name("skylight-updates")
-        .description("Disables rendering of skylight updates.")
+        .name("天光更新")
+        .description("禁用天光更新的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noBeaconBeams = sgWorld.add(new BoolSetting.Builder()
-        .name("beacon-beams")
-        .description("Disables rendering of beacon beams.")
+        .name("信标光束")
+        .description("禁用信标光束的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noFallingBlocks = sgWorld.add(new BoolSetting.Builder()
-        .name("falling-blocks")
-        .description("Disables rendering of falling blocks.")
+        .name("掉落的方块")
+        .description("禁用掉落的方块的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noCaveCulling = sgWorld.add(new BoolSetting.Builder()
-        .name("cave-culling")
-        .description("Disables Minecraft's cave culling algorithm.")
+        .name("洞穴剔除")
+        .description("禁用Minecraft的洞穴剔除算法。")
         .defaultValue(false)
         .onChanged(b -> mc.worldRenderer.reload())
         .build()
     );
 
     private final Setting<Boolean> noMapMarkers = sgWorld.add(new BoolSetting.Builder()
-        .name("map-markers")
-        .description("Disables markers on maps.")
+        .name("地图标记")
+        .description("禁用地图上的标记。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<BannerRenderMode> bannerRender = sgWorld.add(new EnumSetting.Builder<BannerRenderMode>()
-        .name("banners")
-        .description("Changes rendering of banners.")
+        .name("旗帜")
+        .description("改变旗帜的渲染效果。")
         .defaultValue(BannerRenderMode.Everything)
         .build()
     );
 
     private final Setting<Boolean> noFireworkExplosions = sgWorld.add(new BoolSetting.Builder()
-        .name("firework-explosions")
-        .description("Disables rendering of firework explosions.")
+        .name("烟花爆炸")
+        .description("禁用烟花爆炸的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<List<ParticleType<?>>> particles = sgWorld.add(new ParticleTypeListSetting.Builder()
-        .name("particles")
-        .description("Particles to not render.")
+        .name("粒子")
+        .description("不渲染的粒子。")
         .build()
     );
 
     private final Setting<Boolean> noBarrierInvis = sgWorld.add(new BoolSetting.Builder()
-        .name("barrier-invisibility")
-        .description("Disables barriers being invisible when not holding one.")
+        .name("屏障隐形")
+        .description("禁用当不持有屏障时屏障隐形的效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noTextureRotations = sgWorld.add(new BoolSetting.Builder()
-        .name("texture-rotations")
-        .description("Changes texture rotations and model offsets to use a random value instead of the block position.")
+        .name("纹理旋转")
+        .description("改变纹理旋转和模型偏移为使用随机值而不是方块位置。")
         .defaultValue(false)
         .onChanged(b -> mc.worldRenderer.reload())
         .build()
@@ -301,62 +301,62 @@ public class NoRender extends Module {
     // Entity
 
     private final Setting<Set<EntityType<?>>> entities = sgEntity.add(new EntityTypeListSetting.Builder()
-        .name("entities")
-        .description("Disables rendering of selected entities.")
+        .name("实体")
+        .description("禁用选定实体的渲染效果。")
         .build()
     );
 
     private final Setting<Boolean> dropSpawnPacket = sgEntity.add(new BoolSetting.Builder()
-        .name("drop-spawn-packets")
-        .description("WARNING! Drops all spawn packets of entities selected in the above list.")
+        .name("丢弃生成包")
+        .description("警告！丢弃选定实体的生成包。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noArmor = sgEntity.add(new BoolSetting.Builder()
-        .name("armor")
-        .description("Disables rendering of armor on entities.")
+        .name("盔甲")
+        .description("禁用实体上的盔甲的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noInvisibility = sgEntity.add(new BoolSetting.Builder()
-        .name("invisibility")
-        .description("Shows invisible entities.")
+        .name("隐形")
+        .description("显示隐形的实体。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noGlowing = sgEntity.add(new BoolSetting.Builder()
-        .name("glowing")
-        .description("Disables rendering of the glowing effect")
+        .name("发光")
+        .description("禁用发光效果的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noMobInSpawner = sgEntity.add(new BoolSetting.Builder()
-        .name("spawner-entities")
-        .description("Disables rendering of spinning mobs inside of mob spawners")
+        .name("刷怪笼实体")
+        .description("禁用刷怪笼内旋转的怪物的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noDeadEntities = sgEntity.add(new BoolSetting.Builder()
-        .name("dead-entities")
-        .description("Disables rendering of dead entities")
+        .name("死亡实体")
+        .description("禁用死亡实体的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> noNametags = sgEntity.add(new BoolSetting.Builder()
-        .name("nametags")
-        .description("Disables rendering of entity nametags")
+        .name("名牌")
+        .description("禁用实体名牌的渲染效果。")
         .defaultValue(false)
         .build()
     );
 
     public NoRender() {
-        super(Categories.Render, "no-render", "Disables certain animations or overlays from rendering.");
+        super(Categories.Render, "不渲染", "禁用某些动画或覆盖的渲染效果。");
     }
 
     @Override

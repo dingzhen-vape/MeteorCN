@@ -27,36 +27,36 @@ import java.util.List;
 
 public class LightOverlay extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgColors = settings.createGroup("Colors");
+    private final SettingGroup sgColors = settings.createGroup("颜色");
 
     // General
 
     private final Setting<Integer> horizontalRange = sgGeneral.add(new IntSetting.Builder()
-        .name("horizo​​ntal-range")
-        .description("以块为单位的水平范围。")
+        .name("水平范围")
+        .description("水平范围（以方块为单位）。")
         .defaultValue(8)
         .min(0)
         .build()
     );
 
     private final Setting<Integer> verticalRange = sgGeneral.add(new IntSetting.Builder()
-        .name("vertical-range")
-        .description("以块为单位的垂直范围。")
+        .name("垂直范围")
+        .description("垂直范围（以方块为单位）。")
         .defaultValue(4)
         .min(0)
         .build()
     );
 
     private final Setting<Boolean> seeThroughBlocks = sgGeneral.add(new BoolSetting.Builder()
-        .name("see-through-blocks")
-        .description("允许您查看穿过块的线条.")
+        .name("透视方块")
+        .description("允许你透过方块看到线条。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> newMobSpawnLightLevel = sgGeneral.add(new BoolSetting.Builder()
-        .name("new-mob-spawn-light-level")
-        .description("使用新的 (1.18+) 生物生成行为")
+        .name("新怪物生成光照等级")
+        .description("使用新的（1.18+）怪物生成行为")
         .defaultValue(true)
         .build()
     );
@@ -64,15 +64,15 @@ public class LightOverlay extends Module {
     // Colors
 
     private final Setting<SettingColor> color = sgColors.add(new ColorSetting.Builder()
-        .name("color")
-        .description("生物当前可以生成的地方的颜色。")
+        .name("颜色")
+        .description("怪物当前可以生成的地方的颜色。")
         .defaultValue(new SettingColor(225, 25, 25))
         .build()
     );
 
     private final Setting<SettingColor> potentialColor = sgColors.add(new ColorSetting.Builder()
         .name("潜在颜色")
-        .description("小怪可能产卵的地方的颜色(例如在晚上)。")
+        .description("怪物潜在可以生成的地方的颜色（例如在夜晚）。")
         .defaultValue(new SettingColor(225, 225, 25))
         .build()
     );
@@ -85,7 +85,7 @@ public class LightOverlay extends Module {
     private final Mesh mesh = new ShaderMesh(Shaders.POS_COLOR, DrawMode.Lines, Mesh.Attrib.Vec3, Mesh.Attrib.Color);
 
     public LightOverlay() {
-        super(Categories.Render, "光覆盖", "显示小怪可以产卵的方块。");
+        super(Categories.Render, "光照覆盖", "显示怪物可以生成的方块。");
     }
 
     @EventHandler

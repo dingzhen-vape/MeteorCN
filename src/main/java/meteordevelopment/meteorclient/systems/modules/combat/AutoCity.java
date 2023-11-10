@@ -36,7 +36,7 @@ public class AutoCity extends Module {
 
     private final Setting<Double> targetRange = sgGeneral.add(new DoubleSetting.Builder()
         .name("目标范围")
-        .description("玩家成为目标的半径。")
+        .description("玩家被目标的半径。")
         .defaultValue(5.5)
         .min(0)
         .sliderMax(7)
@@ -44,8 +44,8 @@ public class AutoCity extends Module {
     );
 
     private final Setting<Double> breakRange = sgGeneral.add(new DoubleSetting.Builder()
-        .name("突破范围")
-        .description("要考虑的方块必须离你有多近。")
+        .name("破坏范围")
+        .description("一个方块必须多靠近你才能被考虑。")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -53,7 +53,7 @@ public class AutoCity extends Module {
     );
 
     private final Setting<SwitchMode> switchMode = sgGeneral.add(new EnumSetting.Builder<SwitchMode>()
-        .name("switch-mode")
+        .name("切换模式")
         .description("如何切换到镐。")
         .defaultValue(SwitchMode.Normal)
         .build()
@@ -61,14 +61,14 @@ public class AutoCity extends Module {
 
     private final Setting<Boolean> support = sgGeneral.add(new BoolSetting.Builder()
         .name("支持")
-        .description("如果城市街区下方没有方块,它将在采矿之前放置一个方块。")
+        .description("如果城市方块下面没有方块，它会在挖掘之前放置一个。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> placeRange = sgGeneral.add(new DoubleSetting.Builder()
         .name("放置范围")
-        .description("尝试放置方块的距离有多远。")
+        .description("尝试放置方块的距离。")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -77,14 +77,14 @@ public class AutoCity extends Module {
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
-        .name("rotate")
-        .description("自动将你旋转到城市街区。")
+        .name("旋转")
+        .description("自动旋转到城市方块的方向。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> chatInfo = sgGeneral.add(new BoolSetting.Builder()
-        .name("chat-info")
+        .name("聊天信息")
         .description("模块是否应该在聊天中发送消息。")
         .defaultValue(true)
         .build()
@@ -93,29 +93,29 @@ public class AutoCity extends Module {
     // Render
 
     private final Setting<Boolean> swingHand = sgRender.add(new BoolSetting.Builder()
-        .name("swing-hand")
-        .description("是否渲染你的手摆动。")
+        .name("挥动手")
+        .description("是否渲染你的手挥动。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> renderBlock = sgRender.add(new BoolSetting.Builder()
-        .name("render-block")
-        .description("是否渲染被破坏的块。")
+        .name("渲染方块")
+        .description("是否渲染被破坏的方块。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .visible(renderBlock::get)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
+        .name("侧面颜色")
         .description("渲染的侧面颜色。")
         .defaultValue(new SettingColor(225, 0, 0, 75))
         .visible(() -> renderBlock.get() && shapeMode.get().sides())
@@ -123,7 +123,7 @@ public class AutoCity extends Module {
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line -color")
+        .name("线条颜色")
         .description("渲染的线条颜色。")
         .defaultValue(new SettingColor(225, 0, 0, 255))
         .visible(() -> renderBlock.get() && shapeMode.get().lines())
@@ -136,21 +136,21 @@ public class AutoCity extends Module {
     private float progress;
 
     public AutoCity() {
-        super(Categories.Combat, "auto-city", "自动挖掘某人脚边的方块。");
+        super(Categories.Combat, "自动城市", "自动挖掘某人脚边的方块。");
     }
 
     @Override
     public void onActivate() {
         target = TargetUtils.getPlayerTarget(targetRange.get(), SortPriority.ClosestAngle);
         if (TargetUtils.isBadTarget(target, targetRange.get())) {
-            if (chatInfo.get()) error("找不到目标,禁用。");
+            if (chatInfo.get()) error("找不到目标，禁用。");
             toggle();
             return;
         }
 
         targetPos = EntityUtils.getCityBlock(target);
         if (targetPos == null || PlayerUtils.distanceTo(targetPos) > breakRange.get()) {
-            if (chatInfo.get()) error("找不到好的阻止,禁用。");
+            if (chatInfo.get()) error("找不到好的方块，禁用。");
             toggle();
             return;
         }
@@ -164,7 +164,7 @@ public class AutoCity extends Module {
 
         pick = InvUtils.find(itemStack -> itemStack.getItem() == Items.DIAMOND_PICKAXE || itemStack.getItem() == Items.NETHERITE_PICKAXE);
         if (!pick.isHotbar()) {
-            error("未找到镐...禁用。");
+            error("找不到镐... 禁用。");
             toggle();
             return;
         }
@@ -187,7 +187,7 @@ public class AutoCity extends Module {
         }
 
         if (PlayerUtils.distanceTo(targetPos) > breakRange.get()) {
-            if (chatInfo.get()) error("找不到目标,禁用。");
+            if (chatInfo.get()) error("找不到目标，禁用。");
             toggle();
             return;
         }
@@ -195,7 +195,7 @@ public class AutoCity extends Module {
         if (progress < 1.0f) {
             pick = InvUtils.find(itemStack -> itemStack.getItem() == Items.DIAMOND_PICKAXE || itemStack.getItem() == Items.NETHERITE_PICKAXE);
             if (!pick.isHotbar()) {
-                error("未找到镐...禁用。");
+                error("找不到镐... 禁用。");
                 toggle();
                 return;
             }

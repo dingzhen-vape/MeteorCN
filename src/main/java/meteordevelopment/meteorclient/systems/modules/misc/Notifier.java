@@ -36,36 +36,36 @@ import java.util.*;
 import static meteordevelopment.meteorclient.utils.player.ChatUtils.formatCoords;
 
 public class Notifier extends Module {
-    private final SettingGroup sgTotemPops = settings.createGroup("图腾弹出");
+    private final SettingGroup sgTotemPops = settings.createGroup("托特姆爆炸");
     private final SettingGroup sgVisualRange = settings.createGroup("视觉范围");
     private final SettingGroup sgPearl = settings.createGroup("珍珠");
 
     // Totem Pops
 
     private final Setting<Boolean> totemPops = sgTotemPops.add(new BoolSetting.Builder()
-        .name("图腾弹出")
-        .description("当玩家弹出图腾时通知您。")
+        .name("托特姆爆炸")
+        .description("当一个玩家爆炸一个托特姆时通知你。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> totemsIgnoreOwn = sgTotemPops.add(new BoolSetting.Builder()
-        .name("ignore-own")
-        .description("忽略你自己的图腾弹出。")
+        .name("忽略自己")
+        .description("忽略你自己的托特姆爆炸。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> totemsIgnoreFriends = sgTotemPops.add(new BoolSetting.Builder()
-        .name("忽略-friends")
-        .description("忽略朋友图腾弹出。")
+        .name("忽略朋友")
+        .description("忽略朋友的托特姆爆炸。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> totemsIgnoreOthers = sgTotemPops.add(new BoolSetting.Builder()
-        .name("ignore-others")
-        .description("忽略其他玩家图腾弹出。")
+        .name("忽略其他人")
+        .description("忽略其他玩家的托特姆爆炸。")
         .defaultValue(false)
         .build()
     );
@@ -74,13 +74,13 @@ public class Notifier extends Module {
 
     private final Setting<Boolean> visualRange = sgVisualRange.add(new BoolSetting.Builder()
         .name("视觉范围")
-        .description("当实体进入渲染距离时通知您。")
+        .description("当一个实体进入你的渲染距离时通知你。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Event> event = sgVisualRange.add(new EnumSetting.Builder<Event>()
-        .name("event")
+        .name("事件")
         .description("何时记录实体。")
         .defaultValue(Event.Both)
         .build()
@@ -88,13 +88,13 @@ public class Notifier extends Module {
 
     private final Setting<Set<EntityType<?>>> entities = sgVisualRange.add(new EntityTypeListSetting.Builder()
         .name("实体")
-        .description("要通知哪些实体。")
+        .description("要通知的实体。")
         .defaultValue(EntityType.PLAYER)
         .build()
     );
 
     private final Setting<Boolean> visualRangeIgnoreFriends = sgVisualRange.add(new BoolSetting.Builder()
-        .name("忽略-friends")
+        .name("忽略朋友")
         .description("忽略朋友。")
         .defaultValue(true)
         .build()
@@ -108,8 +108,8 @@ public class Notifier extends Module {
     );
 
     private final Setting<Boolean> visualMakeSound = sgVisualRange.add(new BoolSetting.Builder()
-        .name(" sound")
-        .description("进入/离开时发出声音效果")
+        .name("声音")
+        .description("在进入/离开时发出声音效果")
         .defaultValue(true)
         .build()
     );
@@ -117,22 +117,22 @@ public class Notifier extends Module {
     // Pearl
 
     private final Setting<Boolean> pearl = sgPearl.add(new BoolSetting.Builder()
-        .name("pearl")
-        .description("当玩家使用末影珍珠传送时通知你。")
+        .name("珍珠")
+        .description("当一个玩家使用末影珍珠传送时通知你。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> pearlIgnoreOwn = sgPearl.add(new BoolSetting.Builder()
-        .name("ignore-own")
+        .name("忽略自己")
         .description("忽略你自己的珍珠。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pearlIgnoreFriends = sgPearl.add(new BoolSetting.Builder()
-        .name("忽略-friends")
-        .description("忽略朋友珍珠。")
+        .name("忽略朋友")
+        .description("忽略朋友的珍珠。")
         .defaultValue(false)
         .build()
     );
@@ -144,7 +144,7 @@ public class Notifier extends Module {
     private final Random random = new Random();
 
     public Notifier() {
-        super(Categories.Misc, "notifier", "通知您不同的事件。");
+        super(Categories.Misc, "通知器", "通知你不同的事件。");
     }
 
     // Visual Range
@@ -154,16 +154,16 @@ public class Notifier extends Module {
         if (!event.entity.getUuid().equals(mc.player.getUuid()) && entities.get().contains(event.entity.getType()) && visualRange.get() && this.event.get() != Event.Despawn) {
             if (event.entity instanceof PlayerEntity) {
                 if ((!visualRangeIgnoreFriends.get() || !Friends.get().isFriend(((PlayerEntity) event.entity))) && (!visualRangeIgnoreFakes.get() || !(event.entity instanceof FakePlayerEntity))) {
-                    ChatUtils.sendMsg(event.entity.getId() + 100, Formatting.GRAY, "(highlight)%s(默认)已进入您的可视范围！", event.entity.getEntityName());
+                    ChatUtils.sendMsg(event.entity.getId() + 100, Formatting.GRAY, "(高亮)%s(默认)进入了你的视觉范围！", event.entity.getEntityName());
 
                     if (visualMakeSound.get())
                         mc.world.playSoundFromEntity(mc.player, mc.player, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 3.0F, 1.0F);
                 }
             } else {
                 MutableText text = Text.literal(event.entity.getType().getName().getString()).formatted(Formatting.WHITE);
-                text.append(Text.literal(" 已在 ").formatted(Formatting.GRAY));
+                text.append(Text.literal(" 在 ").formatted(Formatting.GRAY));
                 text.append(formatCoords(event.entity.getPos()));
-                text.append(Text.literal("消失,").formatted(Formatting.GRAY));
+                text.append(Text.literal(" 出现。").formatted(Formatting.GRAY));
                 info(text);
             }
         }
@@ -180,16 +180,16 @@ public class Notifier extends Module {
         if (!event.entity.getUuid().equals(mc.player.getUuid()) && entities.get().contains(event.entity.getType()) && visualRange.get() && this.event.get() != Event.Spawn) {
             if (event.entity instanceof PlayerEntity) {
                 if ((!visualRangeIgnoreFriends.get() || !Friends.get().isFriend(((PlayerEntity) event.entity))) && (!visualRangeIgnoreFakes.get() || !(event.entity instanceof FakePlayerEntity))) {
-                    ChatUtils.sendMsg(event.entity.getId() + 100, Formatting.GRAY, "(突出显示)%s(默认)已离开您的可视范围！", event.entity.getEntityName());
+                    ChatUtils.sendMsg(event.entity.getId() + 100, Formatting.GRAY, "(高亮)%s(默认)离开了你的视觉范围！", event.entity.getEntityName());
 
                     if (visualMakeSound.get())
                         mc.world.playSoundFromEntity(mc.player, mc.player, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 3.0F, 1.0F);
                 }
             } else {
                 MutableText text = Text.literal(event.entity.getType().getName().getString()).formatted(Formatting.WHITE);
-                text.append(Text.literal(" 已在 ").formatted(Formatting.GRAY));
+                text.append(Text.literal(" 在 ").formatted(Formatting.GRAY));
                 text.append(formatCoords(event.entity.getPos()));
-                text.append(Text.literal("消失,").formatted(Formatting.GRAY));
+                text.append(Text.literal(" 出现。").formatted(Formatting.GRAY));
                 info(text);
             }
         }
@@ -202,7 +202,7 @@ public class Notifier extends Module {
                 if (pearl.getOwner() != null && pearl.getOwner() instanceof PlayerEntity p) {
                     double d = pearlStartPosMap.get(i).distanceTo(e.getPos());
                     if ((!Friends.get().isFriend(p) || !pearlIgnoreFriends.get()) && (!p.equals(mc.player) || !pearlIgnoreOwn.get())) {
-                        info("(突出显示)%s(默认)珍珠落在 %d,%d,%d(突出显示) (%.1fm 已离开,已行驶 %.1fm)(默认)。", pearl.getOwner().getEntityName(), pearl.getBlockPos().getX(), pearl.getBlockPos().getY(), pearl.getBlockPos().getZ(), pearl.distanceTo(mc.player), d);
+                        info("(高亮)%s的(默认)珍珠落在了 %d, %d, %d (高亮)(%.1fm 远, 旅行了 %.1fm)(默认)。", pearl.getOwner().getEntityName(), pearl.getBlockPos().getX(), pearl.getBlockPos().getY(), pearl.getBlockPos().getZ(), pearl.distanceTo(mc.player), d);
                     }
                 }
                 pearlStartPosMap.remove(i);
@@ -246,7 +246,7 @@ public class Notifier extends Module {
             int pops = totemPopMap.getOrDefault(entity.getUuid(), 0);
             totemPopMap.put(entity.getUuid(), ++pops);
 
-            ChatUtils.sendMsg(getChatId(entity), Formatting.GRAY, "(突出显示)%s(默认)弹出(突出显示)%d(默认)%s。", entity.getEntityName(), pops, pops == 1 ? "图腾" : "图腾");
+            ChatUtils.sendMsg(getChatId(entity), Formatting.GRAY, "(高亮)%s (默认)爆炸了 (高亮)%d (默认)%s。", entity.getEntityName(), pops, pops == 1 ? "托特姆" : "托特姆");
         }
     }
 
@@ -260,7 +260,7 @@ public class Notifier extends Module {
                 if (player.deathTime > 0 || player.getHealth() <= 0) {
                     int pops = totemPopMap.removeInt(player.getUuid());
 
-                    ChatUtils.sendMsg(getChatId(player), Formatting.GRAY, "(高亮)%s(默认)弹出后死亡(高亮)%d(默认)%s。", player.getEntityName(), pops, pops == 1 ? "图腾" : "图腾");
+                    ChatUtils.sendMsg(getChatId(player), Formatting.GRAY, "(高亮)%s (默认)在爆炸了 (高亮)%d (默认)%s后死亡。", player.getEntityName(), pops, pops == 1 ? "托特姆" : "托特姆");
                     chatIdMap.removeInt(player.getUuid());
                 }
             }

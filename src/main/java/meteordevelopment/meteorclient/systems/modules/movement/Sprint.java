@@ -22,8 +22,8 @@ public class Sprint extends Module {
     }
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("speed-mode")
-        .description("什么模式的冲刺。")
+        .name("速度模式")
+        .description("奔跑的模式。")
         .defaultValue(Mode.Strict)
         .build()
     );

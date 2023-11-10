@@ -24,14 +24,14 @@ public class EntityControl extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> maxJump = sgGeneral.add(new BoolSetting.Builder()
-        .name("max-jump")
-        .description("将跳跃功率设置为最大。")
+        .name("最大跳跃")
+        .description("将跳跃力设为最大.")
         .defaultValue(true)
         .build()
     );
 
     public EntityControl() {
-        super(Categories.Movement, "entity-control", "让您无需鞍座即可控制可骑乘实体。");
+        super(Categories.Movement, "实体控制", "让你在没有鞍的情况下控制可骑乘的实体.");
     }
 
     @Override

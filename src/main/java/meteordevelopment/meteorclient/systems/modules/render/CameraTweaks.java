@@ -22,14 +22,14 @@ public class CameraTweaks extends Module {
 
     private final Setting<Boolean> clip = sgGeneral.add(new BoolSetting.Builder()
         .name("剪辑")
-        .description("允许摄像机剪辑穿过块。")
+        .description("允许相机穿透方块。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> cameraDistance = sgGeneral.add(new DoubleSetting.Builder()
-        .name("摄像机距离")
-        .description("第三人称摄像机距玩家的距离。")
+        .name("相机距离")
+        .description("第三人称相机距离玩家的距离。")
         .defaultValue(4)
         .min(0)
         .onChanged(value -> distance = value)
@@ -40,14 +40,14 @@ public class CameraTweaks extends Module {
 
     private final Setting<Boolean> scrollingEnabled = sgScrolling.add(new BoolSetting.Builder()
         .name("滚动启用")
-        .description("允许您滚动以更改相机距离。")
+        .description("允许你滚动来改变相机距离。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> scrollSensitivity = sgScrolling.add(new DoubleSetting.Builder()
-        .name("scroll-sensitivity")
-        .description("更改相机距离时滚动灵敏度。0 禁用。")
+        .name("滚动灵敏度")
+        .description("改变相机距离时的滚动灵敏度。0为禁用。")
         .visible(scrollingEnabled::get)
         .defaultValue(1)
         .min(0)
@@ -55,8 +55,8 @@ public class CameraTweaks extends Module {
     );
 
     private final Setting<Keybind> scrollKeybind = sgScrolling.add(new KeybindSetting.Builder()
-        .name("scroll-keybind")
-        .description("需要按下按键绑定才能滚动。")
+        .name("滚动按键绑定")
+        .description("需要按下一个按键才能使滚动生效。")
         .visible(scrollingEnabled::get)
         .defaultValue(Keybind.none())
         .build()
@@ -65,7 +65,7 @@ public class CameraTweaks extends Module {
     public double distance;
 
     public CameraTweaks() {
-        super(Categories.Render, "camera-tweaks", "允许修改第三人称相机。");
+        super(Categories.Render, "相机微调", "允许修改第三人称相机。");
     }
 
     @Override

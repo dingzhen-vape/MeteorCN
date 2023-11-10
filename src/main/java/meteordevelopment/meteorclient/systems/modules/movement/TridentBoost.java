@@ -16,8 +16,8 @@ public class TridentBoost extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> multiplier = sgGeneral.add(new DoubleSetting.Builder()
-        .name("boost")
-        .description("使用激流时你的速度会乘以多少。")
+        .name("提升")
+        .description("使用激流时你的速度乘以多少。")
         .defaultValue(2)
         .min(0.1)
         .sliderMin(1)
@@ -25,14 +25,14 @@ public class TridentBoost extends Module {
     );
 
     private final Setting<Boolean> allowOutOfWater = sgGeneral.add(new BoolSetting.Builder()
-        .name("out-of-water")
-        .description("激流是否应该在水中工作")
+        .name("离水")
+        .description("是否让激流在水外也能工作")
         .defaultValue(true)
         .build()
     );
 
     public TridentBoost() {
-        super(Categories.Movement, "trident-boost", "使用激流时增强你三叉戟。");
+        super(Categories.Movement, "三叉戟提升", "使用三叉戟的激流时提升你。");
     }
 
     public double getMultiplier() {

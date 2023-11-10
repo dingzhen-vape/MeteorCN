@@ -17,15 +17,18 @@ public class Fullbright extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("用于全亮的模式。")
+        .name("模式")
+        .description("Fullbright的使用模式。")
         .defaultValue(Mode.Gamma)
+        .onChanged(mode -> {
+            if (mc.worldRenderer != null && isActive()) mc.worldRenderer.reload();
+        })
         .build()
     );
 
     public final Setting<LightType> lightType = sgGeneral.add(new EnumSetting.Builder<LightType>()
-        .name("light-type")
-        .description("哪种类型的光用于亮度模式。")
+        .name("光源类型")
+        .description("Luminance模式使用的光源类型。")
         .defaultValue(LightType.BLOCK)
         .visible(() -> mode.get() == Mode.Luminance)
         .onChanged(integer -> {
@@ -35,8 +38,8 @@ public class Fullbright extends Module {
     );
 
     private final Setting<Integer> minimumLightLevel = sgGeneral.add(new IntSetting.Builder()
-        .name("minimum-light-level")
-        .description("使用亮度模式时的最小光级别.")
+        .name("最低光照等级")
+        .description("使用Luminance模式时的最低光照等级。")
         .visible(() -> mode.get() == Mode.Luminance)
         .defaultValue(8)
         .range(0, 15)
@@ -48,7 +51,7 @@ public class Fullbright extends Module {
     );
 
     public Fullbright() {
-        super(Categories.Render, "fullbright", "照亮你的世界！");
+        super(Categories.Render, "全亮", "照亮你的世界！");
     }
 
     @Override

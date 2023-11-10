@@ -22,15 +22,15 @@ public class Velocity extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<Boolean> knockback = sgGeneral.add(new BoolSetting.Builder()
-        .name("knockback")
-        .description("修改你从攻击中获得的击退量。")
+        .name("击退")
+        .description("修改你受到攻击的击退量。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Double> knockbackHorizontal = sgGeneral.add(new DoubleSetting.Builder()
-        .name("knockback-horizo​​ntal")
-        .description("你将承受多少水平击退。")
+        .name("击退水平")
+        .description("你将受到的水平击退量。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(knockback::get)
@@ -38,8 +38,8 @@ public class Velocity extends Module {
     );
 
     public final Setting<Double> knockbackVertical = sgGeneral.add(new DoubleSetting.Builder()
-        .name("knockback-vertical")
-        .description("你将承受多少垂直击退。 ")
+        .name("击退垂直")
+        .description("你将受到的垂直击退量。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(knockback::get)
@@ -48,14 +48,14 @@ public class Velocity extends Module {
 
     public final Setting<Boolean> explosions = sgGeneral.add(new BoolSetting.Builder()
         .name("爆炸")
-        .description("修改爆炸的击退。")
+        .description("修改你受到爆炸的击退量。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Double> explosionsHorizontal = sgGeneral.add(new DoubleSetting.Builder()
         .name("爆炸水平")
-        .description("你将从水平爆炸中获得多少速度。")
+        .description("你将受到的水平爆炸击退量。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(explosions::get)
@@ -63,8 +63,8 @@ public class Velocity extends Module {
     );
 
     public final Setting<Double> explosionsVertical = sgGeneral.add(new DoubleSetting.Builder()
-        .name("爆炸-垂直")
-        .description("你将从垂直爆炸中获得多少速度.")
+        .name("爆炸垂直")
+        .description("你将受到的垂直爆炸击退量。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(explosions::get)
@@ -73,14 +73,14 @@ public class Velocity extends Module {
 
     public final Setting<Boolean> liquids = sgGeneral.add(new BoolSetting.Builder()
         .name("液体")
-        .description("修改流动液体推动您的量。")
+        .description("修改你被流动液体推动的量。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Double> liquidsHorizontal = sgGeneral.add(new DoubleSetting.Builder()
         .name("液体水平")
-        .description("您将从液体水平方向获得多少速度。")
+        .description("你将受到的水平液体击退量。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(liquids::get)
@@ -89,7 +89,7 @@ public class Velocity extends Module {
 
     public final Setting<Double> liquidsVertical = sgGeneral.add(new DoubleSetting.Builder()
         .name("液体垂直")
-        .description("您将获得多少速度将从液体中垂直获取。")
+        .description("你将受到的垂直液体击退量。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(liquids::get)
@@ -97,14 +97,14 @@ public class Velocity extends Module {
     );
 
     public final Setting<Boolean> entityPush = sgGeneral.add(new BoolSetting.Builder()
-        .name("entity-push")
-        .description("修改实体推动你的量。")
+        .name("实体推动")
+        .description("修改你被实体推动的量。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Double> entityPushAmount = sgGeneral.add(new DoubleSetting.Builder()
-        .name("entity-push-amount")
+        .name("实体推动量")
         .description("你将被推动的量。")
         .defaultValue(0)
         .sliderMax(1)
@@ -113,8 +113,8 @@ public class Velocity extends Module {
     );
 
     public final Setting<Boolean> blocks = sgGeneral.add(new BoolSetting.Builder()
-        .name("blocks")
-        .description("防止你不会被推出方块。")
+        .name("方块")
+        .description("防止你被推出方块。")
         .defaultValue(true)
         .build()
     );
@@ -127,7 +127,7 @@ public class Velocity extends Module {
     );
 
     public Velocity() {
-        super(Categories.Movement, "速度", "防止你被外力移动。");
+        super(Categories.Movement, "速度", "防止你被外部力量移动。");
     }
 
     @EventHandler

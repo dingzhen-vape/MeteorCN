@@ -15,8 +15,8 @@ public class Timer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> multiplier = sgGeneral.add(new DoubleSetting.Builder()
-        .name("multiplier")
-        .description("计时器乘数数量。")
+        .name("倍数")
+        .description("计时器的倍数。")
         .defaultValue(1)
         .min(0.1)
         .sliderMin(0.1)
@@ -27,7 +27,7 @@ public class Timer extends Module {
     private double override = 1;
 
     public Timer() {
-        super(Categories.World, "timer", "改变游戏中所有内容的速度。");
+        super(Categories.World, "计时器", "改变你游戏中所有事物的速度。");
     }
 
     public double getMultiplier() {

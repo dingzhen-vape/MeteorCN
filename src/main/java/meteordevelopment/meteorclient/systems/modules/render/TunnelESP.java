@@ -41,37 +41,37 @@ public class TunnelESP extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> height = sgGeneral.add(new DoubleSetting.Builder()
-        .name("height")
-        .description("渲染框的高度。")
+        .name("高度")
+        .description("渲染的盒子的高度。")
         .defaultValue(0.1)
         .sliderMax(2)
         .build()
     );
 
     private final Setting<Boolean> connected = sgGeneral.add(new BoolSetting.Builder()
-        .name("connected")
-        .description("是否应连接相邻的孔。")
+        .name("连接")
+        .description("是否连接相邻的洞。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgGeneral.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgGeneral.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("侧面颜色。")
+        .name("边缘颜色")
+        .description("边缘的颜色。")
         .defaultValue(new SettingColor(255, 175, 25, 50))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgGeneral.add(new ColorSetting.Builder()
         .name("线条颜色")
-        .description("线条颜色。")
+        .description("线条的颜色。")
         .defaultValue(new SettingColor(255, 175, 25, 255))
         .build()
     );
@@ -79,7 +79,7 @@ public class TunnelESP extends Module {
     private final Long2ObjectMap<TChunk> chunks = new Long2ObjectOpenHashMap<>();
 
     public TunnelESP() {
-        super(Categories.Render, "隧道-esp", "突出显示隧道。");
+        super(Categories.Render, "隧道esp", "高亮隧道。");
     }
 
     @Override

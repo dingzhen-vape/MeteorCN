@@ -26,14 +26,14 @@ public class ClickTP extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> maxDistance = sgGeneral.add(new DoubleSetting.Builder()
-        .name("max-distance")
-        .description("你可以传送的最大距离。")
+        .name("最大距离")
+        .description("你可以传送的最大距离.")
         .defaultValue(5)
         .build()
     );
 
     public ClickTP() {
-        super(Categories.Movement, "click-tp", "将你传送到你点击的方块。");
+        super(Categories.Movement, "点击传送", "将你传送到你点击的方块上.");
     }
 
     @EventHandler

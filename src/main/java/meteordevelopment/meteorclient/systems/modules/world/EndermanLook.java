@@ -22,14 +22,14 @@ public class EndermanLook extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> lookMode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("look-mode")
+        .name("看向模式")
         .description("这个模块的行为方式。")
         .defaultValue(Mode.Away)
         .build()
     );
 
     public EndermanLook() {
-        super(Categories.World, "enderman-look", "要么查看所有 Endermen,要么阻止你查看 Endermen。");
+        super(Categories.World, "末影人看向", "要么看向所有的末影人，要么防止你看向末影人。");
     }
 
     @EventHandler

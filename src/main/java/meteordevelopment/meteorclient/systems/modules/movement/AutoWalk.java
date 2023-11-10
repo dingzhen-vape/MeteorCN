@@ -22,8 +22,8 @@ public class AutoWalk extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("行走模式。")
+        .name("模式")
+        .description("行走模式.")
         .defaultValue(Mode.Smart)
         .onChanged(mode1 -> {
             if (isActive()) {
@@ -40,8 +40,8 @@ public class AutoWalk extends Module {
     );
 
     private final Setting<Direction> direction = sgGeneral.add(new EnumSetting.Builder<Direction>()
-        .name("simple-direction")
-        .description("简单模式行走的方向。")
+        .name("简单方向")
+        .description("简单模式中行走的方向.")
         .defaultValue(Direction.Forwards)
         .onChanged(direction1 -> {
             if (isActive()) unpress();
@@ -51,7 +51,7 @@ public class AutoWalk extends Module {
     );
 
     public AutoWalk() {
-        super(Categories.Movement, "自动行走", "自动向前行走。");
+        super(Categories.Movement, "自动行走", "自动向前行走.");
     }
 
     @Override
@@ -76,7 +76,7 @@ public class AutoWalk extends Module {
             }
         } else {
             if (PathManagers.get() instanceof NopPathManager) {
-                info("智能模式需要男中音");
+                info("智能模式需要Baritone");
                 toggle();
             }
         }

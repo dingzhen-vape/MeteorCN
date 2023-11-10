@@ -40,12 +40,12 @@ import java.util.List;
 
 public class HoleFiller extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgSmart = settings.createGroup("Smart");
-    private final SettingGroup sgRender = settings.createGroup("Render");
+    private final SettingGroup sgSmart = settings.createGroup("智能");
+    private final SettingGroup sgRender = settings.createGroup("渲染");
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("blocks")
-        .description("哪些块可用于填充孔。")
+        .name("方块")
+        .description("用来填充洞的方块。")
         .defaultValue(
             Blocks.OBSIDIAN,
             Blocks.CRYING_OBSIDIAN,
@@ -57,8 +57,8 @@ public class HoleFiller extends Module {
     );
 
     private final Setting<Integer> searchRadius = sgGeneral.add(new IntSetting.Builder()
-        .name("search-radius")
-        .description("搜索孔的水平半径。")
+        .name("搜索半径")
+        .description("水平方向上搜索洞的半径。")
         .defaultValue(5)
         .min(0)
         .sliderMax(6)
@@ -66,8 +66,8 @@ public class HoleFiller extends Module {
     );
 
     private final Setting<Double> placeRange = sgGeneral.add(new DoubleSetting.Builder()
-        .name("place-range")
-        .description("您可以在离玩家多远的地方放置方块。")
+        .name("放置范围")
+        .description("离玩家多远可以放置方块。")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -75,30 +75,30 @@ public class HoleFiller extends Module {
     );
 
     private final Setting<Boolean> doubles = sgGeneral.add(new BoolSetting.Builder()
-        .name("双打")
-        .description("填充双孔。")
+        .name("双重")
+        .description("填充双洞。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("自动旋转到正在填充的孔。")
+        .description("自动朝向要填充的洞旋转。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> placeDelay = sgGeneral.add(new IntSetting.Builder()
         .name("放置延迟")
-        .description("刻度延迟放置之间。")
+        .description("放置之间的刻数延迟。")
         .defaultValue(1)
         .min(0)
         .build()
     );
 
     private final Setting<Integer> blocksPerTick = sgGeneral.add(new IntSetting.Builder()
-        .name("每刻度块")
-        .description("一次刻度放置多少块。")
+        .name("每刻放置")
+        .description("每刻放置的方块数量。")
         .defaultValue(3)
         .min(1)
         .build()
@@ -108,14 +108,14 @@ public class HoleFiller extends Module {
 
     private final Setting<Boolean> smart = sgSmart.add(new BoolSetting.Builder()
         .name("智能")
-        .description("在填充孔之前考虑更多因素。")
+        .description("在填充洞之前考虑更多的因素。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Keybind> forceFill = sgSmart.add(new KeybindSetting.Builder()
         .name("强制填充")
-        .description("填充无论目标检查如何,你周围的所有洞。")
+        .description("无视目标检测，填充你周围的所有洞。")
         .defaultValue(Keybind.none())
         .visible(smart::get)
         .build()
@@ -123,7 +123,7 @@ public class HoleFiller extends Module {
 
     private final Setting<Boolean> predict = sgSmart.add(new BoolSetting.Builder()
         .name("预测")
-        .description("预测目标移动以考虑 ping。")
+        .description("预测目标的移动，考虑延迟。")
         .defaultValue(true)
         .visible(smart::get)
         .build()
@@ -131,7 +131,7 @@ public class HoleFiller extends Module {
 
     private final Setting<Boolean> ignoreSafe = sgSmart.add(new BoolSetting.Builder()
         .name("忽略安全")
-        .description("忽略安全洞中的玩家。")
+        .description("忽略在安全洞里的玩家。")
         .defaultValue(true)
         .visible(smart::get)
         .build()
@@ -139,7 +139,7 @@ public class HoleFiller extends Module {
 
     private final Setting<Boolean> onlyMoving = sgSmart.add(new BoolSetting.Builder()
         .name("仅移动")
-        .description("忽略玩家如果他们站着不动。")
+        .description("忽略站着不动的玩家。")
         .defaultValue(true)
         .visible(smart::get)
         .build()
@@ -147,7 +147,7 @@ public class HoleFiller extends Module {
 
     private final Setting<Double> targetRange = sgSmart.add(new DoubleSetting.Builder()
         .name("目标范围")
-        .description("到目标球员有多远。")
+        .description("目标玩家的距离。")
         .defaultValue(7)
         .min(0)
         .sliderMin(1)
@@ -157,8 +157,8 @@ public class HoleFiller extends Module {
     );
 
     private final Setting<Double> feetRange = sgSmart.add(new DoubleSetting.Builder()
-        .name("英尺范围")
-        .description("球员的脚必须离洞多远才能填满它。")
+        .name("脚部范围")
+        .description("玩家的脚离洞多远才填充。")
         .defaultValue(1.5)
         .min(0)
         .sliderMax(4)
@@ -169,7 +169,7 @@ public class HoleFiller extends Module {
     // Render
 
     private final Setting<Boolean> swing = sgRender.add(new BoolSetting.Builder()
-        .name("挥杆")
+        .name("挥动")
         .description("放置时挥动玩家的手。")
         .defaultValue(true)
         .build()
@@ -177,46 +177,46 @@ public class HoleFiller extends Module {
 
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
         .name("渲染")
-        .description("渲染将放置块的覆盖层。")
+        .description("渲染一个覆盖层显示方块将被放置的位置。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .visible(render::get)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("目标块渲染的侧面颜色。")
+        .name("边缘颜色")
+        .description("目标方块渲染的边缘颜色。")
         .defaultValue(new SettingColor(197, 137, 232, 10))
         .visible(() -> render.get() && shapeMode.get().sides())
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("目标块渲染的线条颜色。")
+        .name("线条颜色")
+        .description("目标方块渲染的线条颜色。")
         .defaultValue(new SettingColor(197, 137, 232))
         .visible(() -> render.get() && shapeMode.get().lines())
         .build()
     );
 
     private final Setting<SettingColor> nextSideColor = sgRender.add(new ColorSetting.Builder()
-        .name("next-side-color")
-        .description("下一个要放置的块的侧面颜色。")
+        .name("下一个边缘颜色")
+        .description("下一个要放置的方块的边缘颜色。")
         .defaultValue(new SettingColor(227, 196, 245, 10))
         .visible(() -> render.get() && shapeMode.get().sides())
         .build()
     );
 
     private final Setting<SettingColor> nextLineColor = sgRender.add(new ColorSetting.Builder()
-        .name("next-line-color")
-        .description("下一个要放置的块的线条颜色。")
+        .name("下一个线条颜色")
+        .description("下一个要放置的方块的线条颜色。")
         .defaultValue(new SettingColor(227, 196, 245))
         .visible(() -> render.get() && shapeMode.get().lines())
         .build()
@@ -230,7 +230,7 @@ public class HoleFiller extends Module {
     private int timer;
 
     public HoleFiller() {
-        super(Categories.Combat, "hole-filler", "用指定的块填充孔。");
+        super(Categories.Combat, "洞填充", "用指定的方块填充洞。");
     }
 
     @Override

@@ -22,15 +22,15 @@ public class Breadcrumbs extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<SettingColor> color = sgGeneral.add(new ColorSetting.Builder()
-        .name("color")
-        .description("面包屑路径的颜色。")
+        .name("颜色")
+        .description("Breadcrumbs轨迹的颜色。")
         .defaultValue(new SettingColor(225, 25, 25))
         .build()
     );
 
     private final Setting<Integer> maxSections = sgGeneral.add(new IntSetting.Builder()
-        .name("max-sections")
-        .description("最大节数。")
+        .name("最大段数")
+        .description("最大的段数。")
         .defaultValue(1000)
         .min(1)
         .sliderRange(1, 5000)
@@ -38,8 +38,8 @@ public class Breadcrumbs extends Module {
     );
 
     private final Setting<Double> sectionLength = sgGeneral.add(new DoubleSetting.Builder()
-        .name("section-length")
-        .description("以块为单位的节长度。")
+        .name("每段长度")
+        .description("每段的长度，以方块为单位。")
         .defaultValue(0.5)
         .min(0)
         .sliderMax(1)
@@ -54,7 +54,7 @@ public class Breadcrumbs extends Module {
     private DimensionType lastDimension;
 
     public Breadcrumbs() {
-        super(Categories.Render, "breadcrumbs", "在您走过的地方后面显示一条踪迹。");
+        super(Categories.Render, "足迹", "显示你走过的地方的轨迹。");
     }
 
     @Override

@@ -43,7 +43,7 @@ public class PacketMine extends Module {
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
         .name("延迟")
-        .description("以刻度为单位的挖掘块之间的延迟。")
+        .description("挖掘方块之间的延迟，以刻为单位。")
         .defaultValue(1)
         .min(0)
         .build()
@@ -51,21 +51,21 @@ public class PacketMine extends Module {
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("挖掘时向服务器发送旋转数据包。")
+        .description("挖掘时向服务器发送旋转包。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> autoSwitch = sgGeneral.add(new BoolSetting.Builder()
         .name("自动切换")
-        .description("当挖掘时自动切换到最佳工具。块已准备好立即开采。")
+        .description("当方块可以瞬间被挖掘时，自动切换到最佳工具。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> notOnUse = sgGeneral.add(new BoolSetting.Builder()
-        .name("未使用")
-        .description("如果您正在使用某个项目,则不会自动切换。")
+        .name("不在使用时")
+        .description("如果你正在使用一个物品，不会自动切换。")
         .defaultValue(true)
         .visible(autoSwitch::get)
         .build()
@@ -75,42 +75,42 @@ public class PacketMine extends Module {
 
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
         .name("渲染")
-        .description("是否渲染正在开采的块。")
+        .description("是否渲染正在挖掘的方块。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> readySideColor = sgRender.add(new ColorSetting.Builder()
-        .name("ready-side-color")
-        .description("可破坏的方块侧面的颜色。")
+        .name("准备好的侧面颜色")
+        .description("可以被破坏的方块的侧面颜色。")
         .defaultValue(new SettingColor(0, 204, 0, 10))
         .build()
     );
 
     private final Setting<SettingColor> readyLineColor = sgRender.add(new ColorSetting.Builder()
-        .name("ready-line-color")
+        .name("准备好的线条颜色")
         .description("可以被破坏的方块的线条颜色。")
         .defaultValue(new SettingColor(0, 204, 0, 255))
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("正在渲染的方块侧面的颜色。")
+        .name("侧面颜色")
+        .description("渲染的方块的侧面颜色。")
         .defaultValue(new SettingColor(204, 0, 0, 10))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("正在渲染的方块的线条颜色渲染。")
+        .name("线条颜色")
+        .description("渲染的方块的线条颜色。")
         .defaultValue(new SettingColor(204, 0, 0, 255))
         .build()
     );
@@ -121,7 +121,7 @@ public class PacketMine extends Module {
     private boolean swapped, shouldUpdateSlot;
 
     public PacketMine() {
-        super(Categories.World, "packet-mine", "将数据包发送到采矿块,而不使用采矿动画。");
+        super(Categories.World, "包挖掘", "发送包来挖掘方块，无需挖掘动画。");
     }
 
     @Override

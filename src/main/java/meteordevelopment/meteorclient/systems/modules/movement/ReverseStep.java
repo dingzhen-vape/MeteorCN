@@ -20,23 +20,23 @@ public class ReverseStep extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> fallSpeed = sgGeneral.add(new DoubleSetting.Builder()
-        .name("fall-speed")
-        .description("每秒跌落的速度。")
+        .name("下落速度")
+        .description("以每秒多少方块的速度下落。")
         .defaultValue(3)
         .min(0)
         .build()
     );
 
     private final Setting<Double> fallDistance = sgGeneral.add(new DoubleSetting.Builder()
-        .name("fall-distance")
-        .description("此设置将激活的最大跌落距离。")
+        .name("下落距离")
+        .description("这个设置会在最大下落距离时激活。")
         .defaultValue(3)
         .min(0)
         .build()
     );
 
     public ReverseStep() {
-        super(Categories.Movement, "reverse-step", "允许你跌倒以更快的速度阻止。");
+        super(Categories.Movement, "反向步行", "让你以更快的速度下落方块。");
     }
 
     @EventHandler

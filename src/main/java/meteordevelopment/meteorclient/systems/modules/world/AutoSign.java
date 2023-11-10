@@ -19,7 +19,7 @@ public class AutoSign extends Module {
     private String[] text;
 
     public AutoSign() {
-        super(Categories.World, "auto-sign", "自动写入符号。将使用第一个符号的文本。");
+        super(Categories.World, "自动签名", "自动写牌子。第一个牌子的文字将被使用。");
     }
 
     @Override

@@ -27,42 +27,42 @@ public class HandView extends Module {
 
     private final Setting<Boolean> followRotations = sgGeneral.add(new BoolSetting.Builder()
         .name("服务器旋转")
-        .description("让你的手跟随服务器端旋转。")
+        .description("使你的手跟随你的服务器端旋转。")
         .defaultValue(false)
         .build()
     );
 
     public final Setting<Boolean> oldAnimations = sgGeneral.add(new BoolSetting.Builder()
         .name("旧动画")
-        .description("将点击动画更改为1.8")
+        .description("将击打动画改为类似1.8的动画")
         .defaultValue(false)
         .build()
     );
 
     public final Setting<Boolean> showSwapping = sgGeneral.add(new BoolSetting.Builder()
-        .name("显示-swapping")
-        .description("是否显示物品交换动画")
+        .name("显示切换")
+        .description("是否显示物品切换动画。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> disableFoodAnimation = sgGeneral.add(new BoolSetting.Builder()
-        .name("disable-eating-animation")
-        .description("禁用吃动画。如果它超出屏幕,则可能是理想的。")
+        .name("禁用进食动画")
+        .description("禁用进食动画。如果它会超出屏幕，可能是你想要的。")
         .defaultValue(false)
         .build()
     );
 
     public final Setting<SwingMode> swingMode = sgGeneral.add(new EnumSetting.Builder<SwingMode>()
-        .name("swing-mode")
-        .description("修改你的客户端和服务器的手部摆动。")
+        .name("挥动模式")
+        .description("修改你的客户端和服务器端的手挥动。")
         .defaultValue(SwingMode.None)
         .build()
     );
 
     public final Setting<Integer> swingSpeed = sgGeneral.add(new IntSetting.Builder()
-        .name("swing-speed")
-        .description("你的手部摆动速度。")
+        .name("挥动速度")
+        .description("你的手的挥动速度。")
         .defaultValue(6)
         .range(0, 20)
         .sliderMax(20)
@@ -70,8 +70,8 @@ public class HandView extends Module {
     );
 
     public final Setting<Double> mainSwing = sgGeneral.add(new DoubleSetting.Builder()
-        .name("main-hand-progress")
-        .description("你的主手的挥杆进度。")
+        .name("主手进度")
+        .description("你主手的挥动进度。")
         .defaultValue(0)
         .range(0, 1)
         .sliderMax(1)
@@ -80,7 +80,7 @@ public class HandView extends Module {
 
     public final Setting<Double> offSwing = sgGeneral.add(new DoubleSetting.Builder()
         .name("副手进度")
-        .description("你的副手的挥杆进度。")
+        .description("你副手的挥动进度。")
         .defaultValue(0)
         .range(0, 1)
         .sliderMax(1)
@@ -90,8 +90,8 @@ public class HandView extends Module {
     // Main Hand
 
     private final Setting<Vector3d> scaleMain = sgMainHand.add(new Vector3dSetting.Builder()
-        .name("缩放")
-        .description("你的主手的挥杆进度。")
+        .name("比例")
+        .description("你主手的比例。")
         .defaultValue(1, 1, 1)
         .sliderMax(5)
         .decimalPlaces(1)
@@ -100,7 +100,7 @@ public class HandView extends Module {
 
     private final Setting<Vector3d> posMain = sgMainHand.add(new Vector3dSetting.Builder()
         .name("位置")
-        .description("你的主手的位置。")
+        .description("你主手的位置。")
         .defaultValue(0, 0, 0)
         .sliderRange(-3, 3)
         .decimalPlaces(1)
@@ -109,7 +109,7 @@ public class HandView extends Module {
 
     private final Setting<Vector3d> rotMain = sgMainHand.add(new Vector3dSetting.Builder()
         .name("旋转")
-        .description("你的主手的旋转。")
+        .description("你主手的旋转。")
         .defaultValue(0, 0, 0)
         .sliderRange(-180, 180)
         .decimalPlaces(0)
@@ -119,8 +119,8 @@ public class HandView extends Module {
     // Offhand
 
     private final Setting<Vector3d> scaleOff = sgOffHand.add(new Vector3dSetting.Builder()
-        .name("缩放")
-        .description("你的副手的比例。")
+        .name("比例")
+        .description("你副手的比例。")
         .defaultValue(1, 1, 1)
         .sliderMax(5)
         .decimalPlaces(1)
@@ -129,7 +129,7 @@ public class HandView extends Module {
 
     private final Setting<Vector3d> posOff = sgOffHand.add(new Vector3dSetting.Builder()
         .name("位置")
-        .description("你的副手的位置。")
+        .description("你副手的位置。")
         .defaultValue(0, 0, 0)
         .sliderRange(-3, 3)
         .decimalPlaces(1)
@@ -138,7 +138,7 @@ public class HandView extends Module {
 
     private final Setting<Vector3d> rotOff = sgOffHand.add(new Vector3dSetting.Builder()
         .name("旋转")
-        .description("副手的旋转。")
+        .description("你副手的旋转。")
         .defaultValue(0, 0, 0)
         .sliderRange(-180, 180)
         .decimalPlaces(0)
@@ -148,7 +148,7 @@ public class HandView extends Module {
     // Arm
 
     private final Setting<Vector3d> scaleArm = sgArm.add(new Vector3dSetting.Builder()
-        .name("缩放")
+        .name("比例")
         .defaultValue(1, 1, 1)
         .sliderMax(5)
         .decimalPlaces(1)
@@ -172,7 +172,7 @@ public class HandView extends Module {
     );
 
     public HandView() {
-        super(Categories.Render, "手视图", "改变物品在你手中的渲染方式。");
+        super(Categories.Render, "手部视图", "改变你手中物品的渲染方式。");
     }
 
     @EventHandler

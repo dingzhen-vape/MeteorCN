@@ -22,14 +22,14 @@ public class Rotation extends Module {
 
     private final Setting<LockMode> yawLockMode = sgYaw.add(new EnumSetting.Builder<LockMode>()
         .name("偏航锁定模式")
-        .description("锁定偏航的方式。")
+        .description("锁定你的偏航的方式。")
         .defaultValue(LockMode.Simple)
         .build()
     );
 
     private final Setting<Double> yawAngle = sgYaw.add(new DoubleSetting.Builder()
         .name("偏航角度")
-        .description("偏航角度(以度为单位)。")
+        .description("偏航角度，以度为单位。")
         .defaultValue(0)
         .sliderMax(360)
         .max(360)
@@ -41,14 +41,14 @@ public class Rotation extends Module {
 
     private final Setting<LockMode> pitchLockMode = sgPitch.add(new EnumSetting.Builder<LockMode>()
         .name("俯仰锁定模式")
-        .description("锁定俯仰的方式。")
+        .description("锁定你的俯仰的方式。")
         .defaultValue(LockMode.Simple)
         .build()
     );
 
     private final Setting<Double> pitchAngle = sgPitch.add(new DoubleSetting.Builder()
-        .name("俯仰角")
-        .description("以度为单位的俯仰角。")
+        .name("俯仰角度")
+        .description("俯仰角度，以度为单位。")
         .defaultValue(0)
         .range(-90, 90)
         .sliderRange(-90, 90)

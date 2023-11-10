@@ -36,46 +36,46 @@ public class MiddleClickExtra extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("中键单击时使用哪个项目。")
+        .name("模式")
+        .description("当你中键点击时，使用哪种物品。")
         .defaultValue(Mode.Pearl)
         .build()
     );
 
     private final Setting<Boolean> message = sgGeneral.add(new BoolSetting.Builder()
-        .name("message")
-        .description("当您将玩家添加为好友时向他们发送消息。")
+        .name("信息")
+        .description("当你把他们加为好友时，给玩家发送一条信息。")
         .defaultValue(false)
         .visible(() -> mode.get() == Mode.AddFriend)
         .build()
     );
 
     private final Setting<Boolean> quickSwap = sgGeneral.add(new BoolSetting.Builder()
-        .name("quick-swap")
-        .description("允许您使用项目通过模拟热键按键在您的库存中。可能会被反作弊标记。")
+        .name("快速切换")
+        .description("允许你通过模拟快捷栏按键来使用你物品栏里的物品。可能会被反作弊检测。")
         .defaultValue(false)
         .visible(() -> mode.get() != Mode.AddFriend)
         .build()
     );
 
     private final Setting<Boolean> swapBack = sgGeneral.add(new BoolSetting.Builder()
-        .name("swap-back")
-        .description("当您使用完某个物品后交换回原来的位置。")
+        .name("切换回去")
+        .description("当你使用完一个物品时，切换回你原来的位置。")
         .defaultValue(false)
         .visible(() -> mode.get() != Mode.AddFriend && !quickSwap.get())
         .build()
     );
 
     private final Setting<Boolean> notify = sgGeneral.add(new BoolSetting.Builder()
-        .name("notify")
-        .description("当您的快捷栏中没有指定的物品时通知您。")
+        .name("通知")
+        .description("当你在你的快捷栏里没有指定的物品时，通知你。")
         .defaultValue(true)
         .visible(() -> mode.get() != Mode.AddFriend)
         .build()
     );
 
     public MiddleClickExtra() {
-        super(Categories.Player, "中键单击额外", "中键单击时执行各种操作。");
+        super(Categories.Player, "中键额外", "当你中键点击时，执行各种动作。");
     }
 
     private boolean isUsing;
@@ -98,11 +98,11 @@ public class MiddleClickExtra extends Module {
 
             if (!Friends.get().isFriend(player)) {
                 Friends.get().add(new Friend(player));
-                info("已将 %s 添加到好友", player.getEntityName());
-                if (message.get()) ChatUtils.sendPlayerMsg("/msg " + player.getEntityName() + "我刚刚在 Meteor 上加了你为好友。");
+                info("添加 %s 为好友", player.getEntityName());
+                if (message.get()) ChatUtils.sendPlayerMsg("/msg " + player.getEntityName() + " 我刚刚在Meteor上加了你为好友。");
             } else {
                 Friends.get().remove(Friends.get().get(player));
-                info("从好友中删除了 %s", player.getEntityName());
+                info("移除 %s 为好友", player.getEntityName());
             }
 
             return;
@@ -110,7 +110,7 @@ public class MiddleClickExtra extends Module {
 
         FindItemResult result = InvUtils.find(mode.get().item);
         if (!result.found() || !result.isHotbar() && !quickSwap.get()) {
-            if (notify.get()) warning("无法找到指定的项目。");
+            if (notify.get()) warning("找不到指定的物品。");
             return;
         }
 

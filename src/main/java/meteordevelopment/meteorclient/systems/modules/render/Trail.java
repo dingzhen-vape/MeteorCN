@@ -37,7 +37,7 @@ public class Trail extends Module {
     );
 
     public Trail() {
-        super(Categories.Render, "轨迹", "在玩家身后渲染可定制的轨迹。");
+        super(Categories.Render, "拖尾", "在你的玩家后面渲染一个可自定义的拖尾。");
     }
 
     @EventHandler

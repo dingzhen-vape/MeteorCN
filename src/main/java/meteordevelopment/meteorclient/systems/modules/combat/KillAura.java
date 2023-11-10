@@ -56,49 +56,49 @@ public class KillAura extends Module {
 
     private final Setting<Weapon> weapon = sgGeneral.add(new EnumSetting.Builder<Weapon>()
         .name("武器")
-        .description("仅当指定武器在你手中时才攻击实体。")
+        .description("只在手持指定的武器时攻击实体。")
         .defaultValue(Weapon.Both)
         .build()
     );
 
     private final Setting<RotationMode> rotation = sgGeneral.add(new EnumSetting.Builder<RotationMode>()
         .name("旋转")
-        .description("确定何时应该向目标旋转。")
+        .description("决定何时朝向目标旋转。")
         .defaultValue(RotationMode.Always)
         .build()
     );
 
     private final Setting<Boolean> autoSwitch = sgGeneral.add(new BoolSetting.Builder()
         .name("自动切换")
-        .description("攻击目标时切换到您选择的武器。")
+        .description("攻击目标时切换到你选择的武器。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> onlyOnClick = sgGeneral.add(new BoolSetting.Builder()
-        .name("仅单击时")
-        .description("仅在按住左键单击时攻击。")
+        .name("仅点击")
+        .description("只在按住左键时攻击。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> onlyOnLook = sgGeneral.add(new BoolSetting.Builder()
-        .name("仅查看")
-        .description("仅在查看实体时攻击。")
+        .name("仅注视")
+        .description("只在注视实体时攻击。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pauseOnCombat = sgGeneral.add(new BoolSetting.Builder()
-        .name("暂停男中音")
-        .description("暂时冻结男中音直到你完成对实体的攻击。")
+        .name("暂停巴音")
+        .description("暂时冻结巴音直到你攻击完实体。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShieldMode> shieldMode = sgGeneral.add(new EnumSetting.Builder<ShieldMode>()
         .name("盾牌模式")
-        .description("将尝试使用斧头打破目标护盾。")
+        .description("会尝试用斧头破坏目标的盾牌。")
         .defaultValue(ShieldMode.Break)
         .visible(() -> autoSwitch.get() && weapon.get() != Weapon.Axe)
         .build()
@@ -108,7 +108,7 @@ public class KillAura extends Module {
 
     private final Setting<Set<EntityType<?>>> entities = sgTargeting.add(new EntityTypeListSetting.Builder()
         .name("实体")
-        .description("要攻击的实体。 ")
+        .description("要攻击的实体。")
         .onlyAttackable()
         .defaultValue(EntityType.PLAYER)
         .build()
@@ -116,14 +116,14 @@ public class KillAura extends Module {
 
     private final Setting<SortPriority> priority = sgTargeting.add(new EnumSetting.Builder<SortPriority>()
         .name("优先级")
-        .description("如何过滤范围内的目标。")
+        .description("如何筛选范围内的目标。")
         .defaultValue(SortPriority.ClosestAngle)
         .build()
     );
 
     private final Setting<Integer> maxTargets = sgTargeting.add(new IntSetting.Builder()
         .name("最大目标")
-        .description("一次瞄准多少个实体。")
+        .description("一次可以目标的实体数量。")
         .defaultValue(1)
         .min(1)
         .sliderRange(1, 5)
@@ -133,7 +133,7 @@ public class KillAura extends Module {
 
     private final Setting<Double> range = sgTargeting.add(new DoubleSetting.Builder()
         .name("范围")
-        .description("实体攻击它的最大范围。")
+        .description("可以攻击实体的最大距离。")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -141,8 +141,8 @@ public class KillAura extends Module {
     );
 
     private final Setting<Double> wallsRange = sgTargeting.add(new DoubleSetting.Builder()
-        .name("walls-range")
-        .description("实体可以穿过墙壁攻击的最大范围。")
+        .name("穿墙范围")
+        .description("可以穿墙攻击实体的最大距离。")
         .defaultValue(3.5)
         .min(0)
         .sliderMax(6)
@@ -150,29 +150,29 @@ public class KillAura extends Module {
     );
 
     private final Setting<Boolean> ignoreBabies = sgTargeting.add(new BoolSetting.Builder()
-        .name("ignore-babies")
-        .description("是否攻击实体的婴儿变体。")
+        .name("忽略幼体")
+        .description("是否攻击实体的幼体变种。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> ignoreNamed = sgTargeting.add(new BoolSetting.Builder()
-        .name("ignore-named")
-        .description("是否不攻击有名字的小怪。")
+        .name("忽略命名")
+        .description("是否攻击有名字的生物。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> ignorePassive = sgTargeting.add(new BoolSetting.Builder()
-        .name("忽略-被动")
-        .description("只会攻击有时以你为目标的被动小怪。")
+        .name("忽略被动")
+        .description("只在有时被动的生物攻击你时攻击它们。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> ignoreTamed = sgTargeting.add(new BoolSetting.Builder()
         .name("忽略驯服")
-        .description("将避免攻击你驯服的小怪。")
+        .description("会避免攻击你驯服的生物。")
         .defaultValue(false)
         .build()
     );
@@ -180,43 +180,43 @@ public class KillAura extends Module {
     // Timing
 
     private final Setting<Boolean> pauseOnLag = sgTiming.add(new BoolSetting.Builder()
-        .name("暂停- on-lag")
-        .description("如果服务器滞后则暂停。")
+        .name("暂停卡顿")
+        .description("服务器卡顿时暂停。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> pauseOnUse = sgTiming.add(new BoolSetting.Builder()
-        .name("pause-on-use")
+        .name("暂停使用")
         .description("使用物品时不攻击。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pauseOnCA = sgTiming.add(new BoolSetting.Builder()
-        .name("pause-on-CA")
-        .description("CA 放置时不攻击.")
+        .name("暂停CA")
+        .description("CA放置时不攻击。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> tpsSync = sgTiming.add(new BoolSetting.Builder()
-        .name("TPS-sync")
-        .description("尝试将攻击延迟与服务器的 TPS 同步。")
+        .name("TPS同步")
+        .description("尝试将攻击延迟与服务器的TPS同步。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> customDelay = sgTiming.add(new BoolSetting.Builder()
-        .name("custom-delay")
-        .description("使用自定义延迟而不是普通冷却时间。")
+        .name("自定义延迟")
+        .description("使用自定义的延迟而不是原版的冷却。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> hitDelay = sgTiming.add(new IntSetting.Builder()
-        .name("hit-delay")
-        .description("多快你在滴答声中击中了实体。")
+        .name("攻击延迟")
+        .description("以刻为单位的攻击实体的速度。")
         .defaultValue(11)
         .min(0)
         .sliderMax(60)
@@ -225,8 +225,8 @@ public class KillAura extends Module {
     );
 
     private final Setting<Integer> switchDelay = sgTiming.add(new IntSetting.Builder()
-        .name("switch-delay")
-        .description("切换热键槽后击中实体之前需要等待多少滴答声。")
+        .name("切换延迟")
+        .description("切换快捷栏槽位后攻击实体前等待的刻数。")
         .defaultValue(0)
         .min(0)
         .sliderMax(10)
@@ -239,7 +239,7 @@ public class KillAura extends Module {
     private boolean wasPathing = false;
 
     public KillAura() {
-        super(Categories.Combat, "kill-aura", "攻击你周围的指定实体。");
+        super(Categories.Combat, "杀戮光环", "攻击你周围的指定实体。");
     }
 
     @Override

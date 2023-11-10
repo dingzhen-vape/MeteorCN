@@ -26,21 +26,21 @@ public class AutoMend extends Module {
 
     private final Setting<List<Item>> blacklist = sgGeneral.add(new ItemListSetting.Builder()
         .name("黑名单")
-        .description("项目黑名单。")
+        .description("物品黑名单。")
         .filter(Item::isDamageable)
         .build()
     );
 
     private final Setting<Boolean> force = sgGeneral.add(new BoolSetting.Builder()
         .name("强制")
-        .description("即使存在其他不可修复的项目也立即替换项目。")
+        .description("即使副手中有其他不可修复的物品，也替换副手中的物品。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> autoDisable = sgGeneral.add(new BoolSetting.Builder()
-        .name("自动禁用")
-        .description("当没有更多项目需要修复时自动禁用.")
+        .name("自动关闭")
+        .description("当没有更多要修复的物品时自动关闭。")
         .defaultValue(true)
         .build()
     );
@@ -48,7 +48,7 @@ public class AutoMend extends Module {
     private boolean didMove;
 
     public AutoMend() {
-        super(Categories.Player, "自动修复", "完全修复后自动用修复替换副手中的物品。");
+        super(Categories.Player, "自动修复", "当完全修复时，自动用有经验修补附魔的物品替换副手中的物品。");
     }
 
     @Override
@@ -64,7 +64,7 @@ public class AutoMend extends Module {
 
         if (slot == -1) {
             if (autoDisable.get()) {
-                info("修复所有物品,禁用");
+                info("修复了所有物品，关闭中");
 
                 if (didMove) {
                     int emptySlot = getEmptySlot();

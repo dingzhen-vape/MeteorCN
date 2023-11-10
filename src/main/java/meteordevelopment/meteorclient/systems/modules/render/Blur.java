@@ -22,7 +22,7 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 
 public class Blur extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgScreens = settings.createGroup("屏幕");
+    private final SettingGroup sgScreens = settings.createGroup("Screens");
 
     // Strength-Levels from https://github.com/jonaburg/picom/blob/a8445684fe18946604848efb73ace9457b29bf80/src/backend/backend_common.c#L372
     private final IntDoubleImmutablePair[] strengths = new IntDoubleImmutablePair[]{
@@ -51,7 +51,7 @@ public class Blur extends Module {
     // General
     private final Setting<Integer> strength = sgGeneral.add(new IntSetting.Builder()
         .name("强度")
-        .description("模糊应该有多强。")
+        .description("模糊的强度。")
         .defaultValue(5)
         .min(1)
         .max(20)
@@ -60,8 +60,8 @@ public class Blur extends Module {
     );
 
     private final Setting<Integer> fadeTime = sgGeneral.add(new IntSetting.Builder()
-        .name("淡入淡出时间")
-        .description("淡入淡出将持续多长时间(以毫秒为单位)。")
+        .name("出入时间")
+        .description("淡入淡出的持续时间，以毫秒为单位。")
         .defaultValue(100)
         .min(0)
         .sliderMax(500)
@@ -71,28 +71,28 @@ public class Blur extends Module {
     // Screens
 
     private final Setting<Boolean> meteor = sgScreens.add(new BoolSetting.Builder()
-        .name("meteor")
-        .description("将模糊应用于 Meteor 屏幕。")
+        .name("彗星")
+        .description("对Meteor的屏幕应用模糊。")
         .defaultValue(true)
         .build());
 
     private final Setting<Boolean> inventories = sgScreens.add(new BoolSetting.Builder()
-        .name("inventories")
-        .description("对库存屏幕应用模糊。")
+        .name("背包")
+        .description("对物品栏的屏幕应用模糊。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> chat = sgScreens.add(new BoolSetting.Builder()
-        .name("聊天")
+        .name("聊天栏")
         .description("在聊天时应用模糊。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> other = sgScreens.add(new BoolSetting.Builder()
-        .name("other")
-        .description("对所有其他屏幕类型应用模糊。")
+        .name("其他")
+        .description("对所有其他类型的屏幕应用模糊。")
         .defaultValue(true)
         .build()
     );
@@ -104,7 +104,7 @@ public class Blur extends Module {
     private long fadeEndAt;
 
     public Blur() {
-        super(Categories.Render, "blur", "在聊天时模糊背景GUI 屏幕。");
+        super(Categories.Render, "高斯模糊", "在GUI屏幕中模糊背景。");
 
         // The listeners need to run even when the module is not enabled
         MeteorClient.EVENT_BUS.subscribe(new ConsumerListener<>(WindowResizedEvent.class, event -> {
@@ -210,7 +210,7 @@ public class Blur extends Module {
         shader.bind();
         GL.bindTexture(sourceText);
         shader.set("uTexture", 0);
-        shader.set(" uHalfTexelSize", .5 / targetFbo.width, .5 / targetFbo.height);
+        shader.set("uHalfTexelSize", .5 / targetFbo.width, .5 / targetFbo.height);
         shader.set("uOffset", offset);
         PostProcessRenderer.render();
     }

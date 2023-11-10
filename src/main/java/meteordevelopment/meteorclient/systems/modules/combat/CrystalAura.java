@@ -57,18 +57,18 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class CrystalAura extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgSwitch = settings.createGroup("Switch");
-    private final SettingGroup sgPlace = settings.createGroup("Place");
-    private final SettingGroup sgFacePlace = settings.createGroup("Face Place");
-    private final SettingGroup sgBreak = settings.createGroup("Break");
-    private final SettingGroup sgPause = settings.createGroup("Pause");
-    private final SettingGroup sgRender = settings.createGroup("Render");
+    private final SettingGroup sgSwitch = settings.createGroup("切换");
+    private final SettingGroup sgPlace = settings.createGroup("放置");
+    private final SettingGroup sgFacePlace = settings.createGroup("面向放置");
+    private final SettingGroup sgBreak = settings.createGroup("破坏");
+    private final SettingGroup sgPause = settings.createGroup("暂停");
+    private final SettingGroup sgRender = settings.createGroup("渲染");
 
     // General
 
     private final Setting<Double> targetRange = sgGeneral.add(new DoubleSetting.Builder()
-        .name("target-range")
-        .description("Range in which to target players.")
+        .name("目标范围")
+        .description("目标玩家的范围。")
         .defaultValue(10)
         .min(0)
         .sliderMax(16)
@@ -76,31 +76,31 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Boolean> predictMovement = sgGeneral.add(new BoolSetting.Builder()
-        .name("predict-movement")
-        .description("Predicts target movement.")
+        .name("预测移动")
+        .description("预测目标的移动。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> ignoreTerrain = sgGeneral.add(new BoolSetting.Builder()
-        .name("ignore-terrain")
-        .description("Completely ignores terrain if it can be blown up by end crystals.")
+        .name("忽略地形")
+        .description("如果地形可以被末影水晶炸毁，就完全忽略它。")
         .defaultValue(true)
         .build()
     );
 
 
     private final Setting<Double> minDamage = sgGeneral.add(new DoubleSetting.Builder()
-        .name("min-damage")
-        .description("Minimum damage the crystal needs to deal to your target.")
+        .name("最小伤害")
+        .description("水晶对目标造成的最小伤害。")
         .defaultValue(6)
         .min(0)
         .build()
     );
 
     private final Setting<Double> maxDamage = sgGeneral.add(new DoubleSetting.Builder()
-        .name("max-damage")
-        .description("Maximum damage crystals can deal to yourself.")
+        .name("最大伤害")
+        .description("水晶对自己造成的最大伤害。")
         .defaultValue(6)
         .range(0, 36)
         .sliderMax(36)
@@ -108,37 +108,37 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Boolean> antiSuicide = sgGeneral.add(new BoolSetting.Builder()
-        .name("anti-suicide")
-        .description("Will not place and break crystals if they will kill you.")
+        .name("防自杀")
+        .description("如果水晶会杀死你，就不会放置和破坏水晶。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> ignoreNakeds = sgGeneral.add(new BoolSetting.Builder()
-        .name("ignore-nakeds")
-        .description("Ignore players with no items.")
+        .name("忽略裸体")
+        .description("忽略没有物品的玩家。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
-        .name("rotate")
-        .description("Rotates server-side towards the crystals being hit/placed.")
+        .name("旋转")
+        .description("服务器端旋转到被击中/放置的水晶的方向。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<YawStepMode> yawStepMode = sgGeneral.add(new EnumSetting.Builder<YawStepMode>()
-        .name("yaw-steps-mode")
-        .description("When to run the yaw steps check.")
+        .name("偏航步骤模式")
+        .description("何时运行偏航步骤检查。")
         .defaultValue(YawStepMode.Break)
         .visible(rotate::get)
         .build()
     );
 
     private final Setting<Double> yawSteps = sgGeneral.add(new DoubleSetting.Builder()
-        .name("yaw-steps")
-        .description("Maximum number of degrees its allowed to rotate in one tick.")
+        .name("偏航步骤")
+        .description("每个刻度允许旋转的最大角度。")
         .defaultValue(180)
         .range(1, 180)
         .visible(rotate::get)
@@ -148,38 +148,38 @@ public class CrystalAura extends Module {
     // Switch
 
     private final Setting<AutoSwitchMode> autoSwitch = sgSwitch.add(new EnumSetting.Builder<AutoSwitchMode>()
-        .name("auto-switch")
-        .description("Switches to crystals in your hotbar once a target is found.")
+        .name("自动切换")
+        .description("在找到目标后切换到热键栏中的水晶。")
         .defaultValue(AutoSwitchMode.Normal)
         .build()
     );
 
     private final Setting<Integer> switchDelay = sgSwitch.add(new IntSetting.Builder()
-        .name("switch-delay")
-        .description("The delay in ticks to wait to break a crystal after switching hotbar slot.")
+        .name("切换延迟")
+        .description("切换热键槽后等待破坏水晶的刻度延迟。")
         .defaultValue(0)
         .min(0)
         .build()
     );
 
     private final Setting<Boolean> noGapSwitch = sgSwitch.add(new BoolSetting.Builder()
-        .name("no-gap-switch")
-        .description("Won't auto switch if you're holding a gapple.")
+        .name("无间隙切换")
+        .description("如果你拿着金苹果，就不会自动切换。")
         .defaultValue(true)
         .visible(() -> autoSwitch.get() == AutoSwitchMode.Normal)
         .build()
     );
 
     private final Setting<Boolean> noBowSwitch = sgSwitch.add(new BoolSetting.Builder()
-        .name("no-bow-switch")
-        .description("Won't auto switch if you're holding a bow.")
+        .name("无弓切换")
+        .description("如果你拿着弓，就不会自动切换。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> antiWeakness = sgSwitch.add(new BoolSetting.Builder()
-        .name("anti-weakness")
-        .description("Switches to tools with so you can break crystals with the weakness effect.")
+        .name("防虚弱")
+        .description("切换到工具，以便在有虚弱效果时可以破坏水晶。")
         .defaultValue(true)
         .build()
     );
@@ -187,15 +187,15 @@ public class CrystalAura extends Module {
     // Place
 
     private final Setting<Boolean> doPlace = sgPlace.add(new BoolSetting.Builder()
-        .name("place")
-        .description("If the CA should place crystals.")
+        .name("放置")
+        .description("是否应该放置水晶。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Integer> placeDelay = sgPlace.add(new IntSetting.Builder()
-        .name("place-delay")
-        .description("The delay in ticks to wait to place a crystal after it's exploded.")
+        .name("放置延迟")
+        .description("水晶爆炸后等待放置水晶的刻度延迟。")
         .defaultValue(0)
         .min(0)
         .sliderMax(20)
@@ -203,8 +203,8 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Double> placeRange = sgPlace.add(new DoubleSetting.Builder()
-        .name("place-range")
-        .description("Range in which to place crystals.")
+        .name("放置范围")
+        .description("放置水晶的范围。")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -212,8 +212,8 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Double> placeWallsRange = sgPlace.add(new DoubleSetting.Builder()
-        .name("walls-range")
-        .description("Range in which to place crystals when behind blocks.")
+        .name("墙壁范围")
+        .description("在方块后面放置水晶的范围。")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -221,22 +221,22 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Boolean> placement112 = sgPlace.add(new BoolSetting.Builder()
-        .name("1.12-placement")
-        .description("Uses 1.12 crystal placement.")
+        .name("1.12放置")
+        .description("使用1.12的水晶放置。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<SupportMode> support = sgPlace.add(new EnumSetting.Builder<SupportMode>()
-        .name("support")
-        .description("Places a support block in air if no other position have been found.")
+        .name("支持")
+        .description("如果没有找到其他位置，就在空中放置一个支持方块。")
         .defaultValue(SupportMode.Disabled)
         .build()
     );
 
     private final Setting<Integer> supportDelay = sgPlace.add(new IntSetting.Builder()
-        .name("support-delay")
-        .description("Delay in ticks after placing support block.")
+        .name("支持延迟")
+        .description("放置支持方块后的刻度延迟。")
         .defaultValue(1)
         .min(0)
         .visible(() -> support.get() != SupportMode.Disabled)
@@ -246,15 +246,15 @@ public class CrystalAura extends Module {
     // Face place
 
     private final Setting<Boolean> facePlace = sgFacePlace.add(new BoolSetting.Builder()
-        .name("face-place")
-        .description("Will face-place when target is below a certain health or armor durability threshold.")
+        .name("面向放置")
+        .description("当目标低于一定的生命值或护甲耐久度阈值时，会面向放置。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> facePlaceHealth = sgFacePlace.add(new DoubleSetting.Builder()
-        .name("face-place-health")
-        .description("The health the target has to be at to start face placing.")
+        .name("面向放置生命值")
+        .description("目标的生命值必须低于多少才能开始面向放置。")
         .defaultValue(8)
         .min(1)
         .sliderMin(1)
@@ -264,8 +264,8 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Double> facePlaceDurability = sgFacePlace.add(new DoubleSetting.Builder()
-        .name("face-place-durability")
-        .description("The durability threshold percentage to be able to face-place.")
+        .name("面向放置耐久度")
+        .description("能够面向放置的耐久度阈值百分比。")
         .defaultValue(2)
         .min(1)
         .sliderMin(1)
@@ -275,16 +275,16 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Boolean> facePlaceArmor = sgFacePlace.add(new BoolSetting.Builder()
-        .name("face-place-missing-armor")
-        .description("Automatically starts face placing when a target misses a piece of armor.")
+        .name("面向放置缺少护甲")
+        .description("当目标缺少一件护甲时，自动开始面向放置。")
         .defaultValue(false)
         .visible(facePlace::get)
         .build()
     );
 
     private final Setting<Keybind> forceFacePlace = sgFacePlace.add(new KeybindSetting.Builder()
-        .name("force-face-place")
-        .description("Starts face place when this button is pressed.")
+        .name("强制面向放置")
+        .description("按下这个按钮时开始面向放置。")
         .defaultValue(Keybind.none())
         .build()
     );
@@ -292,15 +292,15 @@ public class CrystalAura extends Module {
     // Break
 
     private final Setting<Boolean> doBreak = sgBreak.add(new BoolSetting.Builder()
-        .name("break")
-        .description("If the CA should break crystals.")
+        .name("破坏")
+        .description("是否应该破坏水晶。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Integer> breakDelay = sgBreak.add(new IntSetting.Builder()
-        .name("break-delay")
-        .description("The delay in ticks to wait to break a crystal after it's placed.")
+        .name("破坏延迟")
+        .description("放置水晶后等待破坏水晶的刻度延迟。")
         .defaultValue(0)
         .min(0)
         .sliderMax(20)
@@ -308,15 +308,15 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Boolean> smartDelay = sgBreak.add(new BoolSetting.Builder()
-        .name("smart-delay")
-        .description("Only breaks crystals when the target can receive damage.")
+        .name("智能延迟")
+        .description("只有当目标可以受到伤害时才破坏水晶。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Double> breakRange = sgBreak.add(new DoubleSetting.Builder()
-        .name("break-range")
-        .description("Range in which to break crystals.")
+        .name("破坏范围")
+        .description("破坏水晶的范围。")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -324,8 +324,8 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Double> breakWallsRange = sgBreak.add(new DoubleSetting.Builder()
-        .name("walls-range")
-        .description("Range in which to break crystals when behind blocks.")
+        .name("墙壁范围")
+        .description("在方块后面破坏水晶的范围。")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -333,15 +333,15 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Boolean> onlyBreakOwn = sgBreak.add(new BoolSetting.Builder()
-        .name("only-own")
-        .description("Only breaks own crystals.")
+        .name("只破坏自己的")
+        .description("只破坏自己的水晶。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> breakAttempts = sgBreak.add(new IntSetting.Builder()
-        .name("break-attempts")
-        .description("How many times to hit a crystal before stopping to target it.")
+        .name("破坏尝试")
+        .description("在停止目标之前，可以击中一个水晶的次数。")
         .defaultValue(2)
         .sliderMin(1)
         .sliderMax(5)
@@ -349,16 +349,16 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Integer> ticksExisted = sgBreak.add(new IntSetting.Builder()
-        .name("ticks-existed")
-        .description("Amount of ticks a crystal needs to have lived for it to be attacked by CrystalAura.")
+        .name("存在刻度")
+        .description("水晶需要存活的刻度数量，才能被水晶光环攻击。")
         .defaultValue(0)
         .min(0)
         .build()
     );
 
     private final Setting<Integer> attackFrequency = sgBreak.add(new IntSetting.Builder()
-        .name("attack-frequency")
-        .description("Maximum hits to do per second.")
+        .name("攻击频率")
+        .description("每秒可以做的最大击打次数。")
         .defaultValue(25)
         .min(1)
         .sliderRange(1, 30)
@@ -366,8 +366,8 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Boolean> fastBreak = sgBreak.add(new BoolSetting.Builder()
-        .name("fast-break")
-        .description("Ignores break delay and tries to break the crystal as soon as it's spawned in the world.")
+        .name("快速破坏")
+        .description("忽略破坏延迟，尽量在水晶出现在世界中时就破坏它。")
         .defaultValue(true)
         .build()
     );
@@ -375,36 +375,36 @@ public class CrystalAura extends Module {
     // Pause
 
     public final Setting<PauseMode> pauseOnUse = sgPause.add(new EnumSetting.Builder<PauseMode>()
-        .name("pause-on-use")
-        .description("Which processes should be paused while using an item.")
+        .name("使用时暂停")
+        .description("使用物品时应该暂停的过程。")
         .defaultValue(PauseMode.Place)
         .build()
     );
 
     public final Setting<PauseMode> pauseOnMine = sgPause.add(new EnumSetting.Builder<PauseMode>()
-        .name("pause-on-mine")
-        .description("Which processes should be paused while mining a block.")
+        .name("挖掘时暂停")
+        .description("挖掘方块时应该暂停的过程。")
         .defaultValue(PauseMode.None)
         .build()
     );
 
     private final Setting<Boolean> pauseOnLag = sgPause.add(new BoolSetting.Builder()
-        .name("pause-on-lag")
-        .description("Whether to pause if the server is not responding.")
+        .name("卡顿时暂停")
+        .description("服务器没有响应时是否暂停。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<List<Module>> pauseModules = sgPause.add(new ModuleListSetting.Builder()
-        .name("pause-modules")
-        .description("Pauses while any of the selected modules are active.")
+        .name("暂停模块")
+        .description("当选中的任何模块激活时暂停。")
         .defaultValue(BedAura.class)
         .build()
     );
 
     public final Setting<Double> pauseHealth = sgPause.add(new DoubleSetting.Builder()
-        .name("pause-health")
-        .description("Pauses when you go below a certain health.")
+        .name("暂停生命值")
+        .description("当你的生命值低于一定值时暂停。")
         .defaultValue(5)
         .range(0,36)
         .sliderRange(0,36)
@@ -414,30 +414,30 @@ public class CrystalAura extends Module {
     // Render
 
     public final Setting<SwingMode> swingMode = sgRender.add(new EnumSetting.Builder<SwingMode>()
-        .name("swing-mode")
-        .description("How to swing when placing.")
+        .name("挥动模式")
+        .description("放置时如何挥动。")
         .defaultValue(SwingMode.Both)
         .build()
     );
 
     private final Setting<RenderMode> renderMode = sgRender.add(new EnumSetting.Builder<RenderMode>()
-        .name("render-mode")
-        .description("The mode to render in.")
+        .name("渲染模式")
+        .description("渲染的模式。")
         .defaultValue(RenderMode.Normal)
         .build()
     );
 
     private final Setting<Boolean> renderPlace = sgRender.add(new BoolSetting.Builder()
-        .name("render-place")
-        .description("Renders a block overlay over the block the crystals are being placed on.")
+        .name("渲染放置")
+        .description("在水晶放置的方块上渲染一个方块覆盖。")
         .defaultValue(true)
         .visible(() -> renderMode.get() == RenderMode.Normal)
         .build()
     );
 
     private final Setting<Integer> placeRenderTime = sgRender.add(new IntSetting.Builder()
-        .name("place-time")
-        .description("How long to render placements.")
+        .name("放置时间")
+        .description("渲染放置的时间。")
         .defaultValue(10)
         .min(0)
         .sliderMax(20)
@@ -446,16 +446,16 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Boolean> renderBreak = sgRender.add(new BoolSetting.Builder()
-        .name("render-break")
-        .description("Renders a block overlay over the block the crystals are broken on.")
+        .name("渲染破坏")
+        .description("在水晶破坏的方块上渲染一个方块覆盖。")
         .defaultValue(false)
         .visible(() -> renderMode.get() == RenderMode.Normal)
         .build()
     );
 
     private final Setting<Integer> breakRenderTime = sgRender.add(new IntSetting.Builder()
-        .name("break-time")
-        .description("How long to render breaking for.")
+        .name("破坏时间")
+        .description("渲染破坏的时间。")
         .defaultValue(13)
         .min(0)
         .sliderMax(20)
@@ -464,8 +464,8 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Integer> smoothness = sgRender.add(new IntSetting.Builder()
-        .name("smoothness")
-        .description("How smoothly the render should move around.")
+        .name("平滑度")
+        .description("渲染应该如何平滑地移动。")
         .defaultValue(10)
         .min(0)
         .sliderMax(20)
@@ -474,8 +474,8 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Double> height = sgRender.add(new DoubleSetting.Builder()
-        .name("height")
-        .description("How tall the gradient should be.")
+        .name("高度")
+        .description("渐变的高度。")
         .defaultValue(0.7)
         .min(0)
         .sliderMax(1)
@@ -484,8 +484,8 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Integer> renderTime = sgRender.add(new IntSetting.Builder()
-        .name("render-time")
-        .description("How long to render placements.")
+        .name("渲染时间")
+        .description("渲染放置的时间。")
         .defaultValue(10)
         .min(0)
         .sliderMax(20)
@@ -494,48 +494,48 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("How the shapes are rendered.")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .visible(() -> renderMode.get() != RenderMode.None)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("The side color of the block overlay.")
+        .name("侧面颜色")
+        .description("方块覆盖的侧面颜色。")
         .defaultValue(new SettingColor(255, 255, 255, 45))
         .visible(() -> shapeMode.get().sides() && renderMode.get() != RenderMode.None)
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("The line color of the block overlay.")
+        .name("线条颜色")
+        .description("方块覆盖的线条颜色。")
         .defaultValue(new SettingColor(255, 255, 255))
         .visible(() -> shapeMode.get().lines() && renderMode.get() != RenderMode.None)
         .build()
     );
 
     private final Setting<Boolean> renderDamageText = sgRender.add(new BoolSetting.Builder()
-        .name("damage")
-        .description("Renders crystal damage text in the block overlay.")
+        .name("伤害")
+        .description("在方块覆盖中渲染水晶伤害文本。")
         .defaultValue(true)
         .visible(() -> renderMode.get() != RenderMode.None)
         .build()
     );
 
     private final Setting<SettingColor> damageColor = sgRender.add(new ColorSetting.Builder()
-        .name("damage-color")
-        .description("The color of the damage text.")
+        .name("伤害颜色")
+        .description("伤害文本的颜色。")
         .defaultValue(new SettingColor(255, 255, 255))
         .visible(() -> renderMode.get() != RenderMode.None && renderDamageText.get())
         .build()
     );
 
     private final Setting<Double> damageTextScale = sgRender.add(new DoubleSetting.Builder()
-        .name("damage-scale")
-        .description("How big the damage text should be.")
+        .name("伤害比例")
+        .description("伤害文本的大小。")
         .defaultValue(1.25)
         .min(1)
         .sliderMax(4)
@@ -590,7 +590,7 @@ public class CrystalAura extends Module {
     private double renderDamage;
 
     public CrystalAura() {
-        super(Categories.Combat, "crystal-aura", "Automatically places and attacks crystals.");
+        super(Categories.Combat, "水晶光环", "自动放置和攻击水晶。");
     }
 
     @Override

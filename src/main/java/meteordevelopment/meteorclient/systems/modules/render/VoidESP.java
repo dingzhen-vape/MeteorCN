@@ -37,14 +37,14 @@ public class VoidESP extends Module {
 
     private final Setting<Boolean> airOnly = sgGeneral.add(new BoolSetting.Builder()
         .name("仅空气")
-        .description("仅检查基岩中的空气块。")
+        .description("只检查基岩层的空气方块。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> horizontalRadius = sgGeneral.add(new IntSetting.Builder()
         .name("水平半径")
-        .description("搜索孔的水平半径。")
+        .description("寻找洞穴的水平半径。")
         .defaultValue(64)
         .min(0)
         .sliderMax(256)
@@ -52,8 +52,8 @@ public class VoidESP extends Module {
     );
 
     private final Setting<Integer> holeHeight = sgGeneral.add(new IntSetting.Builder()
-        .name("孔高度")
-        .description("最小孔高度要渲染。")
+        .name("洞穴高度")
+        .description("需要渲染的洞穴的最小高度。")
         .defaultValue(1)
         .min(1)
         .sliderRange(1, 5)
@@ -61,8 +61,8 @@ public class VoidESP extends Module {
     );
 
     private final Setting<Boolean> netherRoof = sgGeneral.add(new BoolSetting.Builder()
-        .name("nether-roof")
-        .description("检查下界屋顶上的孔。")
+        .name("下界屋顶")
+        .description("检查下界屋顶的洞穴。")
         .defaultValue(true)
         .build()
     );
@@ -70,22 +70,22 @@ public class VoidESP extends Module {
     // Render
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("fill-color")
-        .description("填充孔的颜色虚空。")
+        .name("填充颜色")
+        .description("填充虚空洞穴的颜色。")
         .defaultValue(new SettingColor(225, 25, 25, 50))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("绘制通向虚空的孔线的颜色。")
+        .name("线条颜色")
+        .description("画虚空洞穴的线条的颜色。")
         .defaultValue(new SettingColor(225, 25, 255))
         .build()
     );
@@ -96,7 +96,7 @@ public class VoidESP extends Module {
     private final List<Void> voidHoles = new ArrayList<>();
 
     public VoidESP() {
-        super(Categories.Render, "void-esp", "渲染通向虚空的基岩层中的孔。");
+        super(Categories.Render, "虚空ESP", "渲染通向虚空的基岩层的洞穴。");
     }
 
     @EventHandler

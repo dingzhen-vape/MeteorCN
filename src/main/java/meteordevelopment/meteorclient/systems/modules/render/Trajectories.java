@@ -40,7 +40,7 @@ public class Trajectories extends Module {
 
     private final Setting<List<Item>> items = sgGeneral.add(new ItemListSetting.Builder()
         .name("物品")
-        .description("显示轨迹的物品。")
+        .description("要显示弹道的物品。")
         .defaultValue(getDefaultItems())
         .filter(this::itemFilter)
         .build()
@@ -48,28 +48,28 @@ public class Trajectories extends Module {
 
     private final Setting<Boolean> otherPlayers = sgGeneral.add(new BoolSetting.Builder()
         .name("其他玩家")
-        .description("计算其他玩家的轨迹。")
+        .description("为其他玩家计算弹道。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> firedProjectiles = sgGeneral.add(new BoolSetting.Builder()
-        .name("发射弹丸")
-        .description("计算已发射弹丸的弹道。")
+        .name("已发射的投射物")
+        .description("为已发射的投射物计算弹道。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> accurate = sgGeneral.add(new BoolSetting.Builder()
-        .name(" Accuracy")
-        .description("是否计算更准确。")
+        .name("精确")
+        .description("是否计算更精确的弹道。")
         .defaultValue(false)
         .build()
     );
 
     public final Setting<Integer> simulationSteps = sgGeneral.add(new IntSetting.Builder()
-        .name("simulation-steps")
-        .description("模拟弹丸多少步。零表示无限制")
+        .name("模拟步数")
+        .description("模拟投射物的步数。零表示无限制")
         .defaultValue(500)
         .sliderMax(5000)
         .build()
@@ -79,21 +79,21 @@ public class Trajectories extends Module {
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
         .name("形状模式")
-        .description("如何渲染形状。")
+        .description("形状渲染的方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
         .name("侧面颜色")
-        .description("侧面颜色。")
+        .description("侧面的颜色。")
         .defaultValue(new SettingColor(255, 150, 0, 35))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
         .name("线条颜色")
-        .description("线条颜色。")
+        .description("线条的颜色。")
         .defaultValue(new SettingColor(255, 150, 0))
         .build()
     );
@@ -106,7 +106,7 @@ public class Trajectories extends Module {
     private static final double MULTISHOT_OFFSET = Math.toRadians(10); // accurate-ish offset of crossbow multishot in radians (10° degrees)
 
     public Trajectories() {
-        super(Categories.Render, "轨迹", "预测可投掷物品的轨迹。");
+        super(Categories.Render, "弹道", "预测可投掷物品的弹道。");
     }
 
     private boolean itemFilter(Item item) {

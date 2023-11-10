@@ -30,20 +30,20 @@ public class AutoWeapon extends Module {
 
     private final Setting<Integer> threshold = sgGeneral.add(new IntSetting.Builder()
         .name("阈值")
-        .description("如果非首选武器产生如此大的伤害,这将比你首选的武器更有利。")
+        .description("如果非首选武器产生的伤害达到这个值，将优先使用它而不是你的首选武器。")
         .defaultValue(4)
         .build()
     );
 
     private final Setting<Boolean> antiBreak = sgGeneral.add(new BoolSetting.Builder()
-        .name("防破坏")
-        .description("阻止你以免损坏你的武器。")
+        .name("防破")
+        .description("防止你的武器破损。")
         .defaultValue(false)
         .build()
     );
 
     public AutoWeapon() {
-        super(Categories.Combat, "自动武器", "找到在你的快捷栏中使用的最佳武器。");
+        super(Categories.Combat, "自动武器", "在你的快捷栏中找到最好的武器。");
     }
 
     @EventHandler

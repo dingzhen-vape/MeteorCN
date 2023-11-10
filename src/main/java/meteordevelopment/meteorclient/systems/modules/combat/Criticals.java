@@ -30,15 +30,15 @@ public class Criticals extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("Critics 如何发挥作用的模式。")
+        .name("模式")
+        .description("Criticals的功能方式。")
         .defaultValue(Mode.Packet)
         .build()
     );
 
     private final Setting<Boolean> ka = sgGeneral.add(new BoolSetting.Builder()
-        .name("only-killaura")
-        .description("仅在使用 Killaura 时执行暴击。")
+        .name("仅杀戮光环")
+        .description("只有在使用杀戮光环时才执行暴击。")
         .defaultValue(false)
         .build()
     );
@@ -48,7 +48,7 @@ public class Criticals extends Module {
     private boolean sendPackets;
     private int sendTimer;
     public Criticals() {
-        super(Categories.Combat, "ritics", "击中目标时执行暴击。");
+        super(Categories.Combat, "暴击", "当你击中目标时执行暴击攻击。");
     }
 
     @Override

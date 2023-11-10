@@ -18,15 +18,15 @@ public class Spider extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> speed = sgGeneral.add(new DoubleSetting.Builder()
-        .name("climb-speed")
-        .description("你上升方块的速度。")
+        .name("爬行速度")
+        .description("你上方块的速度。")
         .defaultValue(0.2)
         .min(0.0)
         .build()
     );
 
     public Spider() {
-        super(Categories.Movement, "spider", "允许你像蜘蛛一样爬墙。");
+        super(Categories.Movement, "蜘蛛", "让你像蜘蛛一样爬墙。");
     }
 
     @EventHandler

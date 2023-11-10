@@ -41,14 +41,14 @@ public class Nuker extends Module {
 
     private final Setting<Shape> shape = sgGeneral.add(new EnumSetting.Builder<Shape>()
             .name("形状")
-            .description("核武器算法的形状。")
+            .description("核爆算法的形状。")
             .defaultValue(Shape.Sphere)
             .build()
     );
 
     private final Setting<Nuker.Mode> mode = sgGeneral.add(new EnumSetting.Builder<Nuker.Mode>()
             .name("模式")
-            .description("方块被破坏的方式。")
+            .description("破坏方块的方式。")
             .defaultValue(Nuker.Mode.Flatten)
             .build()
     );
@@ -63,7 +63,7 @@ public class Nuker extends Module {
     );
 
     private final Setting<Integer> range_up = sgGeneral.add(new IntSetting.Builder()
-            .name("向上")
+            .name("上")
             .description("破坏范围。")
             .defaultValue(1)
             .min(0)
@@ -72,7 +72,7 @@ public class Nuker extends Module {
     );
 
     private final Setting<Integer> range_down = sgGeneral.add(new IntSetting.Builder()
-            .name("向下")
+            .name("下")
             .description("破坏范围。")
             .defaultValue(1)
             .min(0)
@@ -99,7 +99,7 @@ public class Nuker extends Module {
     );
 
     private final Setting<Integer> range_forward = sgGeneral.add(new IntSetting.Builder()
-            .name("前进")
+            .name("前")
             .description("破坏范围。")
             .defaultValue(1)
             .min(0)
@@ -108,7 +108,7 @@ public class Nuker extends Module {
     );
 
     private final Setting<Integer> range_back = sgGeneral.add(new IntSetting.Builder()
-            .name("back")
+            .name("后")
             .description("破坏范围。")
             .defaultValue(1)
             .min(0)
@@ -118,14 +118,14 @@ public class Nuker extends Module {
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
             .name("延迟")
-            .description("中断块之间的延迟。")
+            .description("破坏方块之间的延迟，以刻为单位。")
             .defaultValue(0)
             .build()
     );
 
     private final Setting<Integer> maxBlocksPerTick = sgGeneral.add(new IntSetting.Builder()
-            .name("max-blocks-per-tick")
-            .description("每次中断尝试中断的最大块。在即时挖掘时很有用。")
+            .name("每刻最大破坏方块数")
+            .description("每刻尝试破坏的最大方块数。在瞬间挖掘时有用。")
             .defaultValue(1)
             .min(1)
             .sliderRange(1, 6)
@@ -134,28 +134,28 @@ public class Nuker extends Module {
 
     private final Setting<Nuker.SortMode> sortMode = sgGeneral.add(new EnumSetting.Builder<Nuker.SortMode>()
             .name("排序模式")
-            .description("你想首先挖掘的块。")
+            .description("你想要先挖掘的方块。")
             .defaultValue(Nuker.SortMode.Closest)
             .build()
     );
 
     private final Setting<Boolean> swingHand = sgGeneral.add(new BoolSetting.Builder()
-            .name("摆手")
-            .description("摆手客户端。")
+            .name("挥动手臂")
+            .description("客户端挥动手臂。")
             .defaultValue(true)
             .build()
     );
 
     private final Setting<Boolean> packetMine = sgGeneral.add(new BoolSetting.Builder()
-            .name("数据包采矿")
-            .description("尝试即时挖掘所有内容一次。")
+            .name("数据包挖掘")
+            .description("尝试一次性瞬间挖掘所有方块。")
             .defaultValue(false)
             .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
             .name("旋转")
-            .description("将服务器端旋转到正在开采的区块。")
+            .description("服务器端旋转到被挖掘的方块。")
             .defaultValue(true)
             .build()
     );
@@ -171,14 +171,14 @@ public class Nuker extends Module {
 
     private final Setting<List<Block>> blacklist = sgWhitelist.add(new BlockListSetting.Builder()
             .name("黑名单")
-            .description("您不想开采的区块。")
+            .description("你不想挖掘的方块。")
             .visible(() -> listMode.get() == ListMode.Blacklist)
             .build()
     );
 
     private final Setting<List<Block>> whitelist = sgWhitelist.add(new BlockListSetting.Builder()
             .name("白名单")
-            .description("你想要挖掘的块。")
+            .description("你想挖掘的方块。")
             .visible(() -> listMode.get() == ListMode.Whitelist)
             .build()
     );
@@ -186,59 +186,59 @@ public class Nuker extends Module {
     // Rendering
 
     private final Setting<Boolean> enableRenderBounding = sgRender.add(new BoolSetting.Builder()
-            .name("bounding-box")
-            .description("启用立方体和均匀立方体的渲染边界框。")
+            .name("包围盒")
+            .description("为立方体和均匀立方体启用包围盒渲染。")
             .defaultValue(true)
             .build()
     );
 
     private final Setting<ShapeMode> shapeModeBox = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-            .name("nuke-box-mode")
-            .description("边界框的形状如何渲染。")
+            .name("核爆盒模式")
+            .description("包围盒的形状渲染方式。")
             .defaultValue(ShapeMode.Both)
             .build()
     );
 
     private final Setting<SettingColor> sideColorBox = sgRender.add(new ColorSetting.Builder()
-            .name("side-color")
-            .description("边界框的侧面颜色。")
+            .name("侧面颜色")
+            .description("包围盒的侧面颜色。")
             .defaultValue(new SettingColor(16,106,144, 100))
             .build()
     );
 
     private final Setting<SettingColor> lineColorBox = sgRender.add(new ColorSetting.Builder()
-            .name("line-color")
-            .description("边界框的线条颜色。")
+            .name("线条颜色")
+            .description("包围盒的线条颜色。")
             .defaultValue(new SettingColor(16,106,144, 255))
             .build()
     );
 
     private final Setting<Boolean> enableRenderBreaking = sgRender.add(new BoolSetting.Builder()
-            .name("broken-blocks")
-            .description("启用立方体和均匀立方体的渲染边界框。")
+            .name("破坏的方块")
+            .description("为立方体和均匀立方体启用包围盒渲染。")
             .defaultValue(true)
             .build()
     );
 
     private final Setting<ShapeMode> shapeModeBreak = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-            .name("nuke-block-mode")
-            .description("如何渲染破碎块的形状。")
+            .name("核爆方块模式")
+            .description("破坏的方块的形状渲染方式。")
             .defaultValue(ShapeMode.Both)
             .visible(enableRenderBreaking::get)
             .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-            .name("side-color")
-            .description("目标块渲染的侧面颜色。")
+            .name("侧面颜色")
+            .description("目标方块渲染的侧面颜色。")
             .defaultValue(new SettingColor(255, 0, 0, 80))
             .visible(enableRenderBreaking::get)
             .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-            .name("line-color")
-            .description("目标块渲染的线条颜色。")
+            .name("线条颜色")
+            .description("目标方块渲染的线条颜色。")
             .defaultValue(new SettingColor(255, 0, 0, 255))
             .visible(enableRenderBreaking::get)
             .build()
@@ -260,7 +260,7 @@ public class Nuker extends Module {
     int maxv = 0;
 
     public Nuker() {
-        super(Categories.World, "nuker", "打破你周围的块。");
+        super(Categories.World, "核爆", "破坏你周围的方块。");
     }
 
     @Override

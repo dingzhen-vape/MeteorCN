@@ -23,30 +23,30 @@ public class Step extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<Double> height = sgGeneral.add(new DoubleSetting.Builder()
-        .name("height")
-        .description("Step height.")
+        .name("高度")
+        .description("步高。")
         .defaultValue(1)
         .min(0)
         .build()
     );
 
     private final Setting<ActiveWhen> activeWhen = sgGeneral.add(new EnumSetting.Builder<ActiveWhen>()
-        .name("active-when")
-        .description("当你满足这些要求时,Step 被激活。")
+        .name("激活条件")
+        .description("当你满足这些条件时，步高才会激活。")
         .defaultValue(ActiveWhen.Always)
         .build()
     );
 
     private final Setting<Boolean> safeStep = sgGeneral.add(new BoolSetting.Builder()
-        .name("safe-step")
-        .description("如果你很低,不会让你走出洞健康状况良好或附近有水晶。")
+        .name("安全步高")
+        .description("如果你的生命值很低或者附近有水晶，就不会让你从洞里走出去。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> stepHealth = sgGeneral.add(new IntSetting.Builder()
-        .name("step-health")
-        .description("你无法踩到的健康状况。")
+        .name("步高生命值")
+        .description("你不能步高的生命值。")
         .defaultValue(5)
         .range(1, 36)
         .sliderRange(1, 36)
@@ -58,7 +58,7 @@ public class Step extends Module {
     private boolean prevPathManagerStep;
 
     public Step() {
-        super(Categories.Movement, "step", "允许你立即走完整个街区。");
+        super(Categories.Movement, "步高", "让你可以立刻走上整个方块。");
     }
 
     @Override

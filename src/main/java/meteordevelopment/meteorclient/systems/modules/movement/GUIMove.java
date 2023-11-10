@@ -36,15 +36,15 @@ public class GUIMove extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Screens> screens = sgGeneral.add(new EnumSetting.Builder<Screens>()
-        .name("guis")
-        .description("要进入哪个 GUI。")
+        .name("界面")
+        .description("可以在其中移动的界面.")
         .defaultValue(Screens.Inventory)
         .build()
     );
 
     private final Setting<Boolean> jump = sgGeneral.add(new BoolSetting.Builder()
-        .name("jump")
-        .description("允许您在 GUI 中跳跃。")
+        .name("跳跃")
+        .description("在界面中允许你跳跃.")
         .defaultValue(true)
         .onChanged(aBoolean -> {
             if (isActive() && !aBoolean) set(mc.options.jumpKey, false);
@@ -54,7 +54,7 @@ public class GUIMove extends Module {
 
     private final Setting<Boolean> sneak = sgGeneral.add(new BoolSetting.Builder()
         .name("潜行")
-        .description("允许您在 GUI 中潜行。")
+        .description("在界面中允许你潜行.")
         .defaultValue(true)
         .onChanged(aBoolean -> {
             if (isActive() && !aBoolean) set(mc.options.sneakKey, false);
@@ -63,8 +63,8 @@ public class GUIMove extends Module {
     );
 
     private final Setting<Boolean> sprint = sgGeneral.add(new BoolSetting.Builder()
-        .name("sprint")
-        .description("允许在 GUI 中进行冲刺。")
+        .name("冲刺")
+        .description("在界面中允许你冲刺.")
         .defaultValue(true)
         .onChanged(aBoolean -> {
             if (isActive() && !aBoolean) set(mc.options.sprintKey, false);
@@ -73,22 +73,22 @@ public class GUIMove extends Module {
     );
 
     private final Setting<Boolean> arrowsRotate = sgGeneral.add(new BoolSetting.Builder()
-        .name("arrows-rotate")
-        .description("允许您在 GUI 中使用箭头键进行旋转。")
+        .name("箭头旋转")
+        .description("在界面中允许你用箭头键旋转.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> rotateSpeed = sgGeneral.add(new DoubleSetting.Builder()
-        .name("rotate-speed")
-        .description("在 GUI 中的旋转速度。")
+        .name("旋转速度")
+        .description("在界面中的旋转速度.")
         .defaultValue(4)
         .min(0)
         .build()
     );
 
     public GUIMove() {
-        super(Categories.Movement, "gui-move ", "允许您在 GUI 中执行各种操作。");
+        super(Categories.Movement, "界面移动", "在界面中允许你执行各种动作.");
     }
 
     @Override

@@ -23,8 +23,8 @@ public class BoatFly extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> speed = sgGeneral.add(new DoubleSetting.Builder()
-        .name("speed")
-        .description("以每秒块数为单位的水平速度。")
+        .name("速度")
+        .description("水平速度，单位为每秒方块数.")
         .defaultValue(10)
         .min(0)
         .sliderMax(50)
@@ -32,8 +32,8 @@ public class BoatFly extends Module {
     );
 
     private final Setting<Double> verticalSpeed = sgGeneral.add(new DoubleSetting.Builder()
-        .name("vertical-speed")
-        .description("以每秒块数为单位的垂直速度。")
+        .name("垂直速度")
+        .description("垂直速度，单位为每秒方块数.")
         .defaultValue(6)
         .min(0)
         .sliderMax(20)
@@ -41,22 +41,22 @@ public class BoatFly extends Module {
     );
 
     private final Setting<Double> fallSpeed = sgGeneral.add(new DoubleSetting.Builder()
-        .name("fall-speed")
-        .description("你每秒下落的速度有多快。")
+        .name("下落速度")
+        .description("你下落的速度，单位为每秒方块数.")
         .defaultValue(0.1)
         .min(0)
         .build()
     );
 
     private final Setting<Boolean> cancelServerPackets = sgGeneral.add(new BoolSetting.Builder()
-        .name(" cancel-server-packets")
-        .description("取消传入的船移动数据包。")
+        .name("取消服务器数据包")
+        .description("取消进来的船只移动数据包.")
         .defaultValue(false)
         .build()
     );
 
     public BoatFly() {
-        super(Categories.Movement, "boat-fly", "将你的船变成飞机。");
+        super(Categories.Movement, "船飞", "将你的船变成飞机.");
     }
 
     @EventHandler

@@ -36,7 +36,7 @@ public class ArrowDodge extends Module {
 
     private final Setting<Double> moveSpeed = sgMovement.add(new DoubleSetting.Builder()
         .name("移动速度")
-        .description("躲避箭头时你应该多快。")
+        .description("躲避箭矢时的速度。")
         .defaultValue(1)
         .min(0.01)
         .sliderRange(0.01, 5)
@@ -44,8 +44,8 @@ public class ArrowDodge extends Module {
     );
 
     private final Setting<Double> distanceCheck = sgMovement.add(new DoubleSetting.Builder()
-        .name("距离检查")
-        .description("多远如果箭是从玩家发出的,则被认为没有击中。")
+        .name("距离检测")
+        .description("箭矢离玩家多远时被认为不会击中。")
         .defaultValue(1)
         .min(0.01)
         .sliderRange(0.01, 5)
@@ -53,36 +53,36 @@ public class ArrowDodge extends Module {
     );
 
     private final Setting<Boolean> accurate = sgGeneral.add(new BoolSetting.Builder()
-        .name("准确")
-        .description("是否计算得更准确。")
+        .name("精确")
+        .description("是否要计算更精确的。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> groundCheck = sgGeneral.add(new BoolSetting.Builder()
-        .name("ground-check")
-        .description("试图防止你摔死。")
+        .name("地面检测")
+        .description("尝试防止你坠落致死。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> allProjectiles = sgGeneral.add(new BoolSetting.Builder()
-        .name(" all-projectiles")
-        .description("躲避所有射弹,不仅仅是箭头。")
+        .name("所有投射物")
+        .description("躲避所有投射物，不仅仅是箭矢。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> ignoreOwn = sgGeneral.add(new BoolSetting.Builder()
-        .name("ignore-own")
-        .description("忽略你自己的射弹。")
+        .name("忽略自己")
+        .description("忽略你自己的投射物。")
         .defaultValue(false)
         .build()
     );
 
     public final Setting<Integer> simulationSteps = sgGeneral.add(new IntSetting.Builder()
-        .name("simulation-steps")
-        .description("模拟射弹多少步。零表示没有限制。")
+        .name("模拟步数")
+        .description("模拟投射物的步数。零表示无限制。")
         .defaultValue(500)
         .sliderMax(5000)
         .build()
@@ -104,7 +104,7 @@ public class ArrowDodge extends Module {
     private final List<Vector3d> points = new ArrayList<>();
 
     public ArrowDodge() {
-        super(Categories.Combat, "箭闪避", "尝试闪避向你袭来的箭。");
+        super(Categories.Combat, "箭矢躲避", "尝试躲避朝你飞来的箭矢。");
     }
 
     @EventHandler

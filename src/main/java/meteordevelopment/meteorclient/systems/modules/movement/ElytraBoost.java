@@ -29,15 +29,15 @@ public class ElytraBoost extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> dontConsumeFirework = sgGeneral.add(new BoolSetting.Builder()
-        .name("anti-consume")
-        .description("使用鞘翅增强时防止烟花被消耗。")
+        .name("防止消耗")
+        .description("使用鞘翅加速时防止烟花被消耗.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Integer> fireworkLevel = sgGeneral.add(new IntSetting.Builder()
-        .name("firework-duration")
-        .description("烟花的持续时间。")
+        .name("烟花持续时间")
+        .description("烟花的持续时间.")
         .defaultValue(0)
         .range(0, 255)
         .sliderMax(255)
@@ -45,15 +45,15 @@ public class ElytraBoost extends Module {
     );
 
     private final Setting<Boolean> playSound = sgGeneral.add(new BoolSetting.Builder()
-        .name("play-sound")
-        .description("在增强时播放烟花声音触发。")
+        .name("播放声音")
+        .description("当触发加速时播放烟花声音.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Keybind> keybind = sgGeneral.add(new KeybindSetting.Builder()
         .name("按键绑定")
-        .description("增强的按键绑定。")
+        .description("加速的按键绑定.")
         .action(this::boost)
         .build()
     );
@@ -61,7 +61,7 @@ public class ElytraBoost extends Module {
     private final List<FireworkRocketEntity> fireworks = new ArrayList<>();
 
     public ElytraBoost() {
-        super(Categories.Movement, "鞘翅增强", "像使用烟花一样增强你的鞘翅。");
+        super(Categories.Movement, "鞘翅加速", "使用烟花加速你的鞘翅.");
     }
 
     @Override

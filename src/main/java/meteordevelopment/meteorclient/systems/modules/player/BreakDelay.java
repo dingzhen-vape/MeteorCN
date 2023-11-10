@@ -18,8 +18,8 @@ public class BreakDelay extends Module {
     SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Integer> cooldown = sgGeneral.add(new IntSetting.Builder()
-        .name("cooldown")
-        .description("以刻度为单位的方块破坏冷却时间。")
+        .name("冷却")
+        .description("破坏方块的冷却时间，以刻为单位。")
         .defaultValue(0)
         .min(0)
         .sliderMax(5)
@@ -27,14 +27,14 @@ public class BreakDelay extends Module {
     );
 
     public final Setting<Boolean> noInstaBreak = sgGeneral.add(new BoolSetting.Builder()
-        .name("no-insta-break")
-        .description("防止您立即破坏方块。")
+        .name("无瞬间破坏")
+        .description("防止你瞬间破坏方块。")
         .defaultValue(false)
         .build()
     );
 
     public BreakDelay() {
-        super(Categories.Player, "break-delay", "更改破坏方块之间的延迟。");
+        super(Categories.Player, "破坏延迟", "改变破坏方块之间的延迟。");
     }
 
     @EventHandler()

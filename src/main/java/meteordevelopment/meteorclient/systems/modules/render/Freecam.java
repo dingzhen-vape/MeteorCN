@@ -43,8 +43,8 @@ public class Freecam extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> speed = sgGeneral.add(new DoubleSetting.Builder()
-        .name("speed")
-        .description("您在自由摄像头中的速度。")
+        .name("速度")
+        .description("在自由视角中的速度。")
         .onChanged(aDouble -> speedValue = aDouble)
         .defaultValue(1.0)
         .min(0.0)
@@ -52,8 +52,8 @@ public class Freecam extends Module {
     );
 
     private final Setting<Double> speedScrollSensitivity = sgGeneral.add(new DoubleSetting.Builder()
-        .name("speed-scroll-sensitivity")
-        .description("允许您使用滚轮更改速度值。0 禁用。")
+        .name("速度滚轮灵敏度")
+        .description("允许你用滚轮改变速度值。0为关闭。")
         .defaultValue(0)
         .min(0)
         .sliderMax(2)
@@ -61,50 +61,50 @@ public class Freecam extends Module {
     );
 
     private final Setting<Boolean> toggleOnDamage = sgGeneral.add(new BoolSetting.Builder()
-        .name("toggle-on-damage")
-        .description("当你受到伤害时禁用自由摄像头。")
+        .name("受伤时关闭")
+        .description("受伤时关闭自由视角。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> toggleOnDeath = sgGeneral.add(new BoolSetting.Builder()
-        .name("toggle-on-death")
-        .description("当你死亡时禁用自由摄像头。")
+        .name("死亡时关闭")
+        .description("死亡时关闭自由视角。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> toggleOnLog = sgGeneral.add(new BoolSetting.Builder()
-        .name("toggle-on-log")
-        .description("当您与服务器断开连接时禁用自由摄像头。")
+        .name("断开时关闭")
+        .description("从服务器断开时关闭自由视角。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> reloadChunks = sgGeneral.add(new BoolSetting.Builder()
-        .name("重新加载块")
-        .description("禁用洞穴剔除。")
+        .name("重载区块")
+        .description("关闭洞穴剔除。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> renderHands = sgGeneral.add(new BoolSetting.Builder()
-        .name("show-hands")
-        .description("是否在自由摄像头中渲染您的手。")
+        .name("显示手")
+        .description("是否在自由视角中渲染你的手。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("旋转到您正在查看的块或实体。")
+        .description("旋转到你看的方块或实体。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> staticView = sgGeneral.add(new BoolSetting.Builder()
         .name("静态")
-        .description("禁用移动视图的设置。")
+        .description("关闭移动视角的设置。")
         .defaultValue(true)
         .build()
     );
@@ -124,7 +124,7 @@ public class Freecam extends Module {
     private boolean forward, backward, right, left, up, down;
 
     public Freecam() {
-        super(Categories.Render, "freecam", "允许摄像机远离玩家。");
+        super(Categories.Render, "自由视角", "让摄像机从玩家分离。");
     }
 
     @Override
@@ -355,7 +355,7 @@ public class Freecam extends Module {
 
         if (toggleOnDamage.get()) {
             toggle();
-            info("因受到伤害而关闭。 ");
+            info("因为你受伤了，关闭中。");
         }
     }
 
@@ -372,7 +372,7 @@ public class Freecam extends Module {
             Entity entity = mc.world.getEntityById(packet.getEntityId());
             if (entity == mc.player && toggleOnDeath.get()) {
                 toggle();
-                info("由于你死了而关闭。");
+                info("因为你死了，关闭中。");
             }
         }
     }

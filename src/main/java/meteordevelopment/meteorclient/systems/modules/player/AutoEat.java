@@ -38,7 +38,7 @@ public class AutoEat extends Module {
 
     private final Setting<List<Item>> blacklist = sgGeneral.add(new ItemListSetting.Builder()
         .name("黑名单")
-        .description("哪些物品不能吃。")
+        .description("不吃的物品。")
         .defaultValue(
             Items.ENCHANTED_GOLDEN_APPLE,
             Items.GOLDEN_APPLE,
@@ -55,15 +55,15 @@ public class AutoEat extends Module {
     );
 
     private final Setting<Boolean> pauseAuras = sgGeneral.add(new BoolSetting.Builder()
-        .name("pause-auras")
-        .description("吃饭时暂停所有光环。")
+        .name("暂停光环")
+        .description("吃东西时暂停所有光环。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> pauseBaritone = sgGeneral.add(new BoolSetting.Builder()
-        .name("pause-baritone")
-        .description("吃饭时暂停男中音。")
+        .name("暂停巴里通")
+        .description("吃东西时暂停巴里通。")
         .defaultValue(true)
         .build()
     );
@@ -71,15 +71,15 @@ public class AutoEat extends Module {
     // Threshold
 
     private final Setting<ThresholdMode> thresholdMode = sgThreshold.add(new EnumSetting.Builder<ThresholdMode>()
-        .name("threshold- mode")
-        .description("触发自动进食的阈值模式。")
+        .name("阈值模式")
+        .description("触发自动吃东西的阈值模式。")
         .defaultValue(ThresholdMode.Any)
         .build()
     );
 
     private final Setting<Double> healthThreshold = sgThreshold.add(new DoubleSetting.Builder()
-        .name("health-threshold")
-        .description("您进食的健康水平。")
+        .name("生命值阈值")
+        .description("你吃东西的生命值水平。")
         .defaultValue(10)
         .range(1, 19)
         .sliderRange(1, 19)
@@ -88,8 +88,8 @@ public class AutoEat extends Module {
     );
 
     private final Setting<Integer> hungerThreshold = sgThreshold.add(new IntSetting.Builder()
-        .name("hunger-threshold")
-        .description("您进食的饥饿水平。")
+        .name("饥饿值阈值")
+        .description("你吃东西的饥饿值水平。")
         .defaultValue(16)
         .range(1, 19)
         .sliderRange(1, 19)
@@ -104,7 +104,7 @@ public class AutoEat extends Module {
     private boolean wasBaritone = false;
 
     public AutoEat() {
-        super(Categories.Player, "auto -吃", "自动吃食物。");
+        super(Categories.Player, "自动吃东西", "自动吃食物。");
     }
 
     @Override

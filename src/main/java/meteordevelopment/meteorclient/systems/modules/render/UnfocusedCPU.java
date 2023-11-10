@@ -15,8 +15,8 @@ public class UnfocusedCPU extends Module {
     private final SettingGroup sgGeneral = this.settings.getDefaultGroup();
 
     public final Setting<Integer> fps = sgGeneral.add(new IntSetting.Builder()
-        .name("target-fps")
-        .description("当窗口未聚焦时设置为限制的目标 FPS。")
+        .name("目标FPS")
+        .description("当窗口没有焦点时设置为限制的目标FPS。")
         .min(1)
         .defaultValue(1)
         .sliderRange(1, 20)
@@ -24,6 +24,6 @@ public class UnfocusedCPU extends Module {
     );
 
     public UnfocusedCPU() {
-        super(Categories.Render, "unfocused-cpu", "当 Minecraft 窗口未聚焦时限制 FPS。");
+        super(Categories.Render, "非焦点CPU", "当你的Minecraft窗口没有焦点时限制FPS。");
     }
 }

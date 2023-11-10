@@ -23,7 +23,7 @@ public class AutoReconnect extends Module {
 
     public final Setting<Double> time = sgGeneral.add(new DoubleSetting.Builder()
         .name("延迟")
-        .description("重新连接到服务器之前等待的秒数。")
+        .description("在重新连接到服务器之前等待的秒数。")
         .defaultValue(3.5)
         .min(0)
         .decimalPlaces(1)
@@ -33,7 +33,7 @@ public class AutoReconnect extends Module {
     public Pair<ServerAddress, ServerInfo> lastServerConnection;
 
     public AutoReconnect() {
-        super(Categories.Misc, "自动重新连接", "与服务器断开连接时自动重新连接。");
+        super(Categories.Misc, "自动重连", "从服务器断开连接后自动重新连接。");
         MeteorClient.EVENT_BUS.subscribe(new StaticListener());
     }
 

@@ -48,22 +48,22 @@ public class BookBot extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("要写什么样的文本。")
+        .name("模式")
+        .description("要写的文本的种类。")
         .defaultValue(Mode.Random)
         .build()
     );
 
     private final Setting<String> name = sgGeneral.add(new StringSetting.Builder()
-        .name("name")
-        .description("你想给你的书起的名字。")
+        .name("名称")
+        .description("要给你的书本的名称。")
         .defaultValue("Meteor on Crack!")
         .build()
     );
 
     private final Setting<Integer> pages = sgGeneral.add(new IntSetting.Builder()
-        .name("页面")
-        .description("每本书要写的页数book.")
+        .name("页数")
+        .description("每本书写的页数。")
         .defaultValue(50)
         .range(1, 100)
         .sliderRange(1, 100)
@@ -72,23 +72,23 @@ public class BookBot extends Module {
     );
 
     private final Setting<Boolean> onlyAscii = sgGeneral.add(new BoolSetting.Builder()
-        .name("ascii-only")
-        .description("仅使用 ASCII 字符集中的字符。")
+        .name("仅ASCII")
+        .description("只使用ASCII字符集中的字符。")
         .defaultValue(false)
         .visible(() -> mode.get() == Mode.Random)
         .build()
     );
 
     private final Setting<Boolean> count = sgGeneral.add(new BoolSetting.Builder()
-        .name("append-count")
-        .description("是否在标题后面附加书的编号。")
+        .name("附加计数")
+        .description("是否在标题后附加书本的编号。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
-        .name("delay")
-        .description("金额写书之间的延迟。")
+        .name("延迟")
+        .description("写书之间的延迟。")
         .defaultValue(20)
         .min(1)
         .sliderRange(1, 200)
@@ -102,7 +102,7 @@ public class BookBot extends Module {
     private Random random;
 
     public BookBot() {
-        super(Categories.Misc, "book-bot", "自动写入书本。");
+        super(Categories.Misc, "书本机器人", "自动在书本中写字。");
 
         if (!file.exists()) {
             file = null;
@@ -122,7 +122,7 @@ public class BookBot extends Module {
 
         WButton selectFile = list.add(theme.button("选择文件")).widget();
 
-        WLabel fileName = list.add(theme.label((file != null && file.exists()) ? file.getName() : "未选择文件。")).widget();
+        WLabel fileName = list.add(theme.label((file != null && file.exists()) ? file.getName() : "没有选择文件。")).widget();
 
         selectFile.action = () -> {
             String path = TinyFileDialogs.tinyfd_openFileDialog(
@@ -145,7 +145,7 @@ public class BookBot extends Module {
     @Override
     public void onActivate() {
         if ((file == null || !file.exists()) && mode.get() == Mode.File) {
-            info("未选择文件,请在 GUI 中选择文件。");
+            info("没有选择文件，请在GUI中选择一个文件。");
             toggle();
             return;
         }
@@ -195,7 +195,7 @@ public class BookBot extends Module {
         } else if (mode.get() == Mode.File) {
             // Ignore if somehow the file got deleted
             if ((file == null || !file.exists()) && mode.get() == Mode.File) {
-                info("未选择文件,请在 GUI 中选择文件。");
+                info("没有选择文件，请在GUI中选择一个文件。");
                 toggle();
                 return;
             }
@@ -203,8 +203,8 @@ public class BookBot extends Module {
             // Handle the file being empty
             if (file.length() == 0) {
                 MutableText message = Text.literal("");
-                message.append(Text.literal("bookbot 文件为空！").formatted(Formatting.RED));
-                message.append(Text.literal("点击此处编辑。")
+                message.append(Text.literal("书本机器人的文件是空的！").formatted(Formatting.RED));
+                message.append(Text.literal("点击这里编辑它。")
                     .setStyle(Style.EMPTY
                             .withFormatting(Formatting.UNDERLINE, Formatting.RED)
                             .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath()))
@@ -279,7 +279,7 @@ public class BookBot extends Module {
 
         // Get the title with count
         String title = name.get();
-        if (count.get() && bookCount != 0) title += "#" + bookCount;
+        if (count.get() && bookCount != 0) title += " #" + bookCount;
 
         // Write data to book
         mc.player.getMainHandStack().setSubNbt("标题", NbtString.of(title));
@@ -288,7 +288,7 @@ public class BookBot extends Module {
         // Write pages NBT
         NbtList pageNbt = new NbtList();
         pages.stream().map(NbtString::of).forEach(pageNbt::add);
-        if (!pages.isEmpty()) mc.player.getMainHandStack().setSubNbt("页面", pageNbt);
+        if (!pages.isEmpty()) mc.player.getMainHandStack().setSubNbt("页数", pageNbt);
 
         // Send book update to server
         mc.player.networkHandler.sendPacket(new BookUpdateC2SPacket(mc.player.getInventory().selectedSlot, pages, Optional.of(title)));

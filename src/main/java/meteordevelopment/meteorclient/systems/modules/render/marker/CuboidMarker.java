@@ -13,26 +13,26 @@ import net.minecraft.util.math.BlockPos;
 
 // TODO: Add outline and more modes
 public class CuboidMarker extends BaseMarker {
-    public static final String type = "Cuboid";
+    public static final String type = "立方体";
 
     public enum Mode {
         Full
     }
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgRender = settings.createGroup("Render");
+    private final SettingGroup sgRender = settings.createGroup("渲染");
 
     // General
 
     private final Setting<BlockPos> pos1 = sgGeneral.add(new BlockPosSetting.Builder()
         .name("pos-1")
-        .description("长方体的第一个角")
+        .description("立方体的第一个角")
         .build()
     );
 
     private final Setting<BlockPos> pos2 = sgGeneral.add(new BlockPosSetting.Builder()
         .name("pos-2")
-        .description("长方体的第二个角")
+        .description("立方体的第二个角")
         .build()
     );
 
@@ -40,28 +40,28 @@ public class CuboidMarker extends BaseMarker {
 
     private final Setting<Mode> mode = sgRender.add(new EnumSetting.Builder<Mode>()
         .name("mode")
-        .description("此标记使用什么模式。 ")
+        .description("这个标记使用的模式。")
         .defaultValue(Mode.Full)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("正在渲染的块侧面的颜色。")
+        .name("侧面颜色")
+        .description("被渲染的方块的侧面颜色。")
         .defaultValue(new SettingColor(0, 100, 255, 50))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("块的线条的颜色正在渲染的块。")
+        .name("线条颜色")
+        .description("被渲染的方块的线条颜色。")
         .defaultValue(new SettingColor(0, 100, 255, 255))
         .build()
     );

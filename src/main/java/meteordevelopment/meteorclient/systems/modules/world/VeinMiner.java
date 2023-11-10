@@ -54,8 +54,8 @@ public class VeinMiner extends Module {
     // General
 
     private final Setting<List<Block>> selectedBlocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("块")
-        .description("选择哪些块。")
+        .name("方块")
+        .description("要选择的方块。")
         .defaultValue(Blocks.STONE, Blocks.DIRT, Blocks.GRASS)
         .build()
     );
@@ -69,7 +69,7 @@ public class VeinMiner extends Module {
 
     private final Setting<Integer> depth = sgGeneral.add(new IntSetting.Builder()
         .name("深度")
-        .description("用于扫描相似块的迭代量。")
+        .description("扫描相似方块的迭代次数。")
         .defaultValue(3)
         .min(1)
         .sliderRange(1, 15)
@@ -78,7 +78,7 @@ public class VeinMiner extends Module {
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
         .name("延迟")
-        .description("延迟")
+        .description("挖掘方块之间的延迟。")
         .defaultValue(0)
         .min(0)
         .sliderRange(0, 20)
@@ -86,8 +86,8 @@ public class VeinMiner extends Module {
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
-        .name("rotate")
-        .description("挖矿时向服务器发送旋转数据包。")
+        .name("旋转")
+        .description("挖掘时向服务器发送旋转包。")
         .defaultValue(true)
         .build()
     );
@@ -95,36 +95,36 @@ public class VeinMiner extends Module {
     // Render
 
     private final Setting<Boolean> swingHand = sgRender.add(new BoolSetting.Builder()
-        .name("swing-hand")
-        .description("在客户端摇摆手。")
+        .name("挥手")
+        .description("客户端挥手。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
-        .name("render")
-        .description("是否渲染正在挖矿的区块挖掘。")
+        .name("渲染")
+        .description("是否渲染正在挖掘的方块。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("正在渲染的块侧面的颜色。")
+        .name("侧面颜色")
+        .description("渲染的方块的侧面颜色。")
         .defaultValue(new SettingColor(204, 0, 0, 10))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("正在渲染的块的行。")
+        .name("线条颜色")
+        .description("渲染的方块的线条颜色。")
         .defaultValue(new SettingColor(204, 0, 0, 255))
         .build()
     );
@@ -136,7 +136,7 @@ public class VeinMiner extends Module {
     private int tick = 0;
 
     public VeinMiner() {
-        super(Categories.World, "vein-miner", "挖掘所有附近具有此类型的块");
+        super(Categories.World, "脉冲挖掘", "挖掘附近所有相同类型的方块");
     }
 
     @Override

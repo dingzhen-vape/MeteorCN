@@ -24,22 +24,22 @@ public class AutoEXP extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("要修复哪些项目。")
+        .name("模式")
+        .description("要修复的物品。")
         .defaultValue(Mode.Both)
         .build()
     );
 
     private final Setting<Boolean> replenish = sgGeneral.add(new BoolSetting.Builder()
         .name("补充")
-        .description("自动将经验补充到选定的热栏插槽中。")
+        .description("自动将经验补充到选定的热键槽。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Integer> slot = sgGeneral.add(new IntSetting.Builder()
-        .name("exp-slot")
-        .description("要补充经验的插槽。")
+        .name("经验槽")
+        .description("要补充经验的槽。")
         .visible(replenish::get)
         .defaultValue(6)
         .range(1, 9)
@@ -48,8 +48,8 @@ public class AutoEXP extends Module {
     );
 
     private final Setting<Integer> minThreshold = sgGeneral.add(new IntSetting.Builder()
-        .name("min-threshold")
-        .description("物品需要掉落到修复的最小耐久度百分比。")
+        .name("最小阈值")
+        .description("一个物品的耐久度百分比需要降到多少才能被修复。")
         .defaultValue(30)
         .range(1, 100)
         .sliderRange(1, 100)
@@ -57,7 +57,7 @@ public class AutoEXP extends Module {
     );
 
     private final Setting<Integer> maxThreshold = sgGeneral.add(new IntSetting.Builder()
-        .name("max-threshold")
+        .name("最大阈值")
         .description("修复物品的最大耐久度百分比。")
         .defaultValue(80)
         .range(1, 100)
@@ -68,7 +68,7 @@ public class AutoEXP extends Module {
     private int repairingI;
 
     public AutoEXP() {
-        super(Categories.Combat, "auto-exp", "自动修复你的盔甲和PVP 中的工具。");
+        super(Categories.Combat, "自动经验", "在PVP中自动修复你的护甲和工具。");
     }
 
     @Override

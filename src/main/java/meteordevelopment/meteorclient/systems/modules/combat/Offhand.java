@@ -30,7 +30,7 @@ public class Offhand extends Module {
 
     private final Setting<Integer> delayTicks = sgCombat.add(new IntSetting.Builder()
         .name("物品切换延迟")
-        .description("槽位移动之间的延迟。")
+        .description("槽位移动之间的刻延迟.")
         .defaultValue(0)
         .min(0)
         .sliderMax(20)
@@ -38,37 +38,37 @@ public class Offhand extends Module {
     );
     private final Setting<Item> preferreditem = sgCombat.add(new EnumSetting.Builder<Item>()
         .name("物品")
-        .description("副手持有哪个物品。")
+        .description("要在副手持有的物品.")
         .defaultValue(Item.Crystal)
         .build()
     );
 
     private final Setting<Boolean> hotbar = sgCombat.add(new BoolSetting.Builder()
-        .name("快捷栏")
-        .description("是否使用热键栏中的物品。")
+        .name("物品栏")
+        .description("是否使用物品栏中的物品.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> rightgapple = sgCombat.add(new BoolSetting.Builder()
-        .name("right-gapple")
-        .description("按住右键时将切换到gapple。(请勿与药水一起使用)")
+        .name("右键金苹果")
+        .description("按住右键时切换到金苹果.(不要和药水开启时一起使用)")
         .defaultValue(false)
         .build()
     );
 
 
     private final Setting<Boolean> SwordGap = sgCombat.add(new BoolSetting.Builder()
-        .name("sword-gapple")
-        .description("按住a时将切换到gapple剑并右键单击。")
+        .name("剑金苹果")
+        .description("拿着剑并按住右键时切换到金苹果.")
         .defaultValue(false)
         .visible(rightgapple::get)
         .build()
     );
 
     private final Setting<Boolean> alwaysSwordGap = sgCombat.add(new BoolSetting.Builder()
-        .name("always-gap-on-sword")
-        .description("当你拿着剑时持有魔法金苹果。")
+        .name("剑总是金苹果")
+        .description("拿着剑时总是持有附魔金苹果.")
         .defaultValue(false)
         .visible(() -> !rightgapple.get())
         .build()
@@ -76,15 +76,15 @@ public class Offhand extends Module {
 
 
     private final Setting<Boolean> alwaysPot = sgCombat.add(new BoolSetting.Builder()
-        .name("always-pot-on-sword")
-        .description("持有时会切换到药水剑")
+        .name("剑总是药水")
+        .description("拿着剑时切换到药水")
         .defaultValue(false)
         .visible(() -> !rightgapple.get() && !alwaysSwordGap.get())
         .build()
     );
     private final Setting<Boolean> potionClick = sgCombat.add(new BoolSetting.Builder()
-        .name("sword-pot")
-        .description("拿着剑并右键单击时将切换到药水。")
+        .name("剑药水")
+        .description("拿着剑并按住右键时切换到药水.")
         .defaultValue(false)
         .visible(() -> !rightgapple.get() && !alwaysPot.get() && !alwaysSwordGap.get() )
         .build()
@@ -93,8 +93,8 @@ public class Offhand extends Module {
     //Totem
 
     private final Setting<Double> minHealth = sgTotem.add(new DoubleSetting.Builder()
-        .name("min-health")
-        .description("低于此生命值时将持有图腾。")
+        .name("最低生命值")
+        .description("低于这个生命值时持有图腾.")
         .defaultValue(10)
         .range(0,36)
         .sliderRange(0,36)
@@ -103,21 +103,21 @@ public class Offhand extends Module {
 
     private final Setting<Boolean> elytra = sgTotem.add(new BoolSetting.Builder()
         .name("鞘翅")
-        .description("在使用鞘翅飞行时将始终持有图腾。")
+        .description("飞行时总是持有图腾.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> falling = sgTotem.add(new BoolSetting.Builder()
-        .name("坠落")
-        .description("如果坠落伤害会杀死你,你会持有图腾。")
+        .name("下落")
+        .description("如果摔落伤害能杀死你，就持有图腾.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> explosion = sgTotem.add(new BoolSetting.Builder()
         .name("爆炸")
-        .description("当爆炸伤害可能杀死你时,你会持有图腾。")
+        .description("如果爆炸伤害能杀死你，就持有图腾.")
         .defaultValue(true)
         .build()
     );
@@ -132,7 +132,7 @@ public class Offhand extends Module {
     private int totems, ticks;
 
     public Offhand() {
-        super(Categories.Combat, "副手", "允许你在副手上持有指定的物品。");
+        super(Categories.Combat, "副手", "让你在副手持有指定的物品.");
     }
 
     @Override
@@ -216,7 +216,7 @@ public class Offhand extends Module {
                     // No offhand item
                     if (!item.found()) {
                         if (!sentMessage) {
-                            warning("未找到所选物品。");
+                            warning("没有找到选择的物品.");
                             sentMessage = true;
                         }
                     }

@@ -25,30 +25,30 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 public class Config extends System<Config> {
     public final Settings settings = new Settings();
 
-    private final SettingGroup sgVisual = settings.createGroup("Visual");
-    private final SettingGroup sgChat = settings.createGroup("Chat");
-    private final SettingGroup sgMisc = settings.createGroup("Misc");
+    private final SettingGroup sgVisual = settings.createGroup("视觉");
+    private final SettingGroup sgChat = settings.createGroup("聊天");
+    private final SettingGroup sgMisc = settings.createGroup("杂项");
 
     // Visual
 
     public final Setting<Boolean> customFont = sgVisual.add(new BoolSetting.Builder()
-        .name("custom-font")
-        .description("Use a custom font.")
+        .name("自定义字体")
+        .description("使用自定义字体。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<FontFace> font = sgVisual.add(new FontFaceSetting.Builder()
-        .name("font")
-        .description("Custom font to use.")
+        .name("字体")
+        .description("要使用的自定义字体。")
         .visible(customFont::get)
         .onChanged(Fonts::load)
         .build()
     );
 
     public final Setting<Double> rainbowSpeed = sgVisual.add(new DoubleSetting.Builder()
-        .name("rainbow-speed")
-        .description("The global rainbow speed.")
+        .name("彩虹速度")
+        .description("全局彩虹速度。")
         .defaultValue(0.5)
         .range(0, 10)
         .sliderMax(5)
@@ -56,22 +56,22 @@ public class Config extends System<Config> {
     );
 
     public final Setting<Boolean> titleScreenCredits = sgVisual.add(new BoolSetting.Builder()
-        .name("title-screen-credits")
-        .description("Show Meteor credits on title screen")
+        .name("标题屏幕信用")
+        .description("在标题屏幕上显示Meteor信用")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Boolean> titleScreenSplashes = sgVisual.add(new BoolSetting.Builder()
-        .name("title-screen-splashes")
-        .description("Show Meteor splash texts on title screen")
+        .name("标题屏幕飞溅")
+        .description("在标题屏幕上显示Meteor飞溅文本")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Boolean> customWindowTitle = sgVisual.add(new BoolSetting.Builder()
-        .name("custom-window-title")
-        .description("Show custom text in the window title.")
+        .name("自定义窗口标题")
+        .description("在窗口标题中显示自定义文本。")
         .defaultValue(false)
         .onModuleActivated(setting -> mc.updateWindowTitle())
         .onChanged(value -> mc.updateWindowTitle())
@@ -79,8 +79,8 @@ public class Config extends System<Config> {
     );
 
     public final Setting<String> customWindowTitleText = sgVisual.add(new StringSetting.Builder()
-        .name("window-title-text")
-        .description("The text it displays in the window title.")
+        .name("窗口标题文本")
+        .description("它在窗口标题中显示的文本。")
         .visible(customWindowTitle::get)
         .defaultValue("Minecraft {mc_version} - {meteor.name} {meteor.version}")
         .onChanged(value -> mc.updateWindowTitle())
@@ -88,8 +88,8 @@ public class Config extends System<Config> {
     );
 
     public final Setting<SettingColor> friendColor = sgVisual.add(new ColorSetting.Builder()
-        .name("friend-color")
-        .description("The color used to show friends.")
+        .name("好友颜色")
+        .description("用于显示好友的颜色。")
         .defaultValue(new SettingColor(0, 255, 180))
         .build()
     );
@@ -97,22 +97,22 @@ public class Config extends System<Config> {
     // Chat
 
     public final Setting<String> prefix = sgChat.add(new StringSetting.Builder()
-        .name("prefix")
-        .description("Prefix.")
+        .name("前缀")
+        .description("前缀。")
         .defaultValue(".")
         .build()
     );
 
     public final Setting<Boolean> chatFeedback = sgChat.add(new BoolSetting.Builder()
-        .name("chat-feedback")
-        .description("Sends chat feedback when meteor performs certain actions.")
+        .name("聊天反馈")
+        .description("当meteor执行某些操作时发送聊天反馈。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Boolean> deleteChatFeedback = sgChat.add(new BoolSetting.Builder()
-        .name("delete-chat-feedback")
-        .description("Delete previous matching chat feedback to keep chat clear.")
+        .name("删除聊天反馈")
+        .description("删除之前匹配的聊天反馈以保持聊天清晰。")
         .visible(chatFeedback::get)
         .defaultValue(true)
         .build()
@@ -121,22 +121,22 @@ public class Config extends System<Config> {
     // Misc
 
     public final Setting<Integer> rotationHoldTicks = sgMisc.add(new IntSetting.Builder()
-        .name("rotation-hold")
-        .description("Hold long to hold server side rotation when not sending any packets.")
+        .name("旋转保持")
+        .description("当不发送任何数据包时，保持服务器端旋转的时间。")
         .defaultValue(4)
         .build()
     );
 
     public final Setting<Boolean> useTeamColor = sgMisc.add(new BoolSetting.Builder()
-        .name("use-team-color")
-        .description("Uses player's team color for rendering things like esp and tracers.")
+        .name("使用团队颜色")
+        .description("使用玩家的团队颜色来渲染诸如esp和追踪线之类的东西。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Integer> moduleSearchCount = sgMisc.add(new IntSetting.Builder()
-        .name("module-search-count")
-        .description("Amount of modules and settings to be shown in the module search bar.")
+        .name("模块搜索数量")
+        .description("在模块搜索栏中显示的模块和设置的数量。")
         .defaultValue(8)
         .min(1).sliderMax(12)
         .build()
@@ -145,7 +145,7 @@ public class Config extends System<Config> {
     public List<String> dontShowAgainPrompts = new ArrayList<>();
 
     public Config() {
-        super("config");
+        super("配置");
     }
 
     public static Config get() {
@@ -156,17 +156,17 @@ public class Config extends System<Config> {
     public NbtCompound toTag() {
         NbtCompound tag = new NbtCompound();
 
-        tag.putString("version", MeteorClient.VERSION.toString());
-        tag.put("settings", settings.toTag());
-        tag.put("dontShowAgainPrompts", listToTag(dontShowAgainPrompts));
+        tag.putString("版本", MeteorClient.VERSION.toString());
+        tag.put("设置", settings.toTag());
+        tag.put("不再显示提示", listToTag(dontShowAgainPrompts));
 
         return tag;
     }
 
     @Override
     public Config fromTag(NbtCompound tag) {
-        if (tag.contains("settings")) settings.fromTag(tag.getCompound("settings"));
-        if (tag.contains("dontShowAgainPrompts")) dontShowAgainPrompts = listFromTag(tag, "dontShowAgainPrompts");
+        if (tag.contains("设置")) settings.fromTag(tag.getCompound("设置"));
+        if (tag.contains("不再显示提示")) dontShowAgainPrompts = listFromTag(tag, "不再显示提示");
 
         return this;
     }

@@ -31,7 +31,7 @@ import net.minecraft.util.math.Vec3d;
 public class AnchorAura extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgPlace = settings.createGroup("放置");
-    private final SettingGroup sgBreak = settings.createGroup("中断");
+    private final SettingGroup sgBreak = settings.createGroup("破坏");
     private final SettingGroup sgPause = settings.createGroup("暂停");
     private final SettingGroup sgRender = settings.createGroup("渲染");
 
@@ -39,7 +39,7 @@ public class AnchorAura extends Module {
 
     private final Setting<Double> targetRange = sgGeneral.add(new DoubleSetting.Builder()
         .name("目标范围")
-        .description("玩家成为目标的半径。")
+        .description("玩家被目标的半径.")
         .defaultValue(4)
         .min(0)
         .sliderMax(5)
@@ -48,28 +48,28 @@ public class AnchorAura extends Module {
 
     private final Setting<SortPriority> targetPriority = sgGeneral.add(new EnumSetting.Builder<SortPriority>()
         .name("目标优先级")
-        .description("如何选择要瞄准的玩家。")
+        .description("如何选择要目标的玩家.")
         .defaultValue(SortPriority.LowestHealth)
         .build()
     );
 
     private final Setting<RotationMode> rotationMode = sgGeneral.add(new EnumSetting.Builder<RotationMode>()
-        .name("rotation-mode")
-        .description("在服务器端旋转的模式。")
+        .name("旋转模式")
+        .description("服务器端旋转你的模式.")
         .defaultValue(RotationMode.Both)
         .build()
     );
 
     private final Setting<Double> maxDamage = sgGeneral.add(new DoubleSetting.Builder()
-        .name("max-self-damage")
-        .description("允许的最大自我伤害。")
+        .name("最大自伤")
+        .description("允许的最大自伤.")
         .defaultValue(8)
         .build()
     );
 
     private final Setting<Double> minHealth = sgGeneral.add(new DoubleSetting.Builder()
-        .name("min-health")
-        .description("你必须的最小生命值 让 Anchor Aura 发挥作用。")
+        .name("最低生命值")
+        .description("锚灵光生效的最低生命值.")
         .defaultValue(15)
         .build()
     );
@@ -77,15 +77,15 @@ public class AnchorAura extends Module {
     // Place
 
     private final Setting<Boolean> place = sgPlace.add(new BoolSetting.Builder()
-        .name("place")
-        .description("允许 Anchor Aura 放置锚点。")
+        .name("放置")
+        .description("允许锚灵光放置锚.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Integer> placeDelay = sgPlace.add(new IntSetting.Builder()
-        .name("place-delay")
-        .description("放置锚点之间的滴答延迟。")
+        .name("放置延迟")
+        .description("放置锚之间的刻延迟.")
         .defaultValue(2)
         .range(0, 10)
         .visible(place::get)
@@ -93,16 +93,16 @@ public class AnchorAura extends Module {
     );
 
     private final Setting<Safety> placeMode = sgPlace.add(new EnumSetting.Builder<Safety>()
-        .name("place-mode")
-        .description("锚点的方式 允许放置在您附近。")
+        .name("放置模式")
+        .description("锚被允许在你附近放置的方式.")
         .defaultValue(Safety.Safe)
         .visible(place::get)
         .build()
     );
 
     private final Setting<Double> placeRange = sgPlace.add(new DoubleSetting.Builder()
-        .name("place-range")
-        .description("锚点放置的半径。")
+        .name("放置范围")
+        .description("锚被放置的半径.")
         .defaultValue(5)
         .min(0)
         .sliderMax(5)
@@ -111,8 +111,8 @@ public class AnchorAura extends Module {
     );
 
     private final Setting<PlaceMode> placePositions = sgPlace.add(new EnumSetting.Builder<PlaceMode>()
-        .name("placement-positions")
-        .description("锚点将放置在实体上的位置。")
+        .name("放置位置")
+        .description("锚在实体上的放置位置.")
         .defaultValue(PlaceMode.AboveAndBelow)
         .visible(place::get)
         .build()
@@ -121,23 +121,23 @@ public class AnchorAura extends Module {
     // Break
 
     private final Setting<Integer> breakDelay = sgBreak.add(new IntSetting.Builder()
-        .name("break-delay ")
-        .description("破坏锚点之间的滴答延迟。")
+        .name("破坏延迟")
+        .description("破坏锚之间的刻延迟.")
         .defaultValue(10)
         .range(0, 10)
         .build()
     );
 
     private final Setting<Safety> breakMode = sgBreak.add(new EnumSetting.Builder<Safety>()
-        .name("break-mode")
-        .description("允许在您附近破坏锚点的方式。")
+        .name("破坏模式")
+        .description("锚被允许在你附近破坏的方式.")
         .defaultValue(Safety.Safe)
         .build()
     );
 
     private final Setting<Double> breakRange = sgBreak.add(new DoubleSetting.Builder()
-        .name("break-range")
-        .description("锚点破坏的半径。")
+        .name("破坏范围")
+        .description("锚被破坏的半径.")
         .defaultValue(5)
         .min(0)
         .sliderMax(5)
@@ -147,22 +147,22 @@ public class AnchorAura extends Module {
     // Pause
 
     private final Setting<Boolean> pauseOnEat = sgPause.add(new BoolSetting.Builder()
-        .name("吃饭时暂停")
-        .description("吃东西时暂停。")
+        .name("吃东西时暂停")
+        .description("吃东西时暂停.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pauseOnDrink = sgPause.add(new BoolSetting.Builder()
-        .name("喝药时暂停")
-        .description("喝药水时暂停。")
+        .name("喝药水时暂停")
+        .description("喝药水时暂停.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pauseOnMine = sgPause.add(new BoolSetting.Builder()
-        .name("我的暂停")
-        .description("开采方块时暂停。")
+        .name("挖掘方块时暂停")
+        .description("挖掘方块时暂停.")
         .defaultValue(false)
         .build()
     );
@@ -170,53 +170,53 @@ public class AnchorAura extends Module {
     // Render
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("形状- mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式.")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<Boolean> renderPlace = sgRender.add(new BoolSetting.Builder()
-        .name("render-place")
-        .description("渲染放置锚点的块。")
+        .name("渲染放置")
+        .description("渲染放置锚的方块.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<SettingColor> placeSideColor = sgRender.add(new ColorSetting.Builder()
-        .name("place-side-color")
-        .description("要放置的位置的侧面颜色。")
+        .name("放置侧颜色")
+        .description("要放置的位置的侧颜色.")
         .defaultValue(new SettingColor(255, 0, 0, 75))
         .visible(renderPlace::get)
         .build()
     );
 
     private final Setting<SettingColor> placeLineColor = sgRender.add(new ColorSetting.Builder()
-        .name("place-line-color")
-        .description("要放置的位置的线条颜色。")
+        .name("放置线颜色")
+        .description("要放置的位置的线颜色.")
         .defaultValue(new SettingColor(255, 0, 0, 255))
         .visible(renderPlace::get)
         .build()
     );
 
     private final Setting<Boolean> renderBreak = sgRender.add(new BoolSetting.Builder()
-        .name("render-break")
-        .description("渲染破坏锚点的块。")
+        .name("渲染破坏")
+        .description("渲染破坏锚的方块.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<SettingColor> breakSideColor = sgRender.add(new ColorSetting.Builder()
-        .name("break-side-color")
-        .description(" 要破坏的锚点的侧面颜色。")
+        .name("破坏侧颜色")
+        .description("要破坏的锚的侧颜色.")
         .defaultValue(new SettingColor(255, 0, 0, 75))
         .visible(renderBreak::get)
         .build()
     );
 
     private final Setting<SettingColor> breakLineColor = sgRender.add(new ColorSetting.Builder()
-        .name("break-line-color")
-        .description("要破坏的锚点的线条颜色。")
+        .name("破坏线颜色")
+        .description("要破坏的锚的线颜色.")
         .defaultValue(new SettingColor(255, 0, 0, 255))
         .visible(renderBreak::get)
         .build()
@@ -227,7 +227,7 @@ public class AnchorAura extends Module {
     private PlayerEntity target;
 
     public AnchorAura() {
-        super(Categories.Combat, "重生锚光环", "自动放置和破坏重生锚点以伤害实体。");
+        super(Categories.Combat, "锚灵光", "自动放置和破坏重生锚来伤害实体.");
     }
 
     @Override
@@ -240,7 +240,7 @@ public class AnchorAura extends Module {
     @EventHandler
     private void onTick(TickEvent.Post event) {
         if (mc.world.getDimension().respawnAnchorWorks()) {
-            error(" 你在下界...致残。");
+            error("你在下界... 禁用.");
             toggle();
             return;
         }

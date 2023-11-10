@@ -29,14 +29,14 @@ public class AntiAnchor extends Module {
     );
 
     private final Setting<Boolean> swing = sgGeneral.add(new BoolSetting.Builder()
-        .name("摆动")
-        .description("放置时摆动你的手。")
+        .name("摇摆")
+        .description("放置时摇摆你的手。")
         .defaultValue(true)
         .build()
     );
 
     public AntiAnchor() {
-        super(Categories.Combat, "反锚定", "通过在你的头上放置一块板自动防止锚定光环。");
+        super(Categories.Combat, "反锚", "自动通过在你头上放置一个半砖来防止锚光环。");
     }
 
     @EventHandler

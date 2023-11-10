@@ -36,12 +36,12 @@ public class LogoutSpots extends Module {
     private static final Color RED = new Color(225, 25, 25);
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgRender = settings.createGroup("Render");
+    private final SettingGroup sgRender = settings.createGroup("渲染");
 
     // General
 
     private final Setting<Double> scale = sgGeneral.add(new DoubleSetting.Builder()
-        .name("scale")
+        .name("比例")
         .description("比例。")
         .defaultValue(1)
         .min(0)
@@ -49,8 +49,8 @@ public class LogoutSpots extends Module {
     );
 
     private final Setting<Boolean> fullHeight = sgGeneral.add(new BoolSetting.Builder()
-        .name("full-height")
-        .description("将高度显示为玩家的全高。")
+        .name("全高")
+        .description("显示玩家的全高。")
         .defaultValue(true)
         .build()
     );
@@ -58,36 +58,36 @@ public class LogoutSpots extends Module {
     // Render
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side -color")
-        .description("侧面颜色。")
+        .name("侧面颜色")
+        .description("侧面的颜色。")
         .defaultValue(new SettingColor(255, 0, 255, 55))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("线条颜色。")
+        .name("线条颜色")
+        .description("线条的颜色。")
         .defaultValue(new SettingColor(255, 0, 255))
         .build()
     );
 
     private final Setting<SettingColor> nameColor = sgRender.add(new ColorSetting.Builder()
-        .name("name-color")
-        .description("名称颜色。")
+        .name("名字颜色")
+        .description("名字的颜色。")
         .defaultValue(new SettingColor(255, 255, 255))
         .build()
     );
 
     private final Setting<SettingColor> nameBackgroundColor = sgRender.add(new ColorSetting.Builder()
-        .name("name-background-color")
-        .description("名称背景颜色.")
+        .name("名字背景颜色")
+        .description("名字的背景颜色。")
         .defaultValue(new SettingColor(0, 0, 0, 75))
         .build()
     );
@@ -101,7 +101,7 @@ public class LogoutSpots extends Module {
     private Dimension lastDimension;
 
     public LogoutSpots() {
-        super(Categories.Render, "logout-spots", "显示另一个玩家已注销的框。");
+        super(Categories.Render, "登出点", "在其他玩家登出的地方显示一个方框。");
         lineColor.onChanged();
     }
 

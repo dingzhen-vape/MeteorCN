@@ -39,14 +39,14 @@ public class Quiver extends Module {
 
     private final Setting<List<StatusEffect>> effects = sgGeneral.add(new StatusEffectListSetting.Builder()
         .name("效果")
-        .description("使用哪种效果对你进行射击。")
+        .description("要给你射出的效果.")
         .defaultValue(StatusEffects.STRENGTH)
         .build()
     );
 
     private final Setting<Integer> cooldown = sgGeneral.add(new IntSetting.Builder()
-        .name("冷却时间")
-        .description("射击效果之间间隔多少时间(NCP 最少 19 个)。")
+        .name("冷却")
+        .description("射出效果之间的刻冷却时间 (NCP最低19).")
         .defaultValue(10)
         .range(0,40)
         .sliderRange(0,40)
@@ -55,21 +55,21 @@ public class Quiver extends Module {
 
     private final Setting<Boolean> checkEffects = sgGeneral.add(new BoolSetting.Builder()
         .name("检查效果")
-        .description("不会射击你已经拥有的效果。")
+        .description("不会给你已经有的效果射箭.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> silentBow = sgGeneral.add(new BoolSetting.Builder()
-        .name("沉默弓")
-        .description("从你的库存中取出弓来箭袋。")
+        .name("无声弓")
+        .description("从你的物品栏拿出一把弓来射箭.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> chatInfo = sgGeneral.add(new BoolSetting.Builder()
         .name("聊天信息")
-        .description("在聊天中发送有关箭袋检查的信息。")
+        .description("在聊天中发送射箭检查的信息.")
         .defaultValue(false)
         .build()
     );
@@ -77,22 +77,22 @@ public class Quiver extends Module {
     // Safety
 
     private final Setting<Boolean> onlyInHoles = sgSafety.add(new BoolSetting.Builder()
-        .name("only-in-holes ")
-        .description("仅当你在洞里时才会颤抖。")
+        .name("只在洞里")
+        .description("只有在洞里时才射箭.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> onlyOnGround = sgSafety.add(new BoolSetting.Builder()
-        .name("仅在地面上")
-        .description("仅当你在地面上时才会颤抖。")
+        .name("只在地面上")
+        .description("只有在地面上时才射箭.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> minHealth = sgSafety.add(new DoubleSetting.Builder()
-        .name("min-health")
-        .description("你必须有多少生命值颤抖。")
+        .name("最低生命值")
+        .description("你必须有多少生命值才能射箭.")
         .defaultValue(10)
         .range(0,36)
         .sliderRange(0,36)
@@ -106,7 +106,7 @@ public class Quiver extends Module {
     private final BlockPos.Mutable testPos = new BlockPos.Mutable();
 
     public Quiver() {
-        super(Categories.Combat, "颤抖", "向自己射箭。");
+        super(Categories.Combat, "射箭", "给自己射箭.");
     }
 
     @Override
@@ -195,31 +195,31 @@ public class Quiver extends Module {
 
     private boolean shouldQuiver() {
         if (!bow.found() || !bow.isHotbar() && !silentBow.get()) {
-            if (chatInfo.get()) error("找不到可用的弓,致残。");
+            if (chatInfo.get()) error("没有找到可用的弓，禁用.");
             toggle();
             return false;
         }
 
         if (!headIsOpen()) {
-            if (chatInfo.get()) error("没有足够的空间颤抖,致残。");
+            if (chatInfo.get()) error("没有足够的空间射箭，禁用.");
             toggle();
             return false;
         }
 
         if (EntityUtils.getTotalHealth(mc.player) < minHealth.get()) {
-            if (chatInfo.get()) error("生命值不足,无法颤抖,致残。");
+            if (chatInfo.get()) error("没有足够的生命值射箭，禁用.");
             toggle();
             return false;
         }
 
         if (onlyOnGround.get() && !mc.player.isOnGround()) {
-            if (chatInfo.get()) error("你不在地面上,致残。");
+            if (chatInfo.get()) error("你不在地面上，禁用.");
             toggle();
             return false;
         }
 
         if (onlyInHoles.get() && !isSurrounded(mc.player)) {
-            if (chatInfo.get()) error("你不在洞里,致残。");
+            if (chatInfo.get()) error("你不在洞里，禁用.");
             toggle();
             return false;
         }

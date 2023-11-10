@@ -24,22 +24,22 @@ public class PotionSpoof extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Object2IntMap<StatusEffect>> spoofPotions = sgGeneral.add(new StatusEffectAmplifierMapSetting.Builder()
-        .name("spoofed-potions")
+        .name("伪造药水")
         .description("要添加的药水。")
         .defaultValue(Utils.createStatusEffectMap())
         .build()
     );
 
     private final Setting<Boolean> clearEffects = sgGeneral.add(new BoolSetting.Builder()
-        .name("clear-effects")
-        .description("清除模块禁用的效果。")
+        .name("清除效果")
+        .description("在模块禁用时清除效果。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<List<StatusEffect>> antiPotion = sgGeneral.add(new StatusEffectListSetting.Builder()
-        .name("blocked-potions")
-        .description("要阻挡的药水。")
+        .name("阻止药水")
+        .description("要阻止的药水。")
         .defaultValue(
             LEVITATION,
             JUMP_BOOST,
@@ -50,14 +50,14 @@ public class PotionSpoof extends Module {
     );
 
     public final Setting<Boolean> applyGravity = sgGeneral.add(new BoolSetting.Builder()
-        .name("gravity")
-        .description("在以下情况下应用重力悬浮。")
+        .name("重力")
+        .description("在飘浮时应用重力。")
         .defaultValue(false)
         .build()
     );
 
     public PotionSpoof() {
-        super(Categories.Player, "魔药欺骗", "为你欺骗魔药状态。有些效果不起作用。");
+        super(Categories.Player, "药水伪造", "为你伪造药水状态。有些效果不起作用。");
     }
 
     @Override

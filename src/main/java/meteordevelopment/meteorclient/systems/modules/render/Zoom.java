@@ -24,22 +24,22 @@ public class Zoom extends Module {
 
     private final Setting<Double> zoom = sgGeneral.add(new DoubleSetting.Builder()
         .name("缩放")
-        .description("缩放多少。")
+        .description("缩放的程度。")
         .defaultValue(6)
         .min(1)
         .build()
     );
 
     private final Setting<Double> scrollSensitivity = sgGeneral.add(new DoubleSetting.Builder()
-        .name("scroll-sensitivity")
-        .description("允许您使用滚轮更改缩放值。0 禁用。")
+        .name("滚轮灵敏度")
+        .description("允许你用滚轮改变缩放值。0为禁用。")
         .defaultValue(1)
         .min(0)
         .build()
     );
 
     private final Setting<Boolean> smooth = sgGeneral.add(new BoolSetting.Builder()
-        .name("smooth")
+        .name("平滑")
         .description("平滑过渡。")
         .defaultValue(true)
         .build()
@@ -47,13 +47,13 @@ public class Zoom extends Module {
 
     private final Setting<Boolean> cinematic = sgGeneral.add(new BoolSetting.Builder()
         .name("电影")
-        .description("启用电影摄影机。")
+        .description("启用电影相机。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> renderHands = sgGeneral.add(new BoolSetting.Builder()
-        .name("show-hands")
+        .name("显示手")
         .description("是否渲染你的手。")
         .defaultValue(false)
         .build()
@@ -67,7 +67,7 @@ public class Zoom extends Module {
     private double time;
 
     public Zoom() {
-        super(Categories.Render, "缩放", "缩放你的观点。");
+        super(Categories.Render, "缩放", "缩放你的视角。");
         autoSubscribe = false;
     }
 

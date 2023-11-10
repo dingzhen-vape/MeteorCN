@@ -23,22 +23,22 @@ public class BossStack extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<Boolean> stack = sgGeneral.add(new BoolSetting.Builder()
-        .name("stack")
-        .description("堆叠 boss 条并在文本中添加计数器。")
+        .name("计时器")
+        .description("堆叠boss条并在文本中添加一个计数器。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Boolean> hideName = sgGeneral.add(new BoolSetting.Builder()
-        .name("hide-name")
-        .description("隐藏 boss 条的名称。")
+        .name("隐藏名字")
+        .description("隐藏boss条的名字。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Double> spacing = sgGeneral.add(new DoubleSetting.Builder()
         .name("bar-spacing")
-        .description("每个 boss 条之间的间距减少。 ")
+        .description("每个boss条之间的间距减少。")
         .defaultValue(10)
         .min(0)
         .build()
@@ -47,7 +47,7 @@ public class BossStack extends Module {
     public static final WeakHashMap<ClientBossBar, Integer> barMap = new WeakHashMap<>();
 
     public BossStack() {
-        super(Categories.Render, "boss-stack", "堆叠 boss 栏以使你的 HUD 不那么混乱。");
+        super(Categories.Render, "更好的boss条", "堆叠boss条，使你的HUD更清爽。");
     }
 
     @EventHandler

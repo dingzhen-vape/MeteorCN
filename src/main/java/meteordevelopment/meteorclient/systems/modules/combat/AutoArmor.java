@@ -32,14 +32,14 @@ public class AutoArmor extends Module {
 
     private final Setting<Protection> preferredProtection = sgGeneral.add(new EnumSetting.Builder<Protection>()
         .name("首选保护")
-        .description("首选哪种类型的保护。")
+        .description("哪种类型的保护更优先。")
         .defaultValue(Protection.Protection)
         .build()
     );
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
-        .name("交换延迟")
-        .description("装备盔甲之间的延迟。")
+        .name("换装延迟")
+        .description("装备护甲的延迟。")
         .defaultValue(1)
         .min(0)
         .sliderMax(5)
@@ -47,29 +47,29 @@ public class AutoArmor extends Module {
     );
 
     private final Setting<List<Enchantment>> avoidedEnchantments = sgGeneral.add(new EnchantmentListSetting.Builder()
-        .name("避免结界")
-        .description("应该避免的结界。")
+        .name("避免的附魔")
+        .description("应该避免的附魔。")
         .defaultValue(Enchantments.BINDING_CURSE, Enchantments.FROST_WALKER)
         .build()
     );
 
     private final Setting<Boolean> blastLeggings = sgGeneral.add(new BoolSetting.Builder()
-        .name("爆炸-prot-leggings")
-        .description("无论首选保护如何,都对护腿使用爆炸保护。")
+        .name("爆炸保护护腿")
+        .description("无论首选保护如何，都使用爆炸保护的护腿。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> antiBreak = sgGeneral.add(new BoolSetting.Builder()
-        .name("防断裂")
-        .description("如果盔甲即将断裂,则脱下盔甲。")
+        .name("防破")
+        .description("如果护甲即将破裂，就脱掉。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> ignoreElytra = sgGeneral.add(new BoolSetting.Builder()
         .name("忽略鞘翅")
-        .description("不会更换你的鞘翅如果你装备了它。")
+        .description("如果你装备了鞘翅，就不会替换它。")
         .defaultValue(true)
         .build()
     );
@@ -83,7 +83,7 @@ public class AutoArmor extends Module {
     private int timer;
 
     public AutoArmor() {
-        super(Categories.Combat, "自动装甲", "自动装备装甲。");
+        super(Categories.Combat, "自动护甲", "自动装备护甲。");
 
         armorPieces[0] = helmet;
         armorPieces[1] = chestplate;

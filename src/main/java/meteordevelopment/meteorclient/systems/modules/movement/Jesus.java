@@ -38,15 +38,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Jesus extends Module {
-    private final SettingGroup sgGeneral = settings.createGroup("一般");
+    private final SettingGroup sgGeneral = settings.createGroup("通用");
     private final SettingGroup sgWater = settings.createGroup("水");
-    private final SettingGroup sgLava = settings.createGroup("熔岩");
+    private final SettingGroup sgLava = settings.createGroup("岩浆");
 
     // General
 
     private final Setting<Boolean> powderSnow = sgGeneral.add(new BoolSetting.Builder()
         .name("粉雪")
-        .description("在粉雪上行走。")
+        .description("在粉雪上行走.")
         .defaultValue(true)
         .build()
     );
@@ -55,38 +55,38 @@ public class Jesus extends Module {
 
     private final Setting<Mode> waterMode = sgWater.add(new EnumSetting.Builder<Mode>()
         .name("模式")
-        .description("如何处理水。")
+        .description("处理水的方式.")
         .defaultValue(Mode.Solid)
         .build()
     );
 
     private final Setting<Boolean> dipIfBurning = sgWater.add(new BoolSetting.Builder()
-        .name("如果燃烧则浸入")
-        .description("让当你燃烧时,你会进入水中。")
+        .name("燃烧时下沉")
+        .description("当你着火时让你进入水中.")
         .defaultValue(true)
         .visible(() -> waterMode.get() == Mode.Solid)
         .build()
     );
 
     private final Setting<Boolean> dipOnSneakWater = sgWater.add(new BoolSetting.Builder()
-        .name("dip-on-sneak")
-        .description("当你按住潜行键时,让你进入水中。")
+        .name("潜行时下沉")
+        .description("当你按住潜行键时让你进入水中.")
         .defaultValue(true)
         .visible(() -> waterMode.get() == Mode.Solid)
         .build()
     );
 
     private final Setting<Boolean> dipOnFallWater = sgWater.add(new BoolSetting.Builder()
-        .name("dip-on- fall")
-        .description("让你进入当你跌落超过一定高度时,会落入水中。")
+        .name("摔落时下沉")
+        .description("当你从一定高度摔落时让你进入水中.")
         .defaultValue(true)
         .visible(() -> waterMode.get() == Mode.Solid)
         .build()
     );
 
     private final Setting<Integer> dipFallHeightWater = sgWater.add(new IntSetting.Builder()
-        .name("dip-fall-height")
-        .description("你将进入水中的跌落高度。")
+        .name("摔落高度")
+        .description("你会进入水中的摔落高度.")
         .defaultValue(4)
         .range(1, 255)
         .sliderRange(3, 20)
@@ -98,38 +98,38 @@ public class Jesus extends Module {
 
     private final Setting<Mode> lavaMode = sgLava.add(new EnumSetting.Builder<Mode>()
         .name("模式")
-        .description("如何处理熔岩。")
+        .description("处理岩浆的方式.")
         .defaultValue(Mode.Solid)
         .build()
     );
 
     private final Setting<Boolean> dipIfFireResistant = sgLava.add(new BoolSetting.Builder()
-        .name("dip- if-抵抗")
-        .description("如果你有抗火效果,让你进入熔岩。")
+        .name("有抗火时下沉")
+        .description("如果你有抗火效果，就让你进入岩浆中.")
         .defaultValue(true)
         .visible(() -> lavaMode.get() == Mode.Solid)
         .build()
     );
 
     private final Setting<Boolean> dipOnSneakLava = sgLava.add(new BoolSetting.Builder()
-        .name("dip-on-sneak")
-        .description("当你按住潜行键时,让你进入熔岩。")
+        .name("潜行时下沉")
+        .description("当你按住潜行键时让你进入岩浆中.")
         .defaultValue(true)
         .visible(() -> lavaMode.get() == Mode.Solid)
         .build()
     );
 
     private final Setting<Boolean> dipOnFallLava = sgLava.add(new BoolSetting.Builder()
-        .name("dip-on- fall")
-        .description("当你跌倒超过一定高度时,让你进入熔岩。")
+        .name("摔落时下沉")
+        .description("当你从一定高度摔落时让你进入岩浆中.")
         .defaultValue(true)
         .visible(() -> lavaMode.get() == Mode.Solid)
         .build()
     );
 
     private final Setting<Integer> dipFallHeightLava = sgLava.add(new IntSetting.Builder()
-        .name("dip-fall-height")
-        .description("你将进入熔岩的跌落高度。")
+        .name("摔落高度")
+        .description("你会进入岩浆中的摔落高度.")
         .defaultValue(4)
         .range(1, 255)
         .sliderRange(3, 20)
@@ -148,7 +148,7 @@ public class Jesus extends Module {
     private boolean prePathManagerWalkOnLava;
 
     public Jesus() {
-        super(Categories.Movement, "jesus", "继续走像耶稣一样的液体和粉雪。");
+        super(Categories.Movement, "耶稣", "像耶稣一样在液体和粉雪上行走.");
     }
 
     @Override

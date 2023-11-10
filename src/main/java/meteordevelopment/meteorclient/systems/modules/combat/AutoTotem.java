@@ -24,23 +24,23 @@ public class AutoTotem extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("确定何时持有图腾,严格的将始终有效。")
+        .name("模式")
+        .description("决定何时持有图腾，严格模式将一直持有。")
         .defaultValue(Mode.Smart)
         .build()
     );
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
         .name("延迟")
-        .description("插槽移动之间的滴答声。")
+        .description("槽位移动之间的刻数。")
         .defaultValue(0)
         .min(0)
         .build()
     );
 
     private final Setting<Integer> health = sgGeneral.add(new IntSetting.Builder()
-        .name("health")
-        .description("持有图腾的生命值。")
+        .name("生命值")
+        .description("持有图腾的生命值阈值。")
         .defaultValue(10)
         .range(0, 36)
         .sliderMax(36)
@@ -50,7 +50,7 @@ public class AutoTotem extends Module {
 
     private final Setting<Boolean> elytra = sgGeneral.add(new BoolSetting.Builder()
         .name("鞘翅")
-        .description("使用鞘翅飞行时将始终持有图腾。")
+        .description("使用鞘翅飞行时总是持有图腾。")
         .defaultValue(true)
         .visible(() -> mode.get() == Mode.Smart)
         .build()
@@ -58,7 +58,7 @@ public class AutoTotem extends Module {
 
     private final Setting<Boolean> fall = sgGeneral.add(new BoolSetting.Builder()
         .name("坠落")
-        .description("当坠落伤害可能杀死你时将持有图腾。")
+        .description("当坠落伤害可能致死时持有图腾。")
         .defaultValue(true)
         .visible(() -> mode.get() == Mode.Smart)
         .build()
@@ -66,7 +66,7 @@ public class AutoTotem extends Module {
 
     private final Setting<Boolean> explosion = sgGeneral.add(new BoolSetting.Builder()
         .name("爆炸")
-        .description("当爆炸伤害可能杀死你时将持有图腾。")
+        .description("当爆炸伤害可能致死时持有图腾。")
         .defaultValue(true)
         .visible(() -> mode.get() == Mode.Smart)
         .build()
@@ -76,7 +76,7 @@ public class AutoTotem extends Module {
     private int totems, ticks;
 
     public AutoTotem() {
-        super(Categories.Combat, "自动图腾", "自动在副手装备图腾。");
+        super(Categories.Combat, "自动图腾", "自动将图腾装备在副手。");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)

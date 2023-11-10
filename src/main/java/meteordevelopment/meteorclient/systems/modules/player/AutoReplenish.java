@@ -25,8 +25,8 @@ public class AutoReplenish extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Integer> threshold = sgGeneral.add(new IntSetting.Builder()
-        .name("threshold")
-        .description("留下此活动的物品阈值。")
+        .name("阈值")
+        .description("这个在物品剩余多少时激活。")
         .defaultValue(8)
         .min(1)
         .sliderRange(1, 63)
@@ -34,36 +34,36 @@ public class AutoReplenish extends Module {
     );
 
     private final Setting<Integer> tickDelay = sgGeneral.add(new IntSetting.Builder()
-        .name("delay")
-        .description("补充热键栏的滴答延迟。")
+        .name("延迟")
+        .description("补充你的快捷栏的刻数延迟。")
         .defaultValue(1)
         .min(0)
         .build()
     );
 
     private final Setting<Boolean> offhand = sgGeneral.add(new BoolSetting.Builder()
-        .name("offhand")
-        .description("是否用物品重新填充你的副手。")
+        .name("副手")
+        .description("是否用物品补充你的副手。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> unstackable = sgGeneral.add(new BoolSetting.Builder()
-        .name(" unstackable")
+        .name("不可堆叠")
         .description("补充不可堆叠的物品。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> searchHotbar = sgGeneral.add(new BoolSetting.Builder()
-        .name("search-hotbar")
-        .description("使用快捷栏中的物品来补充(如果它们是唯一剩下的物品)。")
+        .name("搜索快捷栏")
+        .description("如果它们是唯一剩下的，使用你快捷栏中的物品补充。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<List<Item>> excludedItems = sgGeneral.add(new ItemListSetting.Builder()
-        .name("exclusion-items")
+        .name("排除物品")
         .description("不会补充的物品。")
         .build()
     );
@@ -73,7 +73,7 @@ public class AutoReplenish extends Module {
     private int tickDelayLeft;
 
     public AutoReplenish() {
-        super(Categories.Player, "自动补充", "自动补充你的快捷栏,主手或副手中的物品。");
+        super(Categories.Player, "自动补充", "自动补充你的快捷栏、主手或副手中的物品。");
 
         for (int i = 0; i < items.length; i++) items[i] = new ItemStack(Items.AIR);
     }

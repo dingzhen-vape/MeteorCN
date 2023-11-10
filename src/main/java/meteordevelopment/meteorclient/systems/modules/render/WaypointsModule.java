@@ -49,8 +49,8 @@ public class WaypointsModule extends Module {
     private final SettingGroup sgDeathPosition = settings.createGroup("死亡位置");
 
     public final Setting<Integer> textRenderDistance = sgGeneral.add(new IntSetting.Builder()
-        .name("text-render-distance")
-        .description("渲染文本距屏幕中心的最大距离。")
+        .name("文本渲染距离")
+        .description("文本渲染的最大距离，以屏幕中心为基准。")
         .defaultValue(100)
         .min(0)
         .sliderMax(200)
@@ -58,8 +58,8 @@ public class WaypointsModule extends Module {
     );
 
     private final Setting<Integer> maxDeathPositions = sgDeathPosition.add(new IntSetting.Builder()
-        .name("max-death-positions")
-        .description("要保存的死亡位置数量, 0禁用")
+        .name("最大死亡位置")
+        .description("保存的死亡位置的数量，0为禁用。")
         .defaultValue(0)
         .min(0)
         .sliderMax(20)
@@ -69,13 +69,13 @@ public class WaypointsModule extends Module {
 
     private final Setting<Boolean> dpChat = sgDeathPosition.add(new BoolSetting.Builder()
         .name("聊天")
-        .description("死亡后发送包含您位置的聊天消息")
+        .description("死亡时发送一条带有你位置的聊天信息。")
         .defaultValue(false)
         .build()
     );
 
     public WaypointsModule() {
-        super(Categories.Render, "航点", "允许您创建航点。");
+        super(Categories.Render, "路径点", "允许你创建路径点。");
     }
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
@@ -126,7 +126,7 @@ public class WaypointsModule extends Module {
                 text.render(waypoint.name.get(), -text.getWidth(waypoint.name.get()) / 2, -16 - text.getHeight(), TEXT, true);
 
                 // Render distance
-                String distText = String.format("%d 个区块", (int) Math.round(dist));
+                String distText = String.format("%d 方块", (int) Math.round(dist));
                 text.render(distText, -text.getWidth(distText) / 2, 16, TEXT, true);
 
                 // End text rendering
@@ -148,16 +148,16 @@ public class WaypointsModule extends Module {
     public void addDeath(Vec3d deathPos) {
         String time = dateFormat.format(new Date());
         if (dpChat.get()) {
-            MutableText text = Text.literal("死亡在 %s 上的 ");
+            MutableText text = Text.literal("死于 ");
             text.append(formatCoords(deathPos));
-            text.append(String.format("。", time));
+            text.append(String.format(" 在 %s。", time));
             info(text);
         }
 
         // Create waypoint
         if (maxDeathPositions.get() > 0) {
             Waypoint waypoint = new Waypoint.Builder()
-                .name("死亡" + time)
+                .name("死亡 " + time)
                 .icon("头骨")
                 .pos(BlockPos.ofFloored(deathPos).up(2))
                 .dimension(PlayerUtils.getDimension())
@@ -175,7 +175,7 @@ public class WaypointsModule extends Module {
         ListIterator<Waypoint> wps = Waypoints.get().iteratorReverse();
         while (wps.hasPrevious()) {
             Waypoint wp = wps.previous();
-            if (wp.name.get().startsWith("死亡") && "头骨".equals(wp.icon.get())) {
+            if (wp.name.get().startsWith("死亡 ") && "头骨".equals(wp.icon.get())) {
                 oldWpC++;
                 if (oldWpC > max)
                     Waypoints.get().remove(wp);
@@ -214,7 +214,7 @@ public class WaypointsModule extends Module {
 
             // Goto
             if (validDim) {
-                WButton gotoB = table.add(theme.button("转到")).widget();
+                WButton gotoB = table.add(theme.button("前往")).widget();
                 gotoB.action = () -> {
                     if (PathManagers.get().isPathing())
                         PathManagers.get().stop();

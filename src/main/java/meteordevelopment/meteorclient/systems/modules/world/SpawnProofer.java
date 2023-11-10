@@ -26,15 +26,15 @@ public class SpawnProofer extends Module {
 
     private final Setting<Integer> range = sgGeneral.add(new IntSetting.Builder()
         .name("范围")
-        .description("块放置和渲染的范围")
+        .description("放置方块和渲染的范围。")
         .defaultValue(3)
         .min(0)
         .build()
     );
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("块")
-        .description("用于生成验证的块")
+        .name("方块")
+        .description("用于防止生成的方块。")
         .defaultValue(Blocks.TORCH, Blocks.STONE_BUTTON, Blocks.STONE_SLAB)
         .filter(this::filterBlocks)
         .build()
@@ -42,7 +42,7 @@ public class SpawnProofer extends Module {
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
         .name("延迟")
-        .description("放置块之间的延迟")
+        .description("放置方块之间的延迟，以刻为单位。")
         .defaultValue(0)
         .min(0)
         .build()
@@ -50,21 +50,21 @@ public class SpawnProofer extends Module {
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("旋转到块放置。")
+        .description("向放置的方块旋转。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("哪些生成类型应该经过生成验证。")
+        .name("模式")
+        .description("应该防止哪些生成类型。")
         .defaultValue(Mode.Both)
         .build()
     );
 
     private final Setting<Boolean> newMobSpawnLightLevel = sgGeneral.add(new BoolSetting.Builder()
-        .name("new-mob-spawn-light-level")
-        .description("使用新的 (1.18+) 生物生成行为")
+        .name("新怪物生成亮度")
+        .description("使用新的（1.18+）怪物生成行为。")
         .defaultValue(true)
         .build()
     );
@@ -75,7 +75,7 @@ public class SpawnProofer extends Module {
     private int ticksWaited;
 
     public SpawnProofer() {
-        super(Categories.World, "spawn-proofer", "自动生成未照亮的区域。");
+        super(Categories.World, "防止生成", "自动防止未照明的区域生成怪物。");
     }
 
     @EventHandler
@@ -88,7 +88,7 @@ public class SpawnProofer extends Module {
         // Find slot
         boolean foundBlock = InvUtils.testInHotbar(itemStack -> blocks.get().contains(Block.getBlockFromItem(itemStack.getItem())));
         if (!foundBlock) {
-            error("在热栏中未找到任何选定的块");
+            error("在快捷栏中找不到选择的方块。");
             toggle();
             return;
         }
@@ -122,7 +122,7 @@ public class SpawnProofer extends Module {
         // Find slot
         FindItemResult block = InvUtils.findInHotbar(itemStack -> blocks.get().contains(Block.getBlockFromItem(itemStack.getItem())));
         if (!block.found()) {
-            error("在热栏中未找到任何选定的块");
+            error("在快捷栏中找不到选择的方块。");
             toggle();
             return;
         }

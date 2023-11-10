@@ -41,15 +41,15 @@ public class StashFinder extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<List<BlockEntityType<?>>> storageBlocks = sgGeneral.add(new StorageBlockListSetting.Builder()
-        .name("storage-blocks")
-        .description("选择要搜索的存储块。")
+        .name("存储方块")
+        .description("选择要搜索的存储方块。")
         .defaultValue(StorageBlockListSetting.STORAGE_BLOCKS)
         .build()
     );
 
     private final Setting<Integer> minimumStorageCount = sgGeneral.add(new IntSetting.Builder()
-        .name("minimum-storage-count")
-        .description("一个 chunk 中记录该 chunk 的最小存储块数量。")
+        .name("最小存储数量")
+        .description("一个区块中需要有的最小存储方块数量才能记录该区块。")
         .defaultValue(4)
         .min(1)
         .sliderMin(1)
@@ -57,8 +57,8 @@ public class StashFinder extends Module {
     );
 
     private final Setting<Integer> minimumDistance = sgGeneral.add(new IntSetting.Builder()
-        .name("minimum-distance")
-        .description("记录特定块所需距生成点的最小距离。")
+        .name("最小距离")
+        .description("你必须离出生点多远才能记录某个区块。")
         .defaultValue(0)
         .min(0)
         .sliderMax(10000)
@@ -67,14 +67,14 @@ public class StashFinder extends Module {
 
     private final Setting<Boolean> sendNotifications = sgGeneral.add(new BoolSetting.Builder()
         .name("通知")
-        .description("当发现新的存储时发送 Minecraft 通知。")
+        .description("当发现新的储藏点时，发送Minecraft通知。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Mode> notificationMode = sgGeneral.add(new EnumSetting.Builder<Mode>()
         .name("通知模式")
-        .description("用于通知的模式。")
+        .description("通知使用的模式。")
         .defaultValue(Mode.Both)
         .visible(sendNotifications::get)
         .build()
@@ -83,7 +83,7 @@ public class StashFinder extends Module {
     public List<Chunk> chunks = new ArrayList<>();
 
     public StashFinder() {
-        super(Categories.World, "存储-finder","在加载的块中搜索存储块。保存到 <您的 minecraft 文件夹>/meteor-client");
+        super(Categories.World, "储藏点寻找器", "搜索加载的区块中的存储方块。保存到<你的minecraft文件夹>/meteor-client");
     }
 
     @Override
@@ -124,11 +124,11 @@ public class StashFinder extends Module {
 
             if (sendNotifications.get() && (!chunk.equals(prevChunk) || !chunk.countsEqual(prevChunk))) {
                 switch (notificationMode.get()) {
-                    case Chat -> info("在(突出显示)%s(默认),(突出显示)%s(默认)找到存储。", chunk.x, chunk.z);
-                    case Toast -> mc.getToastManager().add(new MeteorToast(Items.CHEST, title, "找到存储！"));
+                    case Chat -> info("在 (highlight)%s(default), (highlight)%s(default) 发现储藏点。", chunk.x, chunk.z);
+                    case Toast -> mc.getToastManager().add(new MeteorToast(Items.CHEST, title, "发现储藏点！"));
                     case Both -> {
-                        info("在(突出显示)%s(默认),(突出显示)%s(默认)找到存储。", chunk.x, chunk.z);
-                        mc.getToastManager().add(new MeteorToast(Items.CHEST, title, "找到存储！"));
+                        info("在 (highlight)%s(default), (highlight)%s(default) 发现储藏点。", chunk.x, chunk.z);
+                        mc.getToastManager().add(new MeteorToast(Items.CHEST, title, "发现储藏点！"));
                     }
                 }
             }
@@ -163,13 +163,13 @@ public class StashFinder extends Module {
 
     private void fillTable(GuiTheme theme, WTable table) {
         for (Chunk chunk : chunks) {
-            table.add(theme.label("位置：" + chunk.x + "," + chunk.z));
-            table.add(theme.label("总计：" + chunk.getTotal()));
+            table.add(theme.label("位置: " + chunk.x + ", " + chunk.z));
+            table.add(theme.label("总数: " + chunk.getTotal()));
 
             WButton open = table.add(theme.button("打开")).widget();
             open.action = () -> mc.setScreen(new ChunkScreen(theme, chunk));
 
-            WButton gotoBtn = table.add(theme.button("转到")).widget();
+            WButton gotoBtn = table.add(theme.button("前往")).widget();
             gotoBtn.action = () -> PathManagers.get().moveTo(new BlockPos(chunk.x, 0, chunk.z), true);
 
             WMinus delete = table.add(theme.minus()).widget();
@@ -241,7 +241,7 @@ public class StashFinder extends Module {
             file.getParentFile().mkdirs();
             Writer writer = new FileWriter(file);
 
-            writer.write("X,Z,宝箱,桶,潜影贝,末影宝箱,熔炉,分配器滴水器,料斗\n");
+            writer.write("X,Z,箱子,桶,潜影盒,末影箱,熔炉,发射器投掷器,漏斗\n");
             for (Chunk chunk : chunks) chunk.write(writer);
 
             writer.close();
@@ -263,11 +263,11 @@ public class StashFinder extends Module {
     }
 
     private File getJsonFile() {
-        return new File(new File(new File(MeteorClient.FOLDER, "stashes"), Utils.getFileWorldName()), "stashes.json");
+        return new File(new File(new File(MeteorClient.FOLDER, "储藏点"), Utils.getFileWorldName()), "stashes.json");
     }
 
     private File getCsvFile() {
-        return new File(new File(new File(MeteorClient.FOLDER, "stashes"), Utils.getFileWorldName()), "stashes.csv");
+        return new File(new File(new File(MeteorClient.FOLDER, "储藏点"), Utils.getFileWorldName()), "stashes.csv");
     }
 
     @Override
@@ -333,7 +333,7 @@ public class StashFinder extends Module {
         private final Chunk chunk;
 
         public ChunkScreen(GuiTheme theme, Chunk chunk) {
-            super(theme, "块位于 " + chunk.x + "," + chunk.z);
+            super(theme, "区块在 " + chunk.x + ", " + chunk.z);
 
             this.chunk = chunk;
         }
@@ -343,7 +343,7 @@ public class StashFinder extends Module {
             WTable t = add(theme.table()).expandX().widget();
 
             // Total
-            t.add(theme.label("总计:"));
+            t.add(theme.label("总数:"));
             t.add(theme.label(chunk.getTotal() + ""));
             t.row();
 
@@ -351,7 +351,7 @@ public class StashFinder extends Module {
             t.row();
 
             // Separate
-            t.add(theme.label("宝箱:"));
+            t.add(theme.label("箱子:"));
             t.add(theme.label(chunk.chests + ""));
             t.row();
 
@@ -359,11 +359,11 @@ public class StashFinder extends Module {
             t.add(theme.label(chunk.barrels + ""));
             t.row();
 
-            t.add(theme.label("潜影贝:"));
+            t.add(theme.label("潜影盒:"));
             t.add(theme.label(chunk.shulkers + ""));
             t.row();
 
-            t.add(theme.label("末影宝箱:"));
+            t.add(theme.label("末影箱:"));
             t.add(theme.label(chunk.enderChests + ""));
             t.row();
 
@@ -371,11 +371,11 @@ public class StashFinder extends Module {
             t.add(theme.label(chunk.furnaces + ""));
             t.row();
 
-            t.add(theme.label("分配器和滴管："));
+            t.add(theme.label("发射器和投掷器:"));
             t.add(theme.label(chunk.dispensersDroppers + ""));
             t.row();
 
-            t.add(theme.label("料斗："));
+            t.add(theme.label("漏斗:"));
             t.add(theme.label(chunk.hoppers + ""));
         }
     }

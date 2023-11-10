@@ -23,15 +23,15 @@ public class Spam extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<List<String>> messages = sgGeneral.add(new StringListSetting.Builder()
-        .name("messages")
+        .name("消息")
         .description("用于垃圾邮件的消息。")
         .defaultValue(List.of("Meteor on Crack!"))
         .build()
     );
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
-        .name("delay")
-        .description("指定消息之间的延迟(以刻度为单位)。")
+        .name("延迟")
+        .description("指定消息之间的刻数延迟。")
         .defaultValue(20)
         .min(0)
         .sliderMax(200)
@@ -39,30 +39,30 @@ public class Spam extends Module {
     );
 
     private final Setting<Boolean> disableOnLeave = sgGeneral.add(new BoolSetting.Builder()
-        .name("disable-on-leave")
-        .description("离开时禁用垃圾邮件服务器。")
+        .name("离开时关闭")
+        .description("离开服务器时关闭垃圾邮件。")
         .defaultValue(true)
         .build()
     );
 
 
     private final Setting<Boolean> disableOnDisconnect = sgGeneral.add(new BoolSetting.Builder()
-        .name("disable-on-disconnect")
-        .description("当您与服务器断开连接时禁用垃圾邮件。")
+        .name("断开时关闭")
+        .description("从服务器断开时关闭垃圾邮件。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> random = sgGeneral.add(new BoolSetting.Builder()
-        .name("randomise")
-        .description("从垃圾邮件列表中选择随机邮件。")
+        .name("随机")
+        .description("从你的垃圾邮件消息列表中选择一个随机消息。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> bypass = sgGeneral.add(new BoolSetting.Builder()
-        .name("bypass")
-        .description("添加随机邮件消息末尾的文本,用于尝试绕过反垃圾邮件。")
+        .name("绕过")
+        .description("在消息的末尾添加随机文本，试图绕过反垃圾邮件。")
         .defaultValue(false)
         .build()
     );
@@ -79,7 +79,7 @@ public class Spam extends Module {
     private int messageI, timer;
 
     public Spam() {
-        super(Categories.Misc, "垃圾邮件", "垃圾邮件在聊天中指定的消息。");
+        super(Categories.Misc, "垃圾邮件", "在聊天中发送指定的消息。");
     }
 
     @Override

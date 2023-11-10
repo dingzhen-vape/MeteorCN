@@ -22,21 +22,21 @@ public class PacketCanceller extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Set<Class<? extends Packet<?>>>> s2cPackets = sgGeneral.add(new PacketListSetting.Builder()
-        .name("S2C-packets")
-        .description("要取消的服务器到客户端数据包。")
+        .name("S2C-数据包")
+        .description("要取消的服务器到客户端的数据包。")
         .filter(aClass -> PacketUtils.getS2CPackets().contains(aClass))
         .build()
     );
 
     private final Setting<Set<Class<? extends Packet<?>>>> c2sPackets = sgGeneral.add(new PacketListSetting.Builder()
-        .name("C2S-packets")
-        .description("要取消的客户端到服务器数据包。")
+        .name("C2S-数据包")
+        .description("要取消的客户端到服务器的数据包。")
         .filter(aClass -> PacketUtils.getC2SPackets().contains(aClass))
         .build()
     );
 
     public PacketCanceller() {
-        super(Categories.Misc, "packet-canceller", "允许您取消某些数据包.");
+        super(Categories.Misc, "数据包取消器", "让你可以取消某些数据包。");
     }
 
     @EventHandler(priority = EventPriority.HIGHEST + 1)

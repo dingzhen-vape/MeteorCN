@@ -23,7 +23,7 @@ public class AutoBrewer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<MyPotion> potion = sgGeneral.add(new PotionSetting.Builder()
-        .name("potion")
+        .name("药水")
         .description("要酿造的药水类型。")
         .defaultValue(MyPotion.Strength)
         .build()
@@ -34,7 +34,7 @@ public class AutoBrewer extends Module {
     private int timer;
 
     public AutoBrewer() {
-        super(Categories.World, "自动酿造", "自动酿造指定的药水。");
+        super(Categories.World, "自动酿造器", "自动酿造指定的药水。");
     }
 
     @Override
@@ -94,7 +94,7 @@ public class AutoBrewer extends Module {
         }
 
         if (slot == -1) {
-            error("你的库存中没有任何 %s 剩余...禁用。", ingredient.getName().getString());
+            error("你的背包里没有%s了... 禁用。", ingredient.getName().getString());
             toggle();
             return true;
         }
@@ -116,7 +116,7 @@ public class AutoBrewer extends Module {
             }
 
             if (slot == -1) {
-                error("您没有足够数量的火焰粉来用作酿造的燃料...禁用。");
+                error("你没有足够的烈焰粉来作为酿造的燃料... 禁用。");
                 toggle();
                 return true;
             }
@@ -146,7 +146,7 @@ public class AutoBrewer extends Module {
             }
 
             if (slot == -1) {
-                error("您没有足够数量的水瓶来完成此酿造...禁用。");
+                error("你没有足够的水瓶来完成这个酿造... 禁用。");
                 toggle();
                 return true;
             }
@@ -162,7 +162,7 @@ public class AutoBrewer extends Module {
             InvUtils.shiftClick().slotId(i);
 
             if (!c.slots.get(i).getStack().isEmpty()) {
-                error("您没有有足够的库存空间...禁用。");
+                error("你没有足够的背包空间... 禁用。");
                 toggle();
                 return true;
             }

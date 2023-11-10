@@ -26,7 +26,7 @@ public class BetterTab extends Module {
 
     public final Setting<Integer> tabSize = sgGeneral.add(new IntSetting.Builder()
         .name("tablist-size")
-        .description("在选项卡列表中总共显示多少个玩家。")
+        .description("在tablist中显示的玩家总数。")
         .defaultValue(100)
         .min(1)
         .sliderRange(1, 1000)
@@ -35,7 +35,7 @@ public class BetterTab extends Module {
 
     public final Setting<Integer> tabHeight = sgGeneral.add(new IntSetting.Builder()
         .name("column-height")
-        .description("每列中显示多少个玩家。")
+        .description("每列显示的玩家数。")
         .defaultValue(20)
         .min(1)
         .sliderRange(1, 1000)
@@ -44,14 +44,14 @@ public class BetterTab extends Module {
 
     private final Setting<Boolean> self = sgGeneral.add(new BoolSetting.Builder()
         .name("highlight-self")
-        .description("在列表中突出显示自己tablist。")
+        .description("在tablist中高亮自己。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<SettingColor> selfColor = sgGeneral.add(new ColorSetting.Builder()
         .name("self-color")
-        .description("突出显示你的名字的颜色。")
+        .description("高亮自己的名字的颜色。")
         .defaultValue(new SettingColor(250, 130, 30))
         .visible(self::get)
         .build()
@@ -59,14 +59,14 @@ public class BetterTab extends Module {
 
     private final Setting<Boolean> friends = sgGeneral.add(new BoolSetting.Builder()
         .name("highlight-friends")
-        .description("突出显示 tablist 中的朋友。")
+        .description("在tablist中高亮好友。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Boolean> accurateLatency = sgGeneral.add(new BoolSetting.Builder()
         .name("accurate-latency")
-        .description("将延迟显示为列表中的数字tablist.")
+        .description("在tablist中以数字显示延迟。")
         .defaultValue(true)
         .build()
     );
@@ -80,7 +80,7 @@ public class BetterTab extends Module {
 
 
     public BetterTab() {
-        super(Categories.Misc, "better-tab", "对选项卡列表的各种改进。");
+        super(Categories.Misc, "better-tab", "对tablist的各种改进。");
     }
 
     public Text getPlayerName(PlayerListEntry playerListEntry) {
@@ -115,13 +115,13 @@ public class BetterTab extends Module {
                 gmText = switch (gm) {
                     case SPECTATOR -> "Sp";
                     case SURVIVAL -> "S";
-                    case CREATIVE -> " C";
+                    case CREATIVE -> "C";
                     case ADVENTURE -> "A";
                 };
             }
             MutableText text = Text.literal("");
             text.append(name);
-            text.append("[" + gmText + "]");
+            text.append(" [" + gmText + "]");
             name = text;
         }
 

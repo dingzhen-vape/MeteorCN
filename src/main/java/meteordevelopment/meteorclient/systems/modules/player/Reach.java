@@ -15,8 +15,8 @@ public class Reach extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> blockReach = sgGeneral.add(new DoubleSetting.Builder()
-        .name("block-reach")
-        .description("块的到达修饰符。")
+        .name("方块触及")
+        .description("方块的触及修正。")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -24,8 +24,8 @@ public class Reach extends Module {
     );
 
     private final Setting<Double> entityReach = sgGeneral.add(new DoubleSetting.Builder()
-        .name("entity-reach")
-        .description("实体的到达修饰符。")
+        .name("实体触及")
+        .description("实体的触及修正。")
         .defaultValue(3)
         .min(0)
         .sliderMax(6)
@@ -33,7 +33,7 @@ public class Reach extends Module {
     );
 
     public Reach() {
-        super(Categories.Player, "reach", "给你超长的手臂。");
+        super(Categories.Player, "触及", "给你超长的手臂。");
     }
 
     public float blockReach() {

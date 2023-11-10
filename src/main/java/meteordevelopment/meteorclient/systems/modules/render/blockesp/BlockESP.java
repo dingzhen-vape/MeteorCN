@@ -38,8 +38,8 @@ public class BlockESP extends Module {
     // General
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("blocks")
-        .description("要搜索的块。")
+        .name("方块")
+        .description("要搜索的方块。")
         .onChanged(blocks1 -> {
             if (isActive() && Utils.canUpdate()) onActivate();
         })
@@ -47,8 +47,8 @@ public class BlockESP extends Module {
     );
 
     private final Setting<ESPBlockData> defaultBlockConfig = sgGeneral.add(new GenericSetting.Builder<ESPBlockData>()
-        .name("default-block-config")
-        .description("默认块配置。")
+        .name("默认方块配置")
+        .description("默认的方块配置。")
         .defaultValue(
             new ESPBlockData(
                 ShapeMode.Lines,
@@ -62,15 +62,15 @@ public class BlockESP extends Module {
     );
 
     private final Setting<Map<Block, ESPBlockData>> blockConfigs = sgGeneral.add(new BlockDataSetting.Builder<ESPBlockData>()
-        .name("block-configs")
-        .description("每个块的配置。")
+        .name("方块配置")
+        .description("每个方块的配置。")
         .defaultData(defaultBlockConfig)
         .build()
     );
 
     private final Setting<Boolean> tracers = sgGeneral.add(new BoolSetting.Builder()
-        .name("tracers")
-        .description("渲染跟踪线.")
+        .name("追踪线")
+        .description("渲染追踪线。")
         .defaultValue(false)
         .build()
     );
@@ -83,7 +83,7 @@ public class BlockESP extends Module {
     private Dimension lastDimension;
 
     public BlockESP() {
-        super(Categories.Render, "block-esp", "穿过墙壁渲染指定的方块。");
+        super(Categories.Render, "方块ESP", "透过墙壁渲染指定的方块。");
 
         RainbowColors.register(this::onTickRainbow);
     }

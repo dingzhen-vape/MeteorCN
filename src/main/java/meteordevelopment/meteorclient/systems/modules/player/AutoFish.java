@@ -25,15 +25,15 @@ public class AutoFish extends Module {
     // General
 
     private final Setting<Boolean> autoCast = sgGeneral.add(new BoolSetting.Builder()
-        .name("自动施法")
-        .description("不钓鱼时自动施法。")
+        .name("自动投掷")
+        .description("当不在钓鱼时自动投掷。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Integer> ticksAutoCast = sgGeneral.add(new IntSetting.Builder()
-        .name("ticks-auto-cast")
-        .description("自动重施之前等待的刻度数。")
+        .name("投掷刻数")
+        .description("自动投掷前等待的刻数。")
         .defaultValue(10)
         .min(0)
         .sliderMax(60)
@@ -41,8 +41,8 @@ public class AutoFish extends Module {
     );
 
     private final Setting<Integer> ticksCatch = sgGeneral.add(new IntSetting.Builder()
-        .name("catch-delay")
-        .description("捕获鱼之前要等待的蜱虫数量。")
+        .name("捕获延迟")
+        .description("捕获鱼前等待的刻数。")
         .defaultValue(6)
         .min(0)
         .sliderMax(60)
@@ -51,7 +51,7 @@ public class AutoFish extends Module {
 
     private final Setting<Integer> ticksThrow = sgGeneral.add(new IntSetting.Builder()
         .name("投掷延迟")
-        .description("扔浮子之前要等待的蜱虫数量。")
+        .description("投掷鱼钩前等待的刻数。")
         .defaultValue(14)
         .min(0)
         .sliderMax(60)
@@ -59,8 +59,8 @@ public class AutoFish extends Module {
     );
 
     private final Setting<Boolean> antiBreak = sgGeneral.add(new BoolSetting.Builder()
-        .name("防断裂")
-        .description("防止鱼竿断裂。")
+        .name("防破")
+        .description("防止钓鱼竿破损。")
         .defaultValue(false)
         .build()
     );
@@ -68,15 +68,15 @@ public class AutoFish extends Module {
     // Splash Detection
 
     private final Setting<Boolean> splashDetectionRangeEnabled = sgSplashRangeDetection.add(new BoolSetting.Builder()
-        .name("飞溅-detection-range-enabled")
-        .description("允许您使用彼此相邻的多个帐户。")
+        .name("飞溅检测范围-启用")
+        .description("让你可以在彼此旁边使用多个账号。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Double> splashDetectionRange = sgSplashRangeDetection.add(new DoubleSetting.Builder()
-        .name("splash-detection-range")
-        .description("启动的检测范围。当 TPS 较低时,较低的值将不起作用。")
+        .name("飞溅检测范围")
+        .description("飞溅的检测范围。低的值在TPS低时不会工作。")
         .defaultValue(10)
         .min(0)
         .build()
@@ -92,7 +92,7 @@ public class AutoFish extends Module {
     private int autoCastCheckTimer;
 
     public AutoFish() {
-        super(Categories.Player, "自动钓鱼", "自动为您钓鱼。");
+        super(Categories.Player, "自动钓鱼", "自动为你钓鱼。");
     }
 
     @Override

@@ -34,7 +34,7 @@ import net.minecraft.util.math.Vec3d;
 public class BedAura extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgTargeting = settings.createGroup("目标");
-    private final SettingGroup sgAutoMove = settings.createGroup("库存");
+    private final SettingGroup sgAutoMove = settings.createGroup("物品栏");
     private final SettingGroup sgPause = settings.createGroup("暂停");
     private final SettingGroup sgRender = settings.createGroup("渲染");
 
@@ -42,7 +42,7 @@ public class BedAura extends Module {
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
         .name("延迟")
-        .description("在刻度中放置床之间的延迟。")
+        .description("放置床之间的刻延迟.")
         .defaultValue(9)
         .min(0)
         .sliderMax(20)
@@ -51,7 +51,7 @@ public class BedAura extends Module {
 
     private final Setting<Boolean> strictDirection = sgGeneral.add(new BoolSetting.Builder()
         .name("严格方向")
-        .description("仅将床放置在您面对的方向上。")
+        .description("只在你面对的方向放置床.")
         .defaultValue(false)
         .build()
     );
@@ -59,8 +59,8 @@ public class BedAura extends Module {
     // Targeting
 
     private final Setting<Double> targetRange = sgTargeting.add(new DoubleSetting.Builder()
-        .name("target-range")
-        .description("玩家可以被瞄准的范围。")
+        .name("目标范围")
+        .description("玩家可以被目标的范围.")
         .defaultValue(4)
         .min(0)
         .sliderMax(5)
@@ -68,15 +68,15 @@ public class BedAura extends Module {
     );
 
     private final Setting<SortPriority> priority = sgTargeting.add(new EnumSetting.Builder<SortPriority>()
-        .name("target-priority")
-        .description("如何过滤范围内的目标。")
+        .name("目标优先级")
+        .description("如何筛选范围内的目标.")
         .defaultValue(SortPriority.LowestHealth)
         .build()
     );
 
     private final Setting<Double> minDamage = sgTargeting.add(new DoubleSetting.Builder()
-        .name("min-damage")
-        .description("对目标造成的最小伤害.")
+        .name("最小伤害")
+        .description("对你的目标造成的最小伤害.")
         .defaultValue(7)
         .range(0, 36)
         .sliderMax(36)
@@ -84,8 +84,8 @@ public class BedAura extends Module {
     );
 
     private final Setting<Double> maxSelfDamage = sgTargeting.add(new DoubleSetting.Builder()
-        .name("最大自我伤害")
-        .description("对自己造成的最大伤害。")
+        .name("最大自伤")
+        .description("对你自己造成的最大伤害.")
         .defaultValue(7)
         .range(0, 36)
         .sliderMax(36)
@@ -93,8 +93,8 @@ public class BedAura extends Module {
     );
 
     private final Setting<Boolean> antiSuicide = sgTargeting.add(new BoolSetting.Builder()
-        .name("反自杀")
-        .description("如果他们会杀了你,不会放置和打破床。")
+        .name("防止自杀")
+        .description("如果会杀死你，就不会放置和炸掉床.")
         .defaultValue(true)
         .build()
     );
@@ -103,14 +103,14 @@ public class BedAura extends Module {
 
     private final Setting<Boolean> autoMove = sgAutoMove.add(new BoolSetting.Builder()
         .name("自动移动")
-        .description("将床移动到选定的热栏插槽中。")
+        .description("将床移动到一个选定的物品栏槽.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> autoMoveSlot = sgAutoMove.add(new IntSetting.Builder()
-        .name("auto-move-slot")
-        .description("插槽自动移动将床移动到。")
+        .name("自动移动槽")
+        .description("自动移动将床移动到的槽.")
         .defaultValue(9)
         .range(1, 9)
         .sliderRange(1, 9)
@@ -120,7 +120,7 @@ public class BedAura extends Module {
 
     private final Setting<Boolean> autoSwitch = sgAutoMove.add(new BoolSetting.Builder()
         .name("自动切换")
-        .description("自动切换到床和从床切换。")
+        .description("自动切换到和离开床.")
         .defaultValue(true)
         .build()
     );
@@ -128,22 +128,22 @@ public class BedAura extends Module {
     // Pause
 
     private final Setting<Boolean> pauseOnEat = sgPause.add(new BoolSetting.Builder()
-        .name("pause-on- eat")
-        .description("吃饭时暂停。")
+        .name("吃东西时暂停")
+        .description("吃东西时暂停.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> pauseOnDrink = sgPause.add(new BoolSetting.Builder()
-        .name("pause-on-drink")
-        .description("喝酒时暂停。")
+        .name("喝药水时暂停")
+        .description("喝药水时暂停.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> pauseOnMine = sgPause.add(new BoolSetting.Builder()
-        .name("pause-on-mine")
-        .description("挖矿时暂停。")
+        .name("挖掘方块时暂停")
+        .description("挖掘方块时暂停.")
         .defaultValue(true)
         .build()
     );
@@ -151,36 +151,36 @@ public class BedAura extends Module {
     // Render
 
     private final Setting<Boolean> swing = sgRender.add(new BoolSetting.Builder()
-        .name("swing")
-        .description("是否摇摆手客户端-side.")
+        .name("挥动")
+        .description("是否在客户端挥动手.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
-        .name("render")
-        .description("渲染放置床的块。")
+        .name("渲染")
+        .description("渲染放置床的方块.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式.")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("要放置的位置的侧面颜色被放置。")
+        .name("侧颜色")
+        .description("要放置的位置的侧颜色.")
         .defaultValue(new SettingColor(15, 255, 211,75))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("要放置的位置的线条颜色。")
+        .name("线颜色")
+        .description("要放置的位置的线颜色.")
         .defaultValue(new SettingColor(15, 255, 211))
         .build()
     );
@@ -191,7 +191,7 @@ public class BedAura extends Module {
     private int timer;
 
     public BedAura() {
-        super(Categories.Combat, "bed-aura", "自动放置并爆炸下界和末地的床。");
+        super(Categories.Combat, "床灵光", "在下界和末地自动放置和引爆床.");
     }
 
     @Override
@@ -204,7 +204,7 @@ public class BedAura extends Module {
     private void onTick(TickEvent.Post event) {
         // Check if beds can explode here
         if (mc.world.getDimension().bedWorks()) {
-            error("你不能炸毁这个维度的床,让人无法行动。");
+            error("你不能在这个维度炸掉床，禁用.");
             toggle();
             return;
         }

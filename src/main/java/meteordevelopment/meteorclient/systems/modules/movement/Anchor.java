@@ -21,8 +21,8 @@ public class Anchor extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Integer> maxHeight = sgGeneral.add(new IntSetting.Builder()
-        .name("max-height")
-        .description("锚点工作的最大高度。")
+        .name("最大高度")
+        .description("锚点能够工作的最大高度。")
         .defaultValue(10)
         .range(0, 255)
         .sliderMax(20)
@@ -30,8 +30,8 @@ public class Anchor extends Module {
     );
 
     private final Setting<Integer> minPitch = sgGeneral.add(new IntSetting.Builder()
-        .name("min-pitch")
-        .description("锚点工作的最小螺距。")
+        .name("最小俯仰角")
+        .description("锚点能够工作的最小俯仰角。")
         .defaultValue(0)
         .range(-90, 90)
         .sliderRange(-90, 90)
@@ -39,22 +39,22 @@ public class Anchor extends Module {
     );
 
     private final Setting<Boolean> cancelMove = sgGeneral.add(new BoolSetting.Builder()
-        .name("cancel-jump-in-hole")
-        .description("防止您当 Anchor 处于活动状态且满足最小间距时跳跃。")
+        .name("取消洞中跳跃")
+        .description("当锚点激活并且达到最小俯仰角时，阻止你跳跃。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pull = sgGeneral.add(new BoolSetting.Builder()
-        .name("pull")
-        .description("Anchor 的拉力。")
+        .name("拉力")
+        .description("锚点的拉力。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Double> pullSpeed = sgGeneral.add(new DoubleSetting.Builder()
-        .name("pull-speed")
-        .description("每秒拉向孔的速度(以块为单位)。")
+        .name("拉速")
+        .description("以每秒方块数为单位向洞拉近的速度。")
         .defaultValue(0.3)
         .min(0)
         .sliderMax(5)
@@ -72,7 +72,7 @@ public class Anchor extends Module {
     public double deltaX, deltaZ;
 
     public Anchor() {
-        super(Categories.Movement, "anchor", "通过在洞上方完全停止运动来帮助您进入洞。");
+        super(Categories.Movement, "锚点", "通过在洞上完全停止你的移动来帮助你进入洞。");
     }
 
     @Override

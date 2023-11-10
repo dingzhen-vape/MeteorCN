@@ -10,6 +10,6 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 
 public class Portals extends Module {
     public Portals() {
-        super(Categories.Player, "传送门", "允许您在下界传送门中正常使用 GUI。");
+        super(Categories.Player, "传送门", "允许你在下界传送门里正常使用GUI。");
     }
 }

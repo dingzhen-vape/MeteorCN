@@ -41,8 +41,8 @@ public class InfinityMiner extends Module {
     // General
 
     public final Setting<List<Block>> targetBlocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("目标块")
-        .description("要开采的目标块。")
+        .name("目标方块")
+        .description("要挖掘的目标方块。")
         .defaultValue(Blocks.DIAMOND_ORE, Blocks.DEEPSLATE_DIAMOND_ORE)
         .filter(this::filterBlocks)
         .build()
@@ -56,16 +56,16 @@ public class InfinityMiner extends Module {
     );
 
     public final Setting<List<Block>> repairBlocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("修复块")
-        .description("要开采的修复块。")
+        .name("修复方块")
+        .description("要挖掘的修复方块。")
         .defaultValue(Blocks.COAL_ORE, Blocks.REDSTONE_ORE, Blocks.NETHER_QUARTZ_ORE)
         .filter(this::filterBlocks)
         .build()
     );
 
     public final Setting<Double> startRepairing = sgGeneral.add(new DoubleSetting.Builder()
-        .name("repair-threshold")
-        .description("开始修理的耐用性百分比。")
+        .name("修复阈值")
+        .description("开始修复的耐久度百分比。")
         .defaultValue(20)
         .range(1, 99)
         .sliderRange(1, 99)
@@ -73,8 +73,8 @@ public class InfinityMiner extends Module {
     );
 
     public final Setting<Double> startMining = sgGeneral.add(new DoubleSetting.Builder()
-        .name("mine-threshold")
-        .description("开始采矿的耐用性百分比。")
+        .name("挖掘阈值")
+        .description("开始挖掘的耐久度百分比。")
         .defaultValue(70)
         .range(1, 99)
         .sliderRange(1, 99)
@@ -84,15 +84,15 @@ public class InfinityMiner extends Module {
     // When Full
 
     public final Setting<Boolean> walkHome = sgWhenFull.add(new BoolSetting.Builder()
-        .name("walk-home")
-        .description("将在以下情况下步行'回家'您的库存已满。")
+        .name("走回家")
+        .description("当你的背包满了时，会走回“家”。")
         .defaultValue(false)
         .build()
     );
 
     public final Setting<Boolean> logOut = sgWhenFull.add(new BoolSetting.Builder()
-        .name("注销")
-        .description("当您的库存已满时注销。如果启用步行回家,将首先步行回家。")
+        .name("登出")
+        .description("当你的背包满了时，会登出。如果启用了走回家，会先走回家再登出。")
         .defaultValue(false)
         .build()
     );
@@ -106,7 +106,7 @@ public class InfinityMiner extends Module {
     private boolean repairing;
 
     public InfinityMiner() {
-        super(Categories.World, "无限矿工", "当耐用性降低时,允许您通过挖掘修复块来永久采矿。需要修理镐。");
+        super(Categories.World, "无限矿工", "通过在耐久度低时挖掘修复方块，让你可以无限地挖掘。需要一个有经验修补附魔的镐子。");
     }
 
     @Override
@@ -128,14 +128,14 @@ public class InfinityMiner extends Module {
         if (isFull()) {
             if (walkHome.get()) {
                 if (isBaritoneNotWalking()) {
-                    info("步行回家。");
+                    info("走回家中。");
                     baritone.getCustomGoalProcess().setGoalAndPath(new GoalBlock(homePos));
                 }
                 else if (mc.player.getBlockPos().equals(homePos) && logOut.get()) logOut();
             }
             else if (logOut.get()) logOut();
             else {
-                info("库存已满,正在停止进程。");
+                info("背包满了，停止进程。");
                 toggle();
             }
 
@@ -143,20 +143,20 @@ public class InfinityMiner extends Module {
         }
 
         if (!findPickaxe()) {
-            error("找不到可用的修理镐。");
+            error("找不到可用的有经验修补附魔的镐子。");
             toggle();
             return;
         }
 
         if (!checkThresholds()) {
-            error("开始采矿价值不能低于开始修理价值。");
+            error("开始挖掘的值不能低于开始修复的值。");
             toggle();
             return;
         }
 
         if (repairing) {
             if (!needsRepair()) {
-                warning("修复完毕,返回挖矿。");
+                warning("修复完成，回到挖掘。");
                 repairing = false;
                 mineTargetBlocks();
                 return;
@@ -166,7 +166,7 @@ public class InfinityMiner extends Module {
         }
         else {
             if (needsRepair()) {
-                warning("镐需要修复,开始修复过程");
+                warning("镐子需要修复，开始修复进程");
                 repairing = true;
                 mineRepairBlocks();
                 return;
@@ -214,7 +214,7 @@ public class InfinityMiner extends Module {
 
     private void logOut() {
         toggle();
-        mc.player.networkHandler.sendPacket(new DisconnectS2CPacket(Text.literal("[无限矿工] 库存已满。")));
+        mc.player.networkHandler.sendPacket(new DisconnectS2CPacket(Text.literal("[无限矿工] 背包满了。")));
     }
 
     private boolean isBaritoneNotMining() {

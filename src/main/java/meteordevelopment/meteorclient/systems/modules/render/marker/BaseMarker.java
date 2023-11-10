@@ -19,32 +19,32 @@ import net.minecraft.nbt.NbtCompound;
 public abstract class BaseMarker implements ISerializable<BaseMarker> {
     public final Settings settings = new Settings();
 
-    protected final SettingGroup sgBase = settings.createGroup("Base");
+    protected final SettingGroup sgBase = settings.createGroup("基础");
 
     public final Setting<String> name = sgBase.add(new StringSetting.Builder()
         .name("name")
-        .description("此标记的自定义名称。")
+        .description("这个标记的自定义名称。")
         .defaultValue("")
         .build()
     );
 
     protected final Setting<String> description = sgBase.add(new StringSetting.Builder()
         .name("description")
-        .description("此标记的自定义描述。")
+        .description("这个标记的自定义描述。")
         .defaultValue("")
         .build()
     );
 
     private final Setting<Dimension> dimension = sgBase.add(new EnumSetting.Builder<Dimension>()
         .name("dimension")
-        .description("此标记应在哪个维度可见.")
+        .description("这个标记应该在哪个维度可见。")
         .defaultValue(Dimension.Overworld)
         .build()
     );
 
     private final Setting<Boolean> active = sgBase.add(new BoolSetting.Builder()
-        .name("活动")
-        .description("此标记可见。")
+        .name("active")
+        .description("这个标记是否可见。")
         .defaultValue(false)
         .build()
     );
@@ -94,13 +94,13 @@ public abstract class BaseMarker implements ISerializable<BaseMarker> {
     @Override
     public NbtCompound toTag() {
         NbtCompound tag = new NbtCompound();
-        tag.put("设置", settings.toTag());
+        tag.put("settings", settings.toTag());
         return tag;
     }
 
     @Override
     public BaseMarker fromTag(NbtCompound tag) {
-        NbtCompound settingsTag = (NbtCompound) tag.get("设置");
+        NbtCompound settingsTag = (NbtCompound) tag.get("settings");
         if (settingsTag != null) settings.fromTag(settingsTag);
 
         return this;

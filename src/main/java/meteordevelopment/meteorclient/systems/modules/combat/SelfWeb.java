@@ -21,15 +21,15 @@ public class SelfWeb extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("用于自网的模式。")
+        .name("模式")
+        .description("自我网的使用模式。")
         .defaultValue(Mode.Normal)
         .build()
     );
 
     private final Setting<Integer> range = sgGeneral.add(new IntSetting.Builder()
-        .name("range")
-        .description("玩家必须距离你多远才能放置网。需要模式为智能。")
+        .name("范围")
+        .description("玩家离你多远时才放置网。需要模式为智能。")
         .defaultValue(3)
         .min(1)
         .sliderRange(1, 7)
@@ -39,7 +39,7 @@ public class SelfWeb extends Module {
 
     private final Setting<Boolean> doubles = sgGeneral.add(new BoolSetting.Builder()
         .name("双重放置")
-        .description("将网也放置在上部碰撞箱中。")
+        .description("也在你的上部碰撞箱放置网。")
         .defaultValue(false)
         .build()
     );
@@ -53,13 +53,13 @@ public class SelfWeb extends Module {
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("强制你旋转放置蜘蛛网时向下。")
+        .description("放置网时强制你向下旋转。")
         .defaultValue(true)
         .build()
     );
 
     public SelfWeb() {
-        super(Categories.Combat, "self-web", "自动在你身上放置蜘蛛网。");
+        super(Categories.Combat, "自我网", "自动在你身上放置网。");
     }
 
     @EventHandler

@@ -15,14 +15,14 @@ public class AntiPacketKick extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<Boolean> catchExceptions = sgGeneral.add(new BoolSetting.Builder()
-        .name("catch-exceptions")
+        .name("捕获异常")
         .description("丢弃损坏的数据包。")
         .defaultValue(false)
         .build()
     );
 
     public final Setting<Boolean> logExceptions = sgGeneral.add(new BoolSetting.Builder()
-        .name("log-exceptions")
+        .name("记录异常")
         .description("记录捕获的异常。")
         .defaultValue(false)
         .visible(catchExceptions::get)
@@ -30,7 +30,7 @@ public class AntiPacketKick extends Module {
     );
 
     public AntiPacketKick() {
-        super(Categories.Misc, "anti-packet-kick", "尝试防止您被大数据包断开连接。");
+        super(Categories.Misc, "反数据包踢出", "尝试防止你因为大数据包而被断开连接。");
     }
 
     public boolean catchExceptions() {

@@ -53,30 +53,30 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT;
 public class BetterTooltips extends Module {
     public static final Color ECHEST_COLOR = new Color(0, 50, 50);
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgPreviews = settings.createGroup("Previews");
-    private final SettingGroup sgOther = settings.createGroup("Other");
-    private final SettingGroup sgHideFlags = settings.createGroup("Hide Flags");
+    private final SettingGroup sgPreviews = settings.createGroup("预览");
+    private final SettingGroup sgOther = settings.createGroup("其他");
+    private final SettingGroup sgHideFlags = settings.createGroup("隐藏标志");
 
     // General
 
     private final Setting<DisplayWhen> displayWhen = sgGeneral.add(new EnumSetting.Builder<DisplayWhen>()
-        .name("display-when")
-        .description("When to display previews.")
+        .name("什么时候显示")
+        .description("何时显示预览。")
         .defaultValue(DisplayWhen.Keybind)
         .build()
     );
 
     private final Setting<Keybind> keybind = sgGeneral.add(new KeybindSetting.Builder()
         .name("keybind")
-        .description("The bind for keybind mode.")
+        .description("键绑定模式的绑定。")
         .defaultValue(Keybind.fromKey(GLFW_KEY_LEFT_ALT))
         .visible(() -> displayWhen.get() == DisplayWhen.Keybind)
         .build()
     );
 
     private final Setting<Boolean> middleClickOpen = sgGeneral.add(new BoolSetting.Builder()
-        .name("middle-click-open")
-        .description("Opens a GUI window with the inventory of the storage block when you middle click the item.")
+        .name("中键打开")
+        .description("当你在物品栏中中键点击存储方块的物品时，打开一个带有存储方块物品的GUI窗口。")
         .defaultValue(true)
         .build()
     );
@@ -84,37 +84,37 @@ public class BetterTooltips extends Module {
     // Previews
 
     private final Setting<Boolean> shulkers = sgPreviews.add(new BoolSetting.Builder()
-        .name("containers")
-        .description("Shows a preview of a containers when hovering over it in an inventory.")
+        .name("容器预览")
+        .description("当你在物品栏中悬停在一个容器上时，显示一个容器的预览。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> shulkerCompactTooltip = sgPreviews.add(new BoolSetting.Builder()
-        .name("compact-shulker-tooltip")
-        .description("Compacts the lines of the shulker tooltip.")
+        .name("压缩潜影盒")
+        .description("压缩潜影盒的提示行。")
         .defaultValue(true)
         .visible(shulkers::get)
         .build()
     );
 
     public final Setting<Boolean> echest = sgPreviews.add(new BoolSetting.Builder()
-        .name("echests")
-        .description("Shows a preview of your echest when hovering over it in an inventory.")
+        .name("末影箱预览")
+        .description("当你在物品栏中悬停在你的末影箱上时，显示你的末影箱的预览。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> maps = sgPreviews.add(new BoolSetting.Builder()
-        .name("maps")
-        .description("Shows a preview of a map when hovering over it in an inventory.")
+        .name("地图")
+        .description("当你在物品栏中悬停在一张地图上时，显示一张地图的预览。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Double> mapsScale = sgPreviews.add(new DoubleSetting.Builder()
-        .name("map-scale")
-        .description("The scale of the map preview.")
+        .name("地图比例")
+        .description("地图预览的比例。")
         .defaultValue(1)
         .min(0.001)
         .sliderMax(1)
@@ -123,22 +123,22 @@ public class BetterTooltips extends Module {
     );
 
     private final Setting<Boolean> books = sgPreviews.add(new BoolSetting.Builder()
-        .name("books")
-        .description("Shows contents of a book when hovering over it in an inventory.")
+        .name("书")
+        .description("当你在物品栏中悬停在一本书上时，显示一本书的内容。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> banners = sgPreviews.add(new BoolSetting.Builder()
-        .name("banners")
-        .description("Shows banners' patterns when hovering over it in an inventory. Also works with shields.")
+        .name("旗帜图案")
+        .description("当你在物品栏中悬停在一个旗帜上时，显示旗帜的图案。也适用于盾牌。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> entitiesInBuckets = sgPreviews.add(new BoolSetting.Builder()
-        .name("entities-in-buckets")
-        .description("Shows entities in buckets when hovering over it in an inventory.")
+        .name("桶内实体")
+        .description("当你在物品栏中悬停在一个桶上时，显示桶里的实体。")
         .defaultValue(true)
         .build()
     );
@@ -146,22 +146,22 @@ public class BetterTooltips extends Module {
     // Extras
 
     public final Setting<Boolean> byteSize = sgOther.add(new BoolSetting.Builder()
-        .name("byte-size")
-        .description("Displays an item's size in bytes in the tooltip.")
+        .name("字节大小")
+        .description("在提示中显示一个物品的字节大小。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> statusEffects = sgOther.add(new BoolSetting.Builder()
-        .name("status-effects")
-        .description("Adds list of status effects to tooltips of food items.")
+        .name("状态效果")
+        .description("在食物物品的提示中添加状态效果的列表。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> beehive = sgOther.add(new BoolSetting.Builder()
-        .name("beehive")
-        .description("Displays information about a beehive or bee nest.")
+        .name("蜂巢")
+        .description("显示一个蜂箱或蜂巢的信息。")
         .defaultValue(true)
         .build()
     );
@@ -169,56 +169,56 @@ public class BetterTooltips extends Module {
     //Hide flags
 
     private final Setting<Boolean> enchantments = sgHideFlags.add(new BoolSetting.Builder()
-        .name("enchantments")
-        .description("Show enchantments when it's hidden.")
+        .name("附魔")
+        .description("当它被隐藏时，显示附魔。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> modifiers = sgHideFlags.add(new BoolSetting.Builder()
-        .name("modifiers")
-        .description("Show item modifiers when it's hidden.")
+        .name("物品修饰符")
+        .description("当它被隐藏时，显示物品修饰符。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> unbreakable = sgHideFlags.add(new BoolSetting.Builder()
-        .name("unbreakable")
-        .description("Show \"Unbreakable\" tag when it's hidden.")
+        .name("不毁")
+        .description("当它被隐藏时，显示\"Unbreakable\"标签。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> canDestroy = sgHideFlags.add(new BoolSetting.Builder()
-        .name("can-destroy")
-        .description("Show \"CanDestroy\" tag when it's hidden.")
+        .name("可以被破坏")
+        .description("当它被隐藏时，显示\"CanDestroy\"标签。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> canPlaceOn = sgHideFlags.add(new BoolSetting.Builder()
-        .name("can-place-on")
-        .description("Show \"CanPlaceOn\" tag when it's hidden.")
+        .name("可以放在哪")
+        .description("当它被隐藏时，显示\"CanPlaceOn\"标签。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> additional = sgHideFlags.add(new BoolSetting.Builder()
         .name("additional")
-        .description("Show potion effects, firework status, book author, etc when it's hidden.")
+        .description("当它被隐藏时，显示药水效果，烟花状态，书籍作者等。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> dye = sgHideFlags.add(new BoolSetting.Builder()
         .name("dye")
-        .description("Show dyed item tags when it's hidden.")
+        .description("当它被隐藏时，显示染色物品的标签。")
         .defaultValue(false)
         .build()
     );
 
     public BetterTooltips() {
-        super(Categories.Render, "better-tooltips", "Displays more useful tooltips for certain items.");
+        super(Categories.Render, "更好的物品标签", "为某些物品显示更有用的提示。");
     }
 
     @EventHandler
@@ -267,13 +267,13 @@ public class BetterTooltips extends Module {
                     NbtCompound blockStateTag = tag.getCompound("BlockStateTag");
                     if (blockStateTag != null) {
                         int level = blockStateTag.getInt("honey_level");
-                        event.list.add(1, Text.literal(String.format("%sHoney level: %s%d%s.", Formatting.GRAY, Formatting.YELLOW, level, Formatting.GRAY)));
+                        event.list.add(1, Text.literal(String.format("%s蜂蜜等级: %s%d%s。", Formatting.GRAY, Formatting.YELLOW, level, Formatting.GRAY)));
                     }
 
                     NbtCompound blockEntityTag = tag.getCompound("BlockEntityTag");
                     if (blockEntityTag != null) {
                         NbtList beesTag = blockEntityTag.getList("Bees", 10);
-                        event.list.add(1, Text.literal(String.format("%sBees: %s%d%s.", Formatting.GRAY, Formatting.YELLOW, beesTag.size(), Formatting.GRAY)));
+                        event.list.add(1, Text.literal(String.format("%s蜜蜂: %s%d%s。", Formatting.GRAY, Formatting.YELLOW, beesTag.size(), Formatting.GRAY)));
                     }
                 }
             }
@@ -290,7 +290,7 @@ public class BetterTooltips extends Module {
                 ByteCountDataOutput.INSTANCE.reset();
 
                 if (byteCount >= 1024) count = String.format("%.2f kb", byteCount / (float) 1024);
-                else count = String.format("%d bytes", byteCount);
+                else count = String.format("%d 字节", byteCount);
 
                 event.list.add(Text.literal(count).formatted(Formatting.GRAY));
             } catch (IOException e) {
@@ -309,7 +309,7 @@ public class BetterTooltips extends Module {
             || (event.itemStack.getItem() instanceof BannerPatternItem && banners.get()  && !previewBanners())
             || (event.itemStack.getItem() == Items.SHIELD && banners.get() && !previewBanners())) {
             event.list.add(Text.literal(""));
-            event.list.add(Text.literal("Hold " + Formatting.YELLOW + keybind + Formatting.RESET + " to preview"));
+            event.list.add(Text.literal("按住 " + Formatting.YELLOW + keybind + Formatting.RESET + " 来预览"));
         }
     }
 
@@ -326,7 +326,7 @@ public class BetterTooltips extends Module {
         // EChest preview
         else if (event.itemStack.getItem() == Items.ENDER_CHEST && previewEChest()) {
             event.tooltipData = EChestMemory.isKnown() ? new ContainerTooltipComponent(EChestMemory.ITEMS, ECHEST_COLOR)
-                : new TextTooltipComponent(Text.literal("Unknown ender chest inventory.").formatted(Formatting.DARK_RED));
+                : new TextTooltipComponent(Text.literal("未知的末影箱物品。").formatted(Formatting.DARK_RED));
         }
 
         // Map preview
@@ -438,7 +438,7 @@ public class BetterTooltips extends Module {
         try {
             return Text.Serializer.fromLenientJson(pages.getString(0));
         } catch (JsonParseException e) {
-            return Text.literal("Invalid book data");
+            return Text.literal("无效的书籍数据");
         }
     }
 

@@ -20,21 +20,21 @@ public class FakePlayer extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<String> name = sgGeneral.add(new StringSetting.Builder()
-        .name("name")
+        .name("名字")
         .description("假玩家的名字。")
         .defaultValue("seasnail8169")
         .build()
     );
 
     public final Setting<Boolean> copyInv = sgGeneral.add(new BoolSetting.Builder()
-        .name("copy-inv")
-        .description("将你的物品栏复制到假玩家。")
+        .name("复制物品栏")
+        .description("复制你的物品栏到假玩家。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Integer> health = sgGeneral.add(new IntSetting.Builder()
-        .name("health")
+        .name("生命值")
         .description("假玩家的默认生命值。")
         .defaultValue(20)
         .min(1)
@@ -43,7 +43,7 @@ public class FakePlayer extends Module {
     );
 
     public FakePlayer() {
-        super(Categories.Player, " fake-player", "生成一个客户端假播放器以测试用法。无需主动。");
+        super(Categories.Player, "假玩家", "生成一个客户端的假玩家用于测试用途。无需激活。");
     }
 
     @Override
@@ -66,14 +66,14 @@ public class FakePlayer extends Module {
             table.row();
         }
 
-        WButton spawn = table.add(theme.button("Spawn")).expandCellX().right().widget();
+        WButton spawn = table.add(theme.button("生成")).expandCellX().right().widget();
         spawn.action = () -> {
             FakePlayerManager.add(name.get(), health.get(), copyInv.get());
             table.clear();
             fillTable(theme, table);
         };
 
-        WButton clear = table.add(theme.button("Clear All")).right().widget();
+        WButton clear = table.add(theme.button("清除所有")).right().widget();
         clear.action = () -> {
             FakePlayerManager.clear();
             table.clear();

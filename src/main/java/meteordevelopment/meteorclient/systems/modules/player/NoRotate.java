@@ -14,7 +14,7 @@ import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
 
 public class NoRotate extends Module {
     public NoRotate() {
-        super(Categories.Player, "no-rotate", "尝试阻止从服务器发送到客户端的旋转。");
+        super(Categories.Player, "无旋转", "尝试阻止服务器发送到客户端的旋转。");
     }
 
     @EventHandler

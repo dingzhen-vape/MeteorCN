@@ -62,36 +62,36 @@ public class Nametags extends Module {
     );
 
     private final Setting<Boolean> ignoreSelf = sgGeneral.add(new BoolSetting.Builder()
-        .name("ignore-self")
-        .description("忽略自己在第三人称或自由摄像头中。")
+        .name("忽略自己")
+        .description("在第三人称或自由视角时忽略自己。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> ignoreFriends = sgGeneral.add(new BoolSetting.Builder()
         .name("忽略朋友")
-        .description("忽略为朋友渲染名称标签。")
+        .description("忽略为朋友渲染姓名标签。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> ignoreBots = sgGeneral.add(new BoolSetting.Builder()
         .name("忽略机器人")
-        .description("仅渲染非机器人名称标签。")
+        .description("只渲染非机器人的姓名标签。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> culling = sgGeneral.add(new BoolSetting.Builder()
         .name("剔除")
-        .description("仅渲染一定数量的名称标签。一定距离处的姓名标签。")
+        .description("只渲染一定距离内的一定数量的姓名标签。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Double> maxCullRange = sgGeneral.add(new DoubleSetting.Builder()
-        .name("culling-range")
-        .description("仅渲染距玩家此距离内的姓名标签。")
+        .name("剔除范围")
+        .description("只渲染在你的玩家这个距离内的姓名标签。")
         .defaultValue(20)
         .min(0)
         .sliderMax(200)
@@ -100,8 +100,8 @@ public class Nametags extends Module {
     );
 
     private final Setting<Integer> maxCullCount = sgGeneral.add(new IntSetting.Builder()
-        .name("culling-count")
-        .description("仅渲染这么多姓名标签。")
+        .name("剔除数量")
+        .description("只渲染这么多的姓名标签。")
         .defaultValue(50)
         .min(1)
         .sliderRange(1, 100)
@@ -112,42 +112,42 @@ public class Nametags extends Module {
     //Players
 
     private final Setting<Boolean> displayHealth = sgPlayers.add(new BoolSetting.Builder()
-        .name("health")
-        .description("显示玩家的health.")
+        .name("生命值")
+        .description("显示玩家的生命值。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> displayGameMode = sgPlayers.add(new BoolSetting.Builder()
-        .name("gamemode")
-        .description("显示玩家的 GameMode。")
+        .name("游戏模式")
+        .description("显示玩家的游戏模式。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> displayDistance = sgPlayers.add(new BoolSetting.Builder()
-        .name("distance")
+        .name("距离")
         .description("显示你和玩家之间的距离。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> displayPing = sgPlayers.add(new BoolSetting.Builder()
-        .name("ping")
-        .description("显示玩家的 ping。")
+        .name("延迟")
+        .description("显示玩家的延迟。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> displayItems = sgPlayers.add(new BoolSetting.Builder()
-        .name("items")
-        .description("显示名称标签上方的盔甲和手部物品。")
+        .name("物品")
+        .description("在姓名标签上方显示护甲和手持物品。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> itemSpacing = sgPlayers.add(new DoubleSetting.Builder()
-        .name("item-spacing")
+        .name("物品间距")
         .description("物品之间的间距。")
         .defaultValue(2)
         .range(0, 10)
@@ -156,24 +156,24 @@ public class Nametags extends Module {
     );
 
     private final Setting<Boolean> ignoreEmpty = sgPlayers.add(new BoolSetting.Builder()
-        .name("ignore-empty-slots")
-        .description("不会在空物品堆栈所在的位置添加间距。")
+        .name("忽略空槽")
+        .description("不在空物品栈的位置添加间距。")
         .defaultValue(true)
         .visible(displayItems::get)
         .build()
     );
 
     private final Setting<Boolean> displayEnchants = sgPlayers.add(new BoolSetting.Builder()
-        .name(" display-enchants")
-        .description("在物品上显示物品附魔。")
+        .name("显示附魔")
+        .description("在物品上显示物品的附魔。")
         .defaultValue(false)
         .visible(displayItems::get)
         .build()
     );
 
     private final Setting<List<Enchantment>> shownEnchantments = sgPlayers.add(new EnchantmentListSetting.Builder()
-        .name("shown-enchantments")
-        .description("名称标签上显示的附魔。")
+        .name("显示的附魔")
+        .description("在姓名标签上显示的附魔。")
         .visible(() -> displayItems.get() && displayEnchants.get())
         .defaultValue(
             Enchantments.PROTECTION,
@@ -185,16 +185,16 @@ public class Nametags extends Module {
     );
 
     private final Setting<Position> enchantPos = sgPlayers.add(new EnumSetting.Builder<Position>()
-        .name("enchantment-position")
-        .description("渲染附魔的位置。")
+        .name("附魔位置")
+        .description("附魔渲染的位置。")
         .defaultValue(Position.Above)
         .visible(() -> displayItems.get() && displayEnchants.get())
         .build()
     );
 
     private final Setting<Integer> enchantLength = sgPlayers.add(new IntSetting.Builder()
-        .name("enchant- name-length")
-        .description("魔咒名称被修剪到的长度。")
+        .name("附魔名称长度")
+        .description("附魔名称被裁剪的长度。")
         .defaultValue(3)
         .range(1, 5)
         .sliderRange(1, 5)
@@ -203,8 +203,8 @@ public class Nametags extends Module {
     );
 
     private final Setting<Double> enchantTextScale = sgPlayers.add(new DoubleSetting.Builder()
-        .name("enchant-text-scale")
-        .description("魔咒文本的比例。")
+        .name("附魔文本比例")
+        .description("附魔文本的比例。")
         .defaultValue(1)
         .range(0.1, 2)
         .sliderRange(0.1, 2)
@@ -215,8 +215,8 @@ public class Nametags extends Module {
     //Items
 
     private final Setting<Boolean> itemCount = sgItems.add(new BoolSetting.Builder()
-        .name("show-count")
-        .description("显示堆栈中的项目数。 ")
+        .name("显示数量")
+        .description("显示物品栈中的物品数量。")
         .defaultValue(true)
         .build()
     );
@@ -224,46 +224,46 @@ public class Nametags extends Module {
     // Render
 
     private final Setting<SettingColor> background = sgRender.add(new ColorSetting.Builder()
-        .name("background-color")
+        .name("背景颜色")
         .description("姓名标签背景的颜色。")
         .defaultValue(new SettingColor(0, 0, 0, 75))
         .build()
     );
 
     private final Setting<SettingColor> nameColor = sgRender.add(new ColorSetting.Builder()
-        .name("name-color")
+        .name("名称颜色")
         .description("姓名标签名称的颜色。")
         .defaultValue(new SettingColor())
         .build()
     );
 
     private final Setting<SettingColor> pingColor = sgRender.add(new ColorSetting.Builder()
-        .name("ping-color")
-        .description("姓名标签 ping 的颜色。")
+        .name("延迟颜色")
+        .description("姓名标签延迟的颜色。")
         .defaultValue(new SettingColor(20, 170, 170))
         .visible(displayPing::get)
         .build()
     );
 
     private final Setting<SettingColor> gamemodeColor = sgRender.add(new ColorSetting.Builder()
-        .name("gamemode-color")
-        .description("名称标签游戏模式的颜色。")
+        .name("游戏模式颜色")
+        .description("姓名标签游戏模式的颜色。")
         .defaultValue(new SettingColor(232, 185, 35))
         .visible(displayGameMode::get)
         .build()
     );
 
     private final Setting<DistanceColorMode> distanceColorMode = sgRender.add(new EnumSetting.Builder<DistanceColorMode>()
-        .name("distance-color-mode")
-        .description("为名称标签距离着色的模式。")
+        .name("距离颜色模式")
+        .description("用于给姓名标签距离着色的模式。")
         .defaultValue(DistanceColorMode.Gradient)
         .visible(displayDistance::get)
         .build()
     );
 
     private final Setting<SettingColor> distanceColor = sgRender.add(new ColorSetting.Builder()
-        .name("distance-color")
-        .description("名称标签距离的颜色。 ")
+        .name("距离颜色")
+        .description("姓名标签距离的颜色。")
         .defaultValue(new SettingColor(150, 150, 150))
         .visible(() -> displayDistance.get() && distanceColorMode.get() == DistanceColorMode.Flat)
         .build()
@@ -281,20 +281,20 @@ public class Nametags extends Module {
     private final List<Entity> entityList = new ArrayList<>();
 
     public Nametags() {
-        super(Categories.Render, "nametags", "在玩家上方显示可自定义的名称标签。");
+        super(Categories.Render, "姓名标签", "在玩家上方显示可自定义的姓名标签。");
     }
 
     private static String ticksToTime(int ticks) {
         if (ticks > 20 * 3600) {
             int h = ticks / 20 / 3600;
-            return h + " h";
+            return h + " 小时";
         } else if (ticks > 20 * 60) {
             int m = ticks / 20 / 60;
-            return m + " m";
+            return m + " 分钟";
         } else {
             int s = ticks / 20;
             int ms = (ticks % 20) / 2;
-            return s + "." + ms + " s";
+            return s + "。" + ms + " 秒";
         }
     }
 
@@ -375,17 +375,17 @@ public class Nametags extends Module {
 
         // Gamemode
         GameMode gm = EntityUtils.getGameMode(player);
-        String gmText = "BOT";
+        String gmText = "机器人";
         if (gm != null) {
             gmText = switch (gm) {
-                case SPECTATOR -> "Sp";
-                case SURVIVAL -> "S";
-                case CREATIVE -> "C";
-                case ADVENTURE -> "A";
+                case SPECTATOR -> "生存";
+                case SURVIVAL -> "创造";
+                case CREATIVE -> "冒险";
+                case ADVENTURE -> "观察";
             };
         }
 
-        gmText = "[" + gmText + "]";
+        gmText = "[" + gmText + "] ";
 
         // Name
         String name;
@@ -408,11 +408,11 @@ public class Nametags extends Module {
 
         // Ping
         int ping = EntityUtils.getPing(player);
-        String pingText = "[" + ping + "ms]";
+        String pingText = " [" + ping + "毫秒]";
 
         // Distance
         double dist = Math.round(PlayerUtils.distanceToCamera(player) * 10.0) / 10.0;
-        String distText = " " + dist + "m";
+        String distText = " " + dist + "米";
 
         // Calc widths
         double gmWidth = text.getWidth(gmText, shadow);

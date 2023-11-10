@@ -27,22 +27,22 @@ public class AutoShearer extends Module {
 
     private final Setting<Double> distance = sgGeneral.add(new DoubleSetting.Builder()
         .name("距离")
-        .description("剪羊毛时羊的最大距离。")
+        .description("绵羊被剪毛的最大距离。")
         .min(0.0)
         .defaultValue(5.0)
         .build()
     );
 
     private final Setting<Boolean> antiBreak = sgGeneral.add(new BoolSetting.Builder()
-        .name("防断裂")
-        .description("防止剪羊毛被折断。")
+        .name("防止破损")
+        .description("防止剪刀被破坏。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("自动面向被剪羊毛的动物。")
+        .description("自动面向被剪毛的动物。")
         .defaultValue(true)
         .build()
     );
@@ -51,7 +51,7 @@ public class AutoShearer extends Module {
     private Hand hand;
 
     public AutoShearer() {
-        super(Categories.World, "自动剪羊毛机", "自动剪羊毛。");
+        super(Categories.World, "自动剪毛器", "自动剪毛绵羊。");
     }
 
     @Override

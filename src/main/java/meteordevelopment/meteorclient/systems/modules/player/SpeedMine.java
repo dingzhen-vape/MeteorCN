@@ -31,24 +31,24 @@ public class SpeedMine extends Module {
     );
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("块")
-        .description("选定的块。")
+        .name("方块")
+        .description("选择的方块。")
         .filter(block -> block.getHardness() > 0)
         .visible(() -> mode.get() != Mode.Haste)
         .build()
     );
 
     private final Setting<ListMode> blocksFilter = sgGeneral.add(new EnumSetting.Builder<ListMode>()
-        .name("块过滤器")
-        .description("如何使用块设置。")
+        .name("方块过滤")
+        .description("如何使用方块设置。")
         .defaultValue(ListMode.Blacklist)
         .visible(() -> mode.get() != Mode.Haste)
         .build()
     );
 
     public final Setting<Double> modifier = sgGeneral.add(new DoubleSetting.Builder()
-        .name("修改器")
-        .description("挖掘速度修改器。附加值 0.2 相当于一个急速等级(1.2 = 急速 1)。")
+        .name("修正")
+        .description("挖掘速度的修正。额外的0.2相当于一个急迫等级（1.2 = 急迫 1）。")
         .defaultValue(1.4)
         .visible(() -> mode.get() == Mode.Normal)
         .min(0)
@@ -56,8 +56,8 @@ public class SpeedMine extends Module {
     );
 
     private final Setting<Integer> hasteAmplifier = sgGeneral.add(new IntSetting.Builder()
-        .name("急速放大器")
-        .description("为您提供多少急速值。不推荐以上2种。")
+        .name("急迫放大器")
+        .description("给你的急迫值。不建议超过2。")
         .defaultValue(2)
         .min(1)
         .visible(() -> mode.get() == Mode.Haste)
@@ -66,15 +66,15 @@ public class SpeedMine extends Module {
     );
 
     private final Setting<Boolean> instamine = sgGeneral.add(new BoolSetting.Builder()
-        .name("instamine")
-        .description("是否在特定条件下立即开采区块。")
+        .name("瞬挖")
+        .description("在某些条件下是否立即挖掘方块。")
         .defaultValue(true)
         .visible(() -> mode.get() == Mode.Damage)
         .build()
     );
 
     public SpeedMine() {
-        super(Categories.Player, "speed-mine", "允许你快速开采区块。");
+        super(Categories.Player, "速挖", "让你快速挖掘方块。");
     }
 
     @Override

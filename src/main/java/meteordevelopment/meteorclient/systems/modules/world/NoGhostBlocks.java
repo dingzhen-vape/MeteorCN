@@ -13,7 +13,7 @@ import net.minecraft.block.BlockState;
 
 public class NoGhostBlocks extends Module {
     public NoGhostBlocks() {
-        super(Categories.World, "no-ghost-blocks", "尝试防止因快速破坏方块而产生鬼块。对于多重连接特别有用。");
+        super(Categories.World, "无幽灵方块", "尝试防止快速破坏方块时产生的幽灵方块。对于多连接特别有用。");
     }
 
     @EventHandler

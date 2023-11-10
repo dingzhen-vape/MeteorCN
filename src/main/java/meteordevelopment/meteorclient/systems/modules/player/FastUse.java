@@ -23,22 +23,22 @@ public class FastUse extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("哪些项目可以快速使用。")
+        .name("模式")
+        .description("快速使用的物品。")
         .defaultValue(Mode.All)
         .build()
     );
 
     private final Setting<List<Item>> items = sgGeneral.add(new ItemListSetting.Builder()
-        .name("items")
-        .description("哪些项目应该在中快速放置工作")
+        .name("物品")
+        .description("在 \"Some\" 模式下，快速放置的物品。")
         .visible(() -> mode.get() == Mode.Some)
         .build()
     );
 
     private final Setting<Boolean> blocks = sgGeneral.add(new BoolSetting.Builder()
-        .name("blocks")
-        .description("如果模式为开则快速放置块")
+        .name("方块")
+        .description("如果模式是 \"Some\" 模式下，快速放置的物品。")
         .visible(() -> mode.get() == Mode.Some)
         .defaultValue(false)
         .build()
@@ -46,7 +46,7 @@ public class FastUse extends Module {
 
     private final Setting<Integer> cooldown = sgGeneral.add(new IntSetting.Builder()
         .name("冷却")
-        .description("快速使用冷却时间。")
+        .description("快速使用的冷却时间，以刻为单位。")
         .defaultValue(0)
         .min(0)
         .sliderMax(4)

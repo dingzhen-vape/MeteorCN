@@ -36,15 +36,15 @@ public class EChestFarmer extends Module {
     private final SettingGroup sgRender = settings.createGroup("渲染");
 
     private final Setting<Boolean> selfToggle = sgGeneral.add(new BoolSetting.Builder()
-        .name("自我切换")
-        .description("当您达到所需的黑曜石数量时禁用。")
+        .name("自动切换")
+        .description("当你达到期望的黑曜石数量时禁用。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> ignoreExisting = sgGeneral.add(new BoolSetting.Builder()
         .name("忽略现有")
-        .description("忽略库存中现有的黑曜石并开采总目标数量。")
+        .description("忽略你背包里已有的黑曜石，挖掘总目标数量。")
         .defaultValue(true)
         .visible(selfToggle::get)
         .build()
@@ -52,7 +52,7 @@ public class EChestFarmer extends Module {
 
     private final Setting<Integer> amount = sgGeneral.add(new IntSetting.Builder()
         .name("数量")
-        .description("要种植的黑曜石数量。")
+        .description("要挖掘的黑曜石数量。")
         .defaultValue(64)
         .sliderMax(128)
         .range(8, 512)
@@ -64,36 +64,36 @@ public class EChestFarmer extends Module {
     // Render
 
     private final Setting<Boolean> swingHand = sgRender.add(new BoolSetting.Builder()
-        .name("摆手")
-        .description("摆手客户端。")
+        .name("挥手")
+        .description("客户端挥手。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
         .name("渲染")
-        .description("渲染将放置黑曜石的块覆盖。")
+        .description("渲染一个方块覆盖，显示黑曜石将要放置的位置。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
         .name("形状模式")
-        .description("如何渲染形状。")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("正在渲染的块侧面的颜色。")
+        .name("边缘颜色")
+        .description("渲染的方块的边缘颜色。")
         .defaultValue(new SettingColor(204, 0, 0, 50))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("正在渲染的块的线条颜色。")
+        .name("线条颜色")
+        .description("渲染的方块的线条颜色。")
         .defaultValue(new SettingColor(204, 0, 0, 255))
         .build()
     );
@@ -104,7 +104,7 @@ public class EChestFarmer extends Module {
     private int startCount;
 
     public EChestFarmer() {
-        super(Categories.World, "echest -farmer", "放置并破坏 EChests 来种植黑曜石。");
+        super(Categories.World, "末影箱农场", "放置和破坏末影箱来挖掘黑曜石。");
     }
 
     @Override
@@ -134,7 +134,7 @@ public class EChestFarmer extends Module {
 
         // Disable if the block is too far away
         if (!PlayerUtils.isWithinReach(target)) {
-            error("目标块位置超出范围。");
+            error("目标方块位置超出范围。");
             target = null;
             return;
         }
@@ -174,7 +174,7 @@ public class EChestFarmer extends Module {
             FindItemResult echest = InvUtils.findInHotbar(Items.ENDER_CHEST);
 
             if (!echest.found()) {
-                error("快捷栏中没有 Echests,禁用");
+                error("热栏中没有末影箱，禁用");
                 toggle();
                 return;
             }

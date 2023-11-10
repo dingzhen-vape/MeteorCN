@@ -29,7 +29,7 @@ public class AutoSmelter extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<List<Item>> fuelItems = sgGeneral.add(new ItemListSetting.Builder()
-        .name("fuel-items")
+        .name("燃料物品")
         .description("用作燃料的物品")
         .defaultValue(Items.COAL, Items.CHARCOAL)
         .filter(this::fuelItemFilter)
@@ -38,7 +38,7 @@ public class AutoSmelter extends Module {
     );
 
     private final Setting<List<Item>> smeltableItems = sgGeneral.add(new ItemListSetting.Builder()
-        .name("smeltable-items")
+        .name("可熔炼物品")
         .description("要熔炼的物品")
         .defaultValue(Items.IRON_ORE, Items.GOLD_ORE, Items.COPPER_ORE, Items.RAW_IRON, Items.RAW_COPPER, Items.RAW_GOLD)
         .filter(this::smeltableItemFilter)
@@ -47,8 +47,8 @@ public class AutoSmelter extends Module {
     );
 
     private final Setting<Boolean> disableWhenOutOfItems = sgGeneral.add(new BoolSetting.Builder()
-        .name("disable-when-out-of-items")
-        .description("当物品用完时禁用模块")
+        .name("当物品用完时禁用")
+        .description("当你的物品用完时禁用模块")
         .defaultValue(true)
         .build()
     );
@@ -56,7 +56,7 @@ public class AutoSmelter extends Module {
     private Map<Item, Integer> fuelTimeMap;
 
     public AutoSmelter() {
-        super(Categories.World, "自动熔炼器", "自动熔炼你的库存中的物品");
+        super(Categories.World, "自动熔炼器", "自动从你的背包中熔炼物品");
     }
 
     private boolean fuelItemFilter(Item item) {
@@ -101,7 +101,7 @@ public class AutoSmelter extends Module {
         }
 
         if (disableWhenOutOfItems.get() && slot == -1) {
-            error("你的库存中没有任何可以熔炼的物品。禁用。");
+            error("你的背包里没有可以熔炼的物品。禁用。");
             toggle();
             return;
         }
@@ -126,7 +126,7 @@ public class AutoSmelter extends Module {
         }
 
         if (disableWhenOutOfItems.get() && slot == -1) {
-            error("您的库存中没有任何燃料。正在禁用。");
+            error("你的背包里没有燃料。禁用。");
             toggle();
             return;
         }
@@ -141,7 +141,7 @@ public class AutoSmelter extends Module {
         InvUtils.shiftClick().slotId(2);
 
         if (!resultStack.isEmpty()) {
-            error("您的库存已满。禁用。");
+            error("你的背包已满。禁用。");
             toggle();
         }
     }

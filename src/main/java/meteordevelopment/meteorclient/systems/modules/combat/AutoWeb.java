@@ -21,8 +21,8 @@ public class AutoWeb extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> range = sgGeneral.add(new DoubleSetting.Builder()
-        .name("target-range")
-        .description("到目标玩家的最大距离。")
+        .name("目标范围")
+        .description("目标玩家的最大距离。")
         .defaultValue(4)
         .range(0, 5)
         .sliderMax(5)
@@ -30,22 +30,22 @@ public class AutoWeb extends Module {
     );
 
     private final Setting<SortPriority> priority = sgGeneral.add(new EnumSetting.Builder<SortPriority>()
-        .name("target-priority")
-        .description("如何过滤范围内的目标。")
+        .name("目标优先级")
+        .description("如何筛选范围内的目标。")
         .defaultValue(SortPriority.LowestDistance)
         .build()
     );
 
     private final Setting<Boolean> doubles = sgGeneral.add(new BoolSetting.Builder()
-        .name("doubles")
-        .description("将蜘蛛网放置在目标的上部命中框中以及下部命中框中hitbox。")
+        .name("双重")
+        .description("在目标的上半部分和下半部分都放置蜘蛛网。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("放置时朝蜘蛛网方向旋转。")
+        .description("放置蜘蛛网时朝向蜘蛛网。")
         .defaultValue(true)
         .build()
     );
@@ -53,7 +53,7 @@ public class AutoWeb extends Module {
     private PlayerEntity target = null;
 
     public AutoWeb() {
-        super(Categories.Combat, "自动蜘蛛网", "自动将蜘蛛网放置在其他玩家身上。");
+        super(Categories.Combat, "自动蜘蛛网", "自动在其他玩家身上放置蜘蛛网。");
     }
 
     @EventHandler

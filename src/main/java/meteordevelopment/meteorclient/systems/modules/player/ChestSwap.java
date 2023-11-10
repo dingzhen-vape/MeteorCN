@@ -23,20 +23,20 @@ public class ChestSwap extends Module {
 
     private final Setting<Chestplate> chestplate = sgGeneral.add(new EnumSetting.Builder<Chestplate>()
         .name("胸甲")
-        .description("要交换到哪种类型的胸甲。")
+        .description("要切换到的胸甲类型。")
         .defaultValue(Chestplate.PreferNetherite)
         .build()
     );
 
     private final Setting<Boolean> stayOn = sgGeneral.add(new BoolSetting.Builder()
         .name("保持开启")
-        .description("保持开启并在关闭时激活。")
+        .description("保持开启并在你关闭时激活。")
         .defaultValue(false)
         .build()
     );
 
     public ChestSwap() {
-        super(Categories.Player, "胸部交换", "在胸甲和鞘翅之间自动交换.");
+        super(Categories.Player, "胸甲切换", "自动在胸甲和鞘翅之间切换。");
     }
 
     @Override
@@ -125,7 +125,7 @@ public class ChestSwap extends Module {
     @Override
     public void sendToggledMsg() {
         if (stayOn.get()) super.sendToggledMsg();
-        else if (Config.get().chatFeedback.get() && chatFeedback) info("触发(突出显示)%s(默认)。", title);
+        else if (Config.get().chatFeedback.get() && chatFeedback) info("触发 (highlight)%s(default).", title);
     }
 
     public enum Chestplate {

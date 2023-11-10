@@ -34,7 +34,7 @@ public class BowAimbot extends Module {
 
     private final Setting<Double> range = sgGeneral.add(new DoubleSetting.Builder()
         .name("范围")
-        .description("实体可以瞄准的最大范围。")
+        .description("实体可以被瞄准的最大范围.")
         .defaultValue(20)
         .range(0, 100)
         .sliderMax(100)
@@ -43,36 +43,36 @@ public class BowAimbot extends Module {
 
     private final Setting<Set<EntityType<?>>> entities = sgGeneral.add(new EntityTypeListSetting.Builder()
         .name("实体")
-        .description("要攻击的实体。")
+        .description("要攻击的实体.")
         .onlyAttackable()
         .build()
     );
 
     private final Setting<SortPriority> priority = sgGeneral.add(new EnumSetting.Builder<SortPriority>()
         .name("优先级")
-        .description("要瞄准什么类型的实体。")
+        .description("要目标的实体类型.")
         .defaultValue(SortPriority.LowestHealth)
         .build()
     );
 
     private final Setting<Boolean> babies = sgGeneral.add(new BoolSetting.Builder()
-        .name("婴儿")
-        .description("是否攻击该实体的婴儿变体。")
+        .name("幼体")
+        .description("是否攻击实体的幼体变种.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> nametagged = sgGeneral.add(new BoolSetting.Builder()
-        .name("nametagged")
-        .description("是否攻击带有名字标签的生物。")
+        .name("命名")
+        .description("是否攻击有命名牌的生物.")
         .defaultValue(false)
         .build()
     );
 
 
     private final Setting<Boolean> pauseOnCombat = sgGeneral.add(new BoolSetting.Builder()
-        .name("暂停战斗")
-        .description("暂时冻结男中音,直到你释放弓。")
+        .name("战斗时暂停")
+        .description("暂时冻结Baritone，直到你释放弓.")
         .defaultValue(false)
         .build()
     );
@@ -81,7 +81,7 @@ public class BowAimbot extends Module {
     private Entity target;
 
     public BowAimbot() {
-        super(Categories.Combat, "bow-aimbot", "自动为你瞄准你的弓。");
+        super(Categories.Combat, "弓箭自瞄", "自动为你瞄准弓箭.");
     }
 
     @Override

@@ -85,28 +85,28 @@ public class ESPBlockData implements ICopyable<ESPBlockData>, ISerializable<ESPB
     public NbtCompound toTag() {
         NbtCompound tag = new NbtCompound();
 
-        tag.putString("shapeMode", shapeMode.name());
-        tag.put("lineColor", lineColor.toTag());
-        tag.put("sideColor", sideColor.toTag());
+        tag.putString("形状模式", shapeMode.name());
+        tag.put("线条颜色", lineColor.toTag());
+        tag.put("侧面颜色", sideColor.toTag());
 
-        tag.putBoolean("tracer", tracer);
-        tag.put("tracerColor", tracerColor.toTag());
+        tag.putBoolean("追踪线", tracer);
+        tag.put("追踪线颜色", tracerColor.toTag());
 
-        tag.putBoolean("更改", changed);
+        tag.putBoolean("改变", changed);
 
         return tag;
     }
 
     @Override
     public ESPBlockData fromTag(NbtCompound tag) {
-        shapeMode = ShapeMode.valueOf(tag.getString("shapeMode"));
-        lineColor.fromTag(tag.getCompound("lineColor"));
-        sideColor.fromTag(tag.getCompound("sideColor"));
+        shapeMode = ShapeMode.valueOf(tag.getString("形状模式"));
+        lineColor.fromTag(tag.getCompound("线条颜色"));
+        sideColor.fromTag(tag.getCompound("侧面颜色"));
 
-        tracer = tag.getBoolean("tracer");
-        tracerColor.fromTag(tag.getCompound("tracerColor"));
+        tracer = tag.getBoolean("追踪线");
+        tracerColor.fromTag(tag.getCompound("追踪线颜色"));
 
-        changed = tag.getBoolean("更改");
+        changed = tag.getBoolean("改变");
 
         return this;
     }

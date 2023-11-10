@@ -21,8 +21,8 @@ public class AirJump extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> maintainLevel = sgGeneral.add(new BoolSetting.Builder()
-        .name("maintain-level")
-        .description("按住跳跃键时保持当前的 Y 等级。")
+        .name("保持高度")
+        .description("按住跳跃键时保持你当前的Y轴高度。")
         .defaultValue(false)
         .build()
     );
@@ -30,7 +30,7 @@ public class AirJump extends Module {
     private int level;
 
     public AirJump() {
-        super(Categories.Movement, "air-jump", "让你在空中跳跃。");
+        super(Categories.Movement, "空中跳跃", "让你在空中跳跃。");
     }
 
     @Override

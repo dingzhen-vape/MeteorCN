@@ -39,7 +39,7 @@ public class EntityOwner extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> scale = sgGeneral.add(new DoubleSetting.Builder()
-        .name("scale")
+        .name("比例")
         .description("文本的比例。")
         .defaultValue(1)
         .min(0)
@@ -47,8 +47,8 @@ public class EntityOwner extends Module {
     );
 
     private final Setting<Boolean> projectiles = sgGeneral.add(new BoolSetting.Builder()
-        .name("projectiles")
-        .description("显示射弹的所有者名称。")
+        .name("弹射物")
+        .description("显示弹射物的所有者名称。")
         .defaultValue(false)
         .build()
     );
@@ -57,7 +57,7 @@ public class EntityOwner extends Module {
     private final Map<UUID, String> uuidToName = new HashMap<>();
 
     public EntityOwner() {
-        super(Categories.Render, "entity-owner", "显示拥有您正在查看的实体的玩家的名称。 ");
+        super(Categories.Render, "实体所有者", "显示你正在看的实体的所有者的名称。");
     }
 
     @Override
@@ -122,13 +122,13 @@ public class EntityOwner extends Module {
                 ProfileResponse res = Http.get("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "")).sendJson(ProfileResponse.class);
 
                 if (isActive()) {
-                    if (res == null) uuidToName.put(uuid, "无法获取名称");
+                    if (res == null) uuidToName.put(uuid, "获取名称失败");
                     else uuidToName.put(uuid, res.name);
                 }
             }
         });
 
-        name = "检索";
+        name = "正在获取";
         uuidToName.put(uuid, name);
         return name;
     }

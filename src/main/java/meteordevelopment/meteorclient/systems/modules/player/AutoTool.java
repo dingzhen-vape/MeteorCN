@@ -33,36 +33,36 @@ public class AutoTool extends Module {
     // General
 
     private final Setting<EnchantPreference> prefer = sgGeneral.add(new EnumSetting.Builder<EnchantPreference>()
-        .name("更喜欢")
-        .description("要么选择精准采集,财富,要么不选择。")
+        .name("偏好")
+        .description("选择偏好精准采集、时运、或者无。")
         .defaultValue(EnchantPreference.Fortune)
         .build()
     );
 
     private final Setting<Boolean> silkTouchForEnderChest = sgGeneral.add(new BoolSetting.Builder()
-        .name("丝触换末影箱")
-        .description("仅使用精准采集结界来挖掘末影箱。")
+        .name("精准采集末影箱")
+        .description("只用精准采集附魔来挖末影箱。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> fortuneForOresCrops = sgGeneral.add(new BoolSetting.Builder()
-        .name("财富-for-ores-and-crops")
-        .description("仅使用财富附魔开采矿石和农作物。")
+        .name("时运矿石和作物")
+        .description("只用时运附魔来挖矿石和作物。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> antiBreak = sgGeneral.add(new BoolSetting.Builder()
-        .name("anti-break")
-        .description("阻止你破坏你的工具。")
+        .name("防止损坏")
+        .description("阻止你损坏你的工具。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> breakDurability = sgGeneral.add(new IntSetting.Builder()
-        .name("anti-break-percentage")
-        .description("耐用性停止使用工具的百分比。")
+        .name("防止损坏百分比")
+        .description("停止使用工具的耐久度百分比。")
         .defaultValue(10)
         .range(1, 100)
         .sliderRange(1, 100)
@@ -71,15 +71,15 @@ public class AutoTool extends Module {
     );
 
     private final Setting<Boolean> switchBack = sgGeneral.add(new BoolSetting.Builder()
-        .name("switch-back")
-        .description("在释放攻击键时将手切换到所选的任何位置。")
+        .name("切换回去")
+        .description("当你松开攻击键时，切换你的手到之前选择的物品。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> switchDelay = sgGeneral.add((new IntSetting.Builder()
-        .name("switch-delay")
-        .description("切换工具之前延迟滴答声。")
+        .name("切换延迟")
+        .description("切换工具前的延迟，以刻为单位。")
         .defaultValue(0)
         .build()
     ));
@@ -87,7 +87,7 @@ public class AutoTool extends Module {
     // Whitelist and blacklist
 
     private final Setting<ListMode> listMode = sgWhitelist.add(new EnumSetting.Builder<ListMode>()
-        .name("list- mode")
+        .name("列表模式")
         .description("选择模式。")
         .defaultValue(ListMode.Blacklist)
         .build()
@@ -95,7 +95,7 @@ public class AutoTool extends Module {
 
     private final Setting<List<Item>> whitelist = sgWhitelist.add(new ItemListSetting.Builder()
         .name("白名单")
-        .description("您想要使用的工具。")
+        .description("你想要使用的工具。")
         .visible(() -> listMode.get() == ListMode.Whitelist)
         .filter(AutoTool::isTool)
         .build()
@@ -103,7 +103,7 @@ public class AutoTool extends Module {
 
     private final Setting<List<Item>> blacklist = sgWhitelist.add(new ItemListSetting.Builder()
         .name("黑名单")
-        .description("您不想使用的工具。")
+        .description("你不想要使用的工具。")
         .visible(() -> listMode.get() == ListMode.Blacklist)
         .filter(AutoTool::isTool)
         .build()
@@ -115,7 +115,7 @@ public class AutoTool extends Module {
     private int bestSlot;
 
     public AutoTool() {
-        super(Categories.Player, "自动工具", "自动切换到执行操作时最有效的工具。");
+        super(Categories.Player, "自动工具", "当执行一个动作时，自动切换到最有效的工具。");
     }
 
     @EventHandler

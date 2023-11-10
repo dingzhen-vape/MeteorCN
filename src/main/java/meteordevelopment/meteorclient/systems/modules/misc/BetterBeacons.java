@@ -10,6 +10,6 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 
 public class BetterBeacons extends Module {
     public BetterBeacons() {
-        super(Categories.Misc, "better-beacons", "选择不受信标级别影响的效果。");
+        super(Categories.Misc, "更好的信标", "选择不受信标等级影响的效果。");
     }
 }

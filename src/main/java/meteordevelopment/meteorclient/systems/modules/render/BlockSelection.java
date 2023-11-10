@@ -23,49 +23,49 @@ public class BlockSelection extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> advanced = sgGeneral.add(new BoolSetting.Builder()
-        .name("advanced")
-        .description("在不同类型的形状块上显示更高级的轮廓。")
+        .name("轮廓")
+        .description("在不同类型的形状方块上显示更高级的轮廓。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> oneSide = sgGeneral.add(new BoolSetting.Builder()
-        .name("单面")
-        .description("仅渲染您正在查看的一侧。")
+        .name("优化渲染")
+        .description("只渲染你正在看的一面。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgGeneral.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状.")
+        .name("渲染模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgGeneral.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("侧面颜色。")
+        .name("侧面颜色")
+        .description("侧面的颜色。")
         .defaultValue(new SettingColor(255, 255, 255, 50))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgGeneral.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("线条颜色。")
+        .name("线色")
+        .description("线条的颜色。")
         .defaultValue(new SettingColor(255, 255, 255, 255))
         .build()
     );
 
     private final Setting<Boolean> hideInside = sgGeneral.add(new BoolSetting.Builder()
         .name("hide-when-inside-block")
-        .description("在目标块内隐藏选择。")
+        .description("当在目标方块内时隐藏选择。")
         .defaultValue(true)
         .build()
     );
 
     public BlockSelection() {
-        super(Categories.Render, " block-selection", "修改块选择的呈现方式。");
+        super(Categories.Render, "方块指标", "修改你的方块选择的渲染方式。");
     }
 
     @EventHandler

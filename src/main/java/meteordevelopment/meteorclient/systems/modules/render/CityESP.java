@@ -29,21 +29,21 @@ public class CityESP extends Module {
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
         .name("形状模式")
-        .description("如何渲染形状。")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
+        .name("侧面颜色")
         .description("渲染的侧面颜色。")
         .defaultValue(new SettingColor(225, 0, 0, 75))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("渲染的线条颜色。 ")
+        .name("线条颜色")
+        .description("渲染的线条颜色。")
         .defaultValue(new SettingColor(225, 0, 0, 255))
         .build()
     );
@@ -51,7 +51,7 @@ public class CityESP extends Module {
     private BlockPos target;
 
     public CityESP() {
-        super(Categories.Render, "city-esp", "显示可以打破的方块,以便让另一位玩家进入城市。");
+        super(Categories.Render, "城市-ESP", "显示可以被破坏来城市另一个玩家的方块。");
     }
 
     @EventHandler

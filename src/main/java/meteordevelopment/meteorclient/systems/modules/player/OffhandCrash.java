@@ -25,15 +25,15 @@ public class OffhandCrash extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> doCrash = sgGeneral.add(new BoolSetting.Builder()
-        .name("do-crash")
-        .description("每刻向服务器发送 X 数量的副手交换声音数据包。")
+        .name("崩溃")
+        .description("每刻向服务器发送X个副手切换声音包。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Integer> speed = sgGeneral.add(new IntSetting.Builder()
-        .name("speed")
-        .description("以刻度为单位测量的交换量。")
+        .name("速度")
+        .description("以刻为单位的切换数量。")
         .defaultValue(2000)
         .min(1)
         .sliderRange(1, 10000)
@@ -42,14 +42,14 @@ public class OffhandCrash extends Module {
     );
 
     private final Setting<Boolean> antiCrash = sgGeneral.add(new BoolSetting.Builder()
-        .name("anti-crash")
-        .description("试图阻止你防止自己崩溃。")
+        .name("防崩溃")
+        .description("尝试防止你崩溃自己。")
         .defaultValue(true)
         .build()
     );
 
     public OffhandCrash() {
-        super(Categories.Misc, "副手崩溃", "通过在主手和副手之间来回交换可以导致其他玩家崩溃的漏洞。");
+        super(Categories.Misc, "副手崩溃", "一个利用漏洞，通过在主手和副手之间切换来崩溃其他玩家的功能。");
     }
 
     @EventHandler

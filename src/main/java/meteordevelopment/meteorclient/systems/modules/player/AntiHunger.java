@@ -21,22 +21,22 @@ public class AntiHunger extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> sprint = sgGeneral.add(new BoolSetting.Builder()
-        .name("sprint")
-        .description("欺骗冲刺数据包。")
+        .name("冲刺")
+        .description("伪造冲刺包。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> onGround = sgGeneral.add(new BoolSetting.Builder()
-        .name("on-ground")
-        .description("欺骗 onGround 标志。")
+        .name("在地面")
+        .description("伪造onGround标志。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> waterCheck = sgGeneral.add(new BoolSetting.Builder()
-        .name("water-check")
-        .description("如果你在水中则暂停模块")
+        .name("水检测")
+        .description("如果你在水中，暂停模块。")
         .defaultValue(true)
         .build()
     );
@@ -46,7 +46,7 @@ public class AntiHunger extends Module {
     private boolean ignorePacket;
 
     public AntiHunger() {
-        super(Categories.Player, "anti-hunger", "减少(不消除)饥饿消耗。");
+        super(Categories.Player, "防饿", "减少（不是移除）饥饿消耗。");
     }
 
     @Override

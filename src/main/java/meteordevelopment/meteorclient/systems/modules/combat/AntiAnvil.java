@@ -22,21 +22,21 @@ public class AntiAnvil extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> swing = sgGeneral.add(new BoolSetting.Builder()
-        .name("摆动")
-        .description("放置时向客户端摆动手。")
+        .name("摇摆")
+        .description("放置时客户端摇摆你的手。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("放置时使您旋转。")
+        .description("放置时让你旋转。")
         .defaultValue(true)
         .build()
     );
 
     public AntiAnvil() {
-        super(Categories.Combat, "防砧", "通过放置在您和砧之间自动防止自动砧。");
+        super(Categories.Combat, "反铁砧", "自动通过在你和铁砧之间放置来防止自动铁砧。");
     }
 
     @EventHandler

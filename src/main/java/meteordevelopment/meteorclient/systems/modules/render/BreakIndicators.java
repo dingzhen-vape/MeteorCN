@@ -30,30 +30,30 @@ public class BreakIndicators extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<ShapeMode> shapeMode = sgGeneral.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("渲染模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     public final Setting<Boolean> packetMine = sgGeneral.add(new BoolSetting.Builder()
-        .name("packet-mine")
-        .description("是否渲染正在被数据包挖掘的块。")
+        .name("渲染方块")
+        .description("是否渲染正在被数据包挖掘的方块。")
         .defaultValue(true)
         .build()
     );
 
 
     private final Setting<SettingColor> startColor = sgGeneral.add(new ColorSetting.Builder()
-        .name("start-color")
-        .description("未损坏块的颜色.")
+        .name("为破坏的方块的颜色")
+        .description("未破坏方块的颜色。")
         .defaultValue(new SettingColor(25, 252, 25, 150))
         .build()
     );
 
     private final Setting<SettingColor> endColor = sgGeneral.add(new ColorSetting.Builder()
-        .name("end-color")
-        .description("完全破坏的方块的颜色。")
+        .name("结束破坏方块的颜色")
+        .description("完全破坏方块的颜色。")
         .defaultValue(new SettingColor(255, 25, 25, 150))
         .build()
     );
@@ -62,7 +62,7 @@ public class BreakIndicators extends Module {
     private final Color cLines = new Color();
 
     public BreakIndicators() {
-        super(Categories.Render, "break-indicators", "渲染被破坏的方块的进度。");
+        super(Categories.Render, "破坏进度条", "渲染一个方块被破坏的进度。");
     }
 
     @EventHandler

@@ -22,8 +22,8 @@ public class WallHack extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<Integer> opacity = sgGeneral.add(new IntSetting.Builder()
-        .name("opacity")
-        .description("渲染块的不透明度。")
+        .name("不透明度")
+        .description("渲染方块的不透明度。")
         .defaultValue(0)
         .range(0, 255)
         .sliderMax(255)
@@ -36,8 +36,8 @@ public class WallHack extends Module {
     );
 
     public final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("blocks")
-        .description("哪些块应该成为 Wall Hack 的目标。")
+        .name("方块")
+        .description("透视墙壁的目标方块。")
         .defaultValue()
         .onChanged(onChanged -> {
             if (isActive()) mc.worldRenderer.reload();
@@ -46,14 +46,14 @@ public class WallHack extends Module {
     );
 
     public final Setting<Boolean> occludeChunks = sgGeneral.add(new BoolSetting.Builder()
-        .name("occlusion-chunks")
-        .description("洞穴是否应该遮挡地下(打开时可能看起来很奇怪)。 ")
+        .name("遮挡区块")
+        .description("是否让洞穴遮挡地下（开启时可能看起来很奇怪）。")
         .defaultValue(false)
         .build()
     );
 
     public WallHack() {
-        super(Categories.Render, "wall-hack", "使块半透明。");
+        super(Categories.Render, "透视墙壁", "使方块半透明。");
     }
 
     @Override
@@ -68,8 +68,8 @@ public class WallHack extends Module {
 
     @Override
     public WWidget getWidget(GuiTheme theme) {
-        if (MixinPlugin.isSodiumPresent) return theme.label("警告：由于使用了钠,不透明度被覆盖为 0。");
-        if (MixinPlugin.isIrisPresent && IrisApi.getInstance().isShaderPackInUse()) return theme.label("警告：由于使用了着色器,不透明度被覆盖为 0。");
+        if (MixinPlugin.isSodiumPresent) return theme.label("警告：由于使用了Sodium，不透明度被强制为0。");
+        if (MixinPlugin.isIrisPresent && IrisApi.getInstance().isShaderPackInUse()) return theme.label("警告：由于使用了着色器，不透明度被强制为0。");
 
         return null;
     }

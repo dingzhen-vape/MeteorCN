@@ -28,40 +28,40 @@ import java.util.List;
 import java.util.Set;
 
 public class NoInteract extends Module {
-    private final SettingGroup sgBlocks = settings.createGroup("Blocks");
-    private final SettingGroup sgEntities = settings.createGroup("Entities");
+    private final SettingGroup sgBlocks = settings.createGroup("方块");
+    private final SettingGroup sgEntities = settings.createGroup("实体");
 
     // Blocks
 
     private final Setting<List<Block>> blockMine = sgBlocks.add(new BlockListSetting.Builder()
-        .name("block-mine")
-        .description("取消块挖掘。")
+        .name("方块挖掘")
+        .description("取消方块挖掘。")
         .build()
     );
 
     private final Setting<ListMode> blockMineMode = sgBlocks.add(new EnumSetting.Builder<ListMode>()
-        .name("block-mine-mode")
-        .description("用于块挖掘的列表模式。")
+        .name("方块挖掘模式")
+        .description("方块挖掘的列表模式。")
         .defaultValue(ListMode.BlackList)
         .build()
     );
 
     private final Setting<List<Block>> blockInteract = sgBlocks.add(new BlockListSetting.Builder()
-        .name("block-interact")
-        .description("取消块交互。")
+        .name("方块交互")
+        .description("取消方块交互。")
         .build()
     );
 
     private final Setting<ListMode> blockInteractMode = sgBlocks.add(new EnumSetting.Builder<ListMode>()
-        .name("block-interact-mode")
-        .description("用于块交互的列表模式。")
+        .name("方块交互模式")
+        .description("方块交互的列表模式。")
         .defaultValue(ListMode.BlackList)
         .build()
     );
 
     private final Setting<HandMode> blockInteractHand = sgBlocks.add(new EnumSetting.Builder<HandMode>()
-        .name("block-interact-hand")
-        .description("如果用这只手执行则取消块交互。")
+        .name("方块交互手")
+        .description("如果是这只手，取消方块交互。")
         .defaultValue(HandMode.None)
         .build()
     );
@@ -69,43 +69,43 @@ public class NoInteract extends Module {
     // Entities
 
     private final Setting<Set<EntityType<?>>> entityHit = sgEntities.add(new EntityTypeListSetting.Builder()
-        .name("entity-hit")
-        .description("取消实体命中。")
+        .name("实体攻击")
+        .description("取消实体攻击。")
         .onlyAttackable()
         .build()
     );
 
     private final Setting<ListMode> entityHitMode = sgEntities.add(new EnumSetting.Builder<ListMode>()
-        .name("entity-hit-mode")
-        .description("用于实体命中的列表模式。")
+        .name("实体攻击模式")
+        .description("实体攻击的列表模式。")
         .defaultValue(ListMode.BlackList)
         .build()
     );
 
     private final Setting<Set<EntityType<?>>> entityInteract = sgEntities.add(new EntityTypeListSetting.Builder()
-        .name("entity-interact")
+        .name("实体交互")
         .description("取消实体交互。")
         .onlyAttackable()
         .build()
     );
 
     private final Setting<ListMode> entityInteractMode = sgEntities.add(new EnumSetting.Builder<ListMode>()
-        .name("entity-interact-mode")
-        .description("用于实体命中的列表模式。用于实体交互。")
+        .name("实体交互模式")
+        .description("实体交互的列表模式。")
         .defaultValue(ListMode.BlackList)
         .build()
     );
 
     private final Setting<HandMode> entityInteractHand = sgEntities.add(new EnumSetting.Builder<HandMode>()
-        .name("entity-interact-hand")
-        .description("如果用这只手执行则取消实体交互。")
+        .name("实体交互手")
+        .description("如果是这只手，取消实体交互。")
         .defaultValue(HandMode.None)
         .build()
     );
 
     private final Setting<InteractMode> friends = sgEntities.add(new EnumSetting.Builder<InteractMode>()
-        .name("朋友")
-        .description("朋友取消模式。")
+        .name("好友")
+        .description("好友取消模式。")
         .defaultValue(InteractMode.None)
         .build()
     );
@@ -118,14 +118,14 @@ public class NoInteract extends Module {
     );
 
     private final Setting<InteractMode> nametagged = sgEntities.add(new EnumSetting.Builder<InteractMode>()
-        .name("nametagged")
-        .description("Nametagged 实体取消模式。")
+        .name("命名")
+        .description("命名实体取消模式。")
         .defaultValue(InteractMode.None)
         .build()
     );
 
     public NoInteract() {
-        super(Categories.Player, "no-interact", "阻止与某些类型的输入交互。");
+        super(Categories.Player, "无交互", "阻止你与某些类型的输入交互。");
     }
 
     @EventHandler(priority = EventPriority.HIGH)

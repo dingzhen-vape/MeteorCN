@@ -21,8 +21,8 @@ public class BowSpam extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Integer> charge = sgGeneral.add(new IntSetting.Builder()
-        .name("充电")
-        .description("在释放之前为弓充电多长时间。")
+        .name("蓄力")
+        .description("释放弓箭前的刻蓄力时间.")
         .defaultValue(5)
         .range(5, 20)
         .sliderRange(5, 20)
@@ -30,8 +30,8 @@ public class BowSpam extends Module {
     );
 
     private final Setting<Boolean> onlyWhenHoldingRightClick = sgGeneral.add(new BoolSetting.Builder()
-        .name("按住右键时单击")
-        .description("仅在按住右键时有效。")
+        .name("按住右键时生效")
+        .description("只在按住右键时生效.")
         .defaultValue(false)
         .build()
     );
@@ -40,7 +40,7 @@ public class BowSpam extends Module {
     private boolean wasHoldingRightClick = false;
 
     public BowSpam() {
-        super(Categories.Combat, "弓垃圾邮件", "垃圾邮件箭头。");
+        super(Categories.Combat, "弓箭连射", "连射箭矢.");
     }
 
     @Override

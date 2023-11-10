@@ -32,42 +32,42 @@ public class Flamethrower extends Module {
 
     private final Setting<Double> distance = sgGeneral.add(new DoubleSetting.Builder()
         .name("距离")
-        .description("烘烤动物的最大距离。")
+        .description("动物要被烤的最大距离。")
         .min(0.0)
         .defaultValue(5.0)
         .build()
     );
 
     private final Setting<Boolean> antiBreak = sgGeneral.add(new BoolSetting.Builder()
-        .name("防破裂")
-        .description("防止打火石被打破。")
+        .name("防止损坏")
+        .description("防止打火石被损坏。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> putOutFire = sgGeneral.add(new BoolSetting.Builder()
-        .name("扑灭火")
-        .description("尝试扑灭当动物生命值较低时着火,因此物品不会燃烧。")
+        .name("扑灭火焰")
+        .description("尝试在动物血量低时扑灭火焰，这样物品就不会烧掉。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> targetBabies = sgGeneral.add(new BoolSetting.Builder()
-        .name("目标婴儿")
-        .description("如果检查到婴儿也会被杀死。")
+        .name("目标幼体")
+        .description("如果勾选，幼体也会被杀死。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> tickInterval = sgGeneral.add(new IntSetting.Builder()
-        .name("tick-interval")
+        .name("间隔刻")
         .defaultValue(5)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("自动面向烤动物。")
+        .description("自动面向被烤的动物。")
         .defaultValue(true)
         .build()
     );
@@ -90,7 +90,7 @@ public class Flamethrower extends Module {
     private Hand hand;
 
     public Flamethrower() {
-        super(Categories.World, "火焰喷射器", "点燃每一块活着的食物。");
+        super(Categories.World, "火焰喷射器", "点燃每一只活着的食物。");
     }
 
     @Override

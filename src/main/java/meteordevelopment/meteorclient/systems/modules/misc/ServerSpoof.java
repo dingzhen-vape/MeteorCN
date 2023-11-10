@@ -30,44 +30,44 @@ public class ServerSpoof extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> spoofBrand = sgGeneral.add(new BoolSetting.Builder()
-        .name("spoof-brand")
-        .description("是否欺骗品牌。")
+        .name("伪装品牌")
+        .description("是否伪装品牌。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<String> brand = sgGeneral.add(new StringSetting.Builder()
-        .name("brand")
-        .description("指定将发送到服务器的品牌。")
-        .defaultValue("vanilla")
+        .name("品牌")
+        .description("指定要发送给服务器的品牌。")
+        .defaultValue("原版")
         .visible(spoofBrand::get)
         .build()
     );
 
     private final Setting<Boolean> resourcePack = sgGeneral.add(new BoolSetting.Builder()
-        .name("resource-pack")
-        .description("欺骗接受服务器资源包。")
+        .name("资源包")
+        .description("伪装接受服务器资源包。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> blockChannels = sgGeneral.add(new BoolSetting.Builder()
-        .name("block-channels")
-        .description("是否屏蔽某些频道。")
+        .name("屏蔽频道")
+        .description("是否屏蔽一些频道。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<List<String>> channels = sgGeneral.add(new StringListSetting.Builder()
-        .name("channels")
-        .description("如果频道包含该关键字,则该出站频道将被屏蔽。")
+        .name("频道")
+        .description("如果频道包含关键字，这个输出频道将被屏蔽。")
         .defaultValue("minecraft:register")
         .visible(blockChannels::get)
         .build()
     );
 
     public ServerSpoof() {
-        super(Categories.Misc, "server-spoof", "欺骗客户端品牌,资源包和渠道。");
+        super(Categories.Misc, "服务器伪装", "伪装客户端品牌，资源包和频道。");
 
         MeteorClient.EVENT_BUS.subscribe(new Listener());
     }
@@ -99,8 +99,8 @@ public class ServerSpoof extends Module {
             if (resourcePack.get()) {
                 if (!(event.packet instanceof ResourcePackSendS2CPacket packet)) return;
                 event.cancel();
-                MutableText msg = Text.literal("本服务器有");
-                msg.append(packet.isRequired() ? "必填" : "可选");
+                MutableText msg = Text.literal("这个服务器有 ");
+                msg.append(packet.isRequired() ? "一个必须的 " : "一个可选的 ");
                 MutableText link = Text.literal("资源包");
                 link.setStyle(link.getStyle()
                     .withColor(Formatting.BLUE)
@@ -109,7 +109,7 @@ public class ServerSpoof extends Module {
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击下载")))
                 );
                 msg.append(link);
-                msg.append(".");
+                msg.append("。");
                 info(msg);
             }
         }

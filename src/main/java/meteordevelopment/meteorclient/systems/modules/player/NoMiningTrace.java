@@ -16,14 +16,14 @@ public class NoMiningTrace extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> onlyWhenHoldingPickaxe = sgGeneral.add(new BoolSetting.Builder()
-        .name("only-when-holding-a-pickaxe")
-        .description("是否仅在持有镐时才工作。")
+        .name("只有拿着镐")
+        .description("是否只在拿着镐时工作。")
         .defaultValue(true)
         .build()
     );
 
     public NoMiningTrace() {
-        super(Categories.Player, "no-mining-trace", "允许你通过实体开采方块。");
+        super(Categories.Player, "无挖掘轨迹", "允许你通过实体挖方块。");
     }
 
     public boolean canWork() {

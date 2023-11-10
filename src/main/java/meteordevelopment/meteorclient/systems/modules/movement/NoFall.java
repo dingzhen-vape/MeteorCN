@@ -44,38 +44,38 @@ public class NoFall extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("你免受坠落伤害的方式。")
+        .name("模式")
+        .description("从摔伤中保存你的方式。")
         .defaultValue(Mode.Packet)
         .build()
     );
 
     private final Setting<PlacedItem> placedItem = sgGeneral.add(new EnumSetting.Builder<PlacedItem>()
-        .name("placed-item")
-        .description("放置哪个方块。")
+        .name("放置物品")
+        .description("要放置的方块。")
         .defaultValue(PlacedItem.Bucket)
         .visible(() -> mode.get() == Mode.Place)
         .build()
     );
 
     private final Setting<PlaceMode> airPlaceMode = sgGeneral.add(new EnumSetting.Builder<PlaceMode>()
-        .name("air-place-mode")
-        .description("放置模式是在你死之前还是在你之前放置受到伤害。")
+        .name("空中放置模式")
+        .description("是在你死之前还是在你受伤之前放置。")
         .defaultValue(PlaceMode.BeforeDeath)
         .visible(() -> mode.get() == Mode.AirPlace)
         .build()
     );
 
     private final Setting<Boolean> anchor = sgGeneral.add(new BoolSetting.Builder()
-        .name("锚定")
-        .description("使用桶或空气放置模式时使玩家居中并减少移动。")
+        .name("锚")
+        .description("在使用水桶或空中放置模式时，将玩家居中并减少移动。")
         .defaultValue(true)
         .visible(() -> mode.get() != Mode.Packet)
         .build()
     );
 
     private final Setting<Boolean> autoDimension = sgGeneral.add(new BoolSetting.Builder()
-        .name("自动尺寸")
+        .name("自动维度")
         .description("在下界使用粉雪桶。")
         .defaultValue(true)
         .visible(() -> mode.get() == Mode.Place)
@@ -83,8 +83,8 @@ public class NoFall extends Module {
     );
 
     private final Setting<Boolean> antiBounce = sgGeneral.add(new BoolSetting.Builder()
-        .name("防弹跳")
-        .description("禁用着陆时在粘液块和床上弹跳。")
+        .name("反弹")
+        .description("在着陆时禁用在粘液块和床上弹跃。")
         .defaultValue(true)
         .build()
     );
@@ -95,7 +95,7 @@ public class NoFall extends Module {
     private boolean prePathManagerNoFall;
 
     public NoFall() {
-        super(Categories.Movement, "不摔倒", "试图防止你受到坠落伤害。");
+        super(Categories.Movement, "无摔伤", "尝试防止你受到摔伤。");
     }
 
     @Override

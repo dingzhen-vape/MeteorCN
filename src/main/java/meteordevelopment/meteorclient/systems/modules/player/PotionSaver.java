@@ -22,7 +22,7 @@ public class PotionSaver extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<List<StatusEffect>> effects = sgGeneral.add(new StatusEffectListSetting.Builder()
-        .name("effects")
+        .name("效果")
         .description("要保留的效果。")
         .defaultValue(
             STRENGTH,
@@ -44,14 +44,14 @@ public class PotionSaver extends Module {
     );
 
     public final Setting<Boolean> onlyWhenStationary = sgGeneral.add(new BoolSetting.Builder()
-        .name("only-when-stationary")
-        .description("仅在您不移动时冻结效果。")
+        .name("仅静止时")
+        .description("只有在你不动时才冻结效果。")
         .defaultValue(false)
         .build()
     );
 
     public PotionSaver() {
-        super(Categories.Player, "potion-saver", "当您静止时停止药水效果滴答作响。 ");
+        super(Categories.Player, "药水节省", "当你站着不动时停止药水效果的计时。");
     }
 
     public boolean shouldFreeze(StatusEffect effect) {

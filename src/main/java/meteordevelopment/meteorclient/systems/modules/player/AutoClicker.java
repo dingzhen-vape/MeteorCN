@@ -19,15 +19,15 @@ public class AutoClicker extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> leftClickMode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode-left")
-        .description("左键单击的方法。")
+        .name("左键模式")
+        .description("左键点击的方法。")
         .defaultValue(Mode.Press)
         .build()
     );
 
     private final Setting<Integer> leftClickDelay = sgGeneral.add(new IntSetting.Builder()
-        .name("delay-left")
-        .description("左键单击之间的延迟量,以刻度为单位。")
+        .name("左键延迟")
+        .description("以刻为单位的左键点击之间的延迟。")
         .defaultValue(2)
         .min(0)
         .sliderMax(60)
@@ -36,15 +36,15 @@ public class AutoClicker extends Module {
     );
 
     private final Setting<Mode> rightClickMode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode-right")
-        .description("右键单击的方法点击次数。")
+        .name("右键模式")
+        .description("右键点击的方法。")
         .defaultValue(Mode.Press)
         .build()
     );
 
     private final Setting<Integer> rightClickDelay = sgGeneral.add(new IntSetting.Builder()
-        .name("delay-right")
-        .description("右击之间的延迟量(以刻度为单位)。")
+        .name("右键延迟")
+        .description("以刻为单位的右键点击之间的延迟。")
         .defaultValue(2)
         .min(0)
         .sliderMax(60)
@@ -55,7 +55,7 @@ public class AutoClicker extends Module {
     private int rightClickTimer, leftClickTimer;
 
     public AutoClicker() {
-        super(Categories.Player, "自动点击器", "自动点击次数。");
+        super(Categories.Player, "自动点击器", "自动点击。");
     }
 
     @Override

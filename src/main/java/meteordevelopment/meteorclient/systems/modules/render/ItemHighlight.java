@@ -21,20 +21,20 @@ public class ItemHighlight extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<List<Item>> items = sgGeneral.add(new ItemListSetting.Builder()
-        .name("items")
-        .description("要突出显示的项目。")
+        .name("物品")
+        .description("要高亮的物品。")
         .build()
     );
 
     private final Setting<SettingColor> color = sgGeneral.add(new ColorSetting.Builder()
-        .name("color")
-        .description("突出显示项目的颜色。")
+        .name("颜色")
+        .description("高亮物品的颜色。")
         .defaultValue(new SettingColor(225, 25, 255, 50))
         .build()
     );
 
     public ItemHighlight() {
-        super(Categories.Render, "item-highlight", "在 guis 中突出显示所选项目");
+        super(Categories.Render, "物品高亮", "在GUI中高亮选中的物品。");
     }
 
     public int getColor(ItemStack stack) {

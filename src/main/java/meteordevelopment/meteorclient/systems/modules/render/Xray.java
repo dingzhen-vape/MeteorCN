@@ -35,7 +35,7 @@ public class Xray extends Module {
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
         .name("白名单")
-        .description("哪些方块要显示 X 射线。")
+        .description("显示透视的方块。")
         .defaultValue(ORES)
         .onChanged(v -> {
             if (isActive()) mc.worldRenderer.reload();
@@ -65,7 +65,7 @@ public class Xray extends Module {
         .build());
 
     public Xray() {
-        super(Categories.Render, "x 射线", "仅渲染指定的块。适合采矿。");
+        super(Categories.Render, "透视", "只渲染指定的方块。适合挖矿。");
     }
 
     @Override
@@ -80,8 +80,8 @@ public class Xray extends Module {
 
     @Override
     public WWidget getWidget(GuiTheme theme) {
-        if (MixinPlugin.isSodiumPresent) return theme.label("警告：由于使用了钠,不透明度被覆盖为 0。");
-        if (MixinPlugin.isIrisPresent && IrisApi.getInstance().isShaderPackInUse()) return theme.label("警告：由于使用了着色器,不透明度被覆盖为 0。");
+        if (MixinPlugin.isSodiumPresent) return theme.label("警告：由于使用了Sodium，不透明度被强制为0。");
+        if (MixinPlugin.isIrisPresent && IrisApi.getInstance().isShaderPackInUse()) return theme.label("警告：由于使用了着色器，不透明度被强制为0。");
 
         return null;
     }

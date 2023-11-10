@@ -27,8 +27,8 @@ public class AutoNametag extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Set<EntityType<?>>> entities = sgGeneral.add(new EntityTypeListSetting.Builder()
-        .name("entities")
-        .description("要命名哪些实体。")
+        .name("实体")
+        .description("要命名的实体。")
         .build()
     );
 
@@ -42,22 +42,22 @@ public class AutoNametag extends Module {
     );
 
     private final Setting<SortPriority> priority = sgGeneral.add(new EnumSetting.Builder<SortPriority>()
-        .name("priority")
+        .name("优先级")
         .description("优先级排序")
         .defaultValue(SortPriority.LowestDistance)
         .build()
     );
 
     private final Setting<Boolean> renametag = sgGeneral.add(new BoolSetting.Builder()
-        .name("重命名标签")
-        .description("允许已添加名称标签的实体被重命名。")
+        .name("重命名")
+        .description("允许已经命名的实体被重命名。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("自动面向被标记名称的生物。")
+        .description("自动面向被命名的实体。")
         .defaultValue(true)
         .build()
     );
@@ -66,7 +66,7 @@ public class AutoNametag extends Module {
     private boolean offHand;
 
     public AutoNametag() {
-        super(Categories.World, "自动名称标签", "自动在没有名称标签的实体上使用名称标签。将为指定距离内的所有实体添加名称标签。");
+        super(Categories.World, "自动命名", "自动对没有命名的实体使用命名牌。将命名指定距离内的所有实体。");
     }
 
     @EventHandler
@@ -75,7 +75,7 @@ public class AutoNametag extends Module {
         FindItemResult findNametag = InvUtils.findInHotbar(Items.NAME_TAG);
 
         if (!findNametag.found()) {
-            error("热栏中没有名称标签");
+            error("热栏中没有命名牌");
             toggle();
             return;
         }

@@ -45,49 +45,49 @@ public class SelfTrap extends Module {
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
         .name("白名单")
-        .description("使用哪些块。")
+        .description("要使用的方块.")
         .defaultValue(Blocks.OBSIDIAN, Blocks.NETHERITE_BLOCK)
         .build()
     );
 
     private final Setting<TopMode> topPlacement = sgGeneral.add(new EnumSetting.Builder<TopMode>()
-        .name("顶部模式")
-        .description("放置在上半部分的哪些位置。")
+        .name("上半部模式")
+        .description("要在你上半身放置的位置.")
         .defaultValue(TopMode.Top)
         .build()
     );
 
     private final Setting<BottomMode> bottomPlacement = sgGeneral.add(new EnumSetting.Builder<BottomMode>()
-        .name("底部模式")
-        .description("放置在下半部分的位置.")
+        .name("下半部模式")
+        .description("要在你下半身放置的位置.")
         .defaultValue(BottomMode.None)
         .build()
     );
 
     private final Setting<Integer> delaySetting = sgGeneral.add(new IntSetting.Builder()
-        .name("place-delay")
-        .description("块放置之间有多少个刻度。")
+        .name("放置延迟")
+        .description("放置方块之间的刻延迟.")
         .defaultValue(1)
         .build()
     );
 
     private final Setting<Boolean> center = sgGeneral.add(new BoolSetting.Builder()
-        .name("center")
-        .description("在放置之前将您置于您所站立的块的中心。")
+        .name("居中")
+        .description("放置前将你居中到你站的方块上.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> turnOff = sgGeneral.add(new BoolSetting.Builder()
-        .name("turn-off")
-        .description("放置后关闭。 ")
+        .name("关闭")
+        .description("放置后关闭.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("放置时将旋转数据包发送到服务器。")
+        .description("放置时向服务器发送旋转数据包.")
         .defaultValue(true)
         .build()
     );
@@ -96,28 +96,28 @@ public class SelfTrap extends Module {
 
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
         .name("渲染")
-        .description("在将放置块的位置渲染块覆盖。")
+        .description("渲染一个方块覆盖在要放置的方块上.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
         .name("形状模式")
-        .description("如何渲染形状。")
+        .description("形状的渲染方式.")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("正在渲染的块侧面的颜色。")
+        .name("侧颜色")
+        .description("要渲染的方块的侧颜色.")
         .defaultValue(new SettingColor(204, 0, 0, 10))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("正在渲染的块的线条颜色。")
+        .name("线颜色")
+        .description("要渲染的方块的线颜色.")
         .defaultValue(new SettingColor(204, 0, 0, 255))
         .build()
     );
@@ -127,7 +127,7 @@ public class SelfTrap extends Module {
     private int delay;
 
     public SelfTrap(){
-        super(Categories.Combat, "self-trap", "放置块在你头顶上方。");
+        super(Categories.Combat, "自我困住", "在你头上放置方块.");
     }
 
     @Override

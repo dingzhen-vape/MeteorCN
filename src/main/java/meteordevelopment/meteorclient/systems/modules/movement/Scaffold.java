@@ -34,71 +34,71 @@ public class Scaffold extends Module {
     private final SettingGroup sgRender = settings.createGroup("渲染");
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("blocks")
-        .description("选定的块。")
+        .name("方块")
+        .description("选择的方块。")
         .build()
     );
 
     private final Setting<ListMode> blocksFilter = sgGeneral.add(new EnumSetting.Builder<ListMode>()
-        .name("blocks-filter")
-        .description("如何使用块列表设置")
+        .name("方块过滤")
+        .description("如何使用方块列表设置")
         .defaultValue(ListMode.Blacklist)
         .build()
     );
 
     private final Setting<Boolean> fastTower = sgGeneral.add(new BoolSetting.Builder()
-        .name("fast-tower")
-        .description("是否更快地向上搭建脚手架。")
+        .name("快速塔")
+        .description("是否更快地向上搭建。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> cancelVelocity = sgGeneral.add(new BoolSetting.Builder()
-        .name("取消-velocity")
-        .description("高耸时是否取消速度。")
+        .name("取消速度")
+        .description("在塔上时是否取消速度。")
         .defaultValue(false)
         .visible(fastTower::get)
         .build()
     );
 
     private final Setting<Boolean> onlyOnClick = sgGeneral.add(new BoolSetting.Builder()
-        .name("only-on-click")
-        .description("仅在按住右键时放置方块。")
+        .name("仅点击")
+        .description("只有在按住右键时才放置方块。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> renderSwing = sgGeneral.add(new BoolSetting.Builder()
-        .name("swing")
-        .description("渲染客户端摆动。")
+        .name("摇摆")
+        .description("渲染你的客户端摇摆。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> autoSwitch = sgGeneral.add(new BoolSetting.Builder()
         .name("自动切换")
-        .description("放置前自动交换到一个块。")
+        .description("在放置前自动切换到一个方块。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("朝着正在放置的块旋转。")
+        .description("朝向被放置的方块旋转。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> airPlace = sgGeneral.add(new BoolSetting.Builder()
         .name("空中放置")
-        .description("允许空中放置。这还允许您修改支架半径。")
+        .description("允许空中放置。这也允许你修改脚手架半径。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Double> placeRange = sgGeneral.add(new DoubleSetting.Builder()
-        .name("closest-block-range")
-        .description("当你在空中时支架可以放置方块多远。")
+        .name("最近方块范围")
+        .description("当你在空中时，脚手架可以放置方块的范围。")
         .defaultValue(4)
         .min(0)
         .sliderMax(8)
@@ -107,8 +107,8 @@ public class Scaffold extends Module {
     );
 
     private final Setting<Double> radius = sgGeneral.add(new DoubleSetting.Builder()
-        .name("radius")
-        .description("支架半径。")
+        .name("半径")
+        .description("脚手架半径。")
         .defaultValue(0)
         .min(0)
         .max(6)
@@ -117,8 +117,8 @@ public class Scaffold extends Module {
     );
 
     private final Setting<Integer> blocksPerTick = sgGeneral.add(new IntSetting.Builder()
-        .name("blocks-per-tick ")
-        .description("一次要放置多少块。")
+        .name("每刻方块")
+        .description("每刻放置多少方块。")
         .defaultValue(3)
         .min(1)
         .visible(() -> airPlace.get())
@@ -129,30 +129,30 @@ public class Scaffold extends Module {
 
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
         .name("渲染")
-        .description("是否渲染已放置的块。")
+        .description("是否渲染已经放置的方块。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .visible(render::get)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("目标块渲染的侧面颜色。")
+        .name("侧颜色")
+        .description("目标方块渲染的侧面颜色。")
         .defaultValue(new SettingColor(197, 137, 232, 10))
         .visible(render::get)
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("目标块渲染的线条颜色。")
+        .name("线颜色")
+        .description("目标方块渲染的线条颜色。")
         .defaultValue(new SettingColor(197, 137, 232))
         .visible(render::get)
         .build()
@@ -165,7 +165,7 @@ public class Scaffold extends Module {
     private double lastSneakingY;
 
     public Scaffold() {
-        super(Categories.Movement, "scaffold", "自动将块放置在你的下方。");
+        super(Categories.Movement, "脚手架", "自动在你下面放置方块。");
     }
 
     @Override

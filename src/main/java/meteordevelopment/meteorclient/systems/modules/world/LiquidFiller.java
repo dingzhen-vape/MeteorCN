@@ -31,8 +31,8 @@ public class LiquidFiller extends Module {
     private final SettingGroup sgWhitelist = settings.createGroup("白名单");
 
     private final Setting<PlaceIn> placeInLiquids = sgGeneral.add(new EnumSetting.Builder<PlaceIn>()
-        .name("放置")
-        .description("放置什么类型的液体。")
+        .name("放置于")
+        .description("要放置于的液体类型。")
         .defaultValue(PlaceIn.Both)
         .build()
     );
@@ -54,15 +54,15 @@ public class LiquidFiller extends Module {
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
         .name("延迟")
-        .description("以刻度为单位的操作之间的延迟。")
+        .description("每个动作之间的延迟，以刻为单位。")
         .defaultValue(0)
         .min(0)
         .build()
     );
 
     private final Setting<Integer> maxBlocksPerTick = sgGeneral.add(new IntSetting.Builder()
-        .name("每刻度最大块")
-        .description("每个刻度尝试放置的最大块。")
+        .name("每刻最大放置方块数")
+        .description("每刻尝试放置的最大方块数。")
         .defaultValue(1)
         .min(1)
         .sliderRange(1, 10)
@@ -71,14 +71,14 @@ public class LiquidFiller extends Module {
 
     private final Setting<SortMode> sortMode = sgGeneral.add(new EnumSetting.Builder<SortMode>()
         .name("排序模式")
-        .description("您要首先放置的块。")
+        .description("你想要先放置的方块。")
         .defaultValue(SortMode.Closest)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
-        .name("旋转")
-        .description("自动旋转到要填充的目标空间。")
+        .name("自动旋转")
+        .description("自动旋转朝向要填充的空间。")
         .defaultValue(true)
         .build()
     );
@@ -94,7 +94,7 @@ public class LiquidFiller extends Module {
 
     private final Setting<List<Block>> whitelist = sgWhitelist.add(new BlockListSetting.Builder()
         .name("白名单")
-        .description("用于填充液体的允许块。")
+        .description("允许用来填充液体的方块。")
         .defaultValue(
             Blocks.DIRT,
             Blocks.COBBLESTONE,
@@ -110,7 +110,7 @@ public class LiquidFiller extends Module {
 
     private final Setting<List<Block>> blacklist = sgWhitelist.add(new BlockListSetting.Builder()
         .name("黑名单")
-        .description("被拒绝的方块不会用来填充液体。")
+        .description("不允许用来填充液体的方块。")
         .visible(() -> listMode.get() == ListMode.Blacklist)
         .build()
     );
@@ -120,7 +120,7 @@ public class LiquidFiller extends Module {
     private int timer;
 
     public LiquidFiller(){
-        super(Categories.World, "液体填充器", "将方块放置在您范围内的液体源方块内。");
+        super(Categories.World, "液体填充器", "在你周围的范围内，将方块放置在液体源方块中。");
     }
 
     @Override

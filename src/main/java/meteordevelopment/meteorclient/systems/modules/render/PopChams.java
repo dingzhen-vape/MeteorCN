@@ -28,15 +28,15 @@ public class PopChams extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> onlyOne = sgGeneral.add(new BoolSetting.Builder()
-        .name("only-one")
-        .description("每个玩家只允许出现一个幽灵。")
+        .name("仅一")
+        .description("每个玩家只允许一个幽灵。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Double> renderTime = sgGeneral.add(new DoubleSetting.Builder()
-        .name("render-time")
-        .description("幽灵渲染的时间以秒为单位。")
+        .name("渲染时间")
+        .description("以秒为单位的幽灵渲染时间。")
         .defaultValue(1)
         .min(0.1)
         .sliderMax(6)
@@ -44,45 +44,45 @@ public class PopChams extends Module {
     );
 
     private final Setting<Double> yModifier = sgGeneral.add(new DoubleSetting.Builder()
-        .name("y-modifier")
-        .description("幽灵的 Y 位置应该是多少每秒幻影变化。")
+        .name("y-修正")
+        .description("幽灵的Y轴位置每秒改变的量。")
         .defaultValue(0.75)
         .sliderRange(-4, 4)
         .build()
     );
 
     private final Setting<Double> scaleModifier = sgGeneral.add(new DoubleSetting.Builder()
-        .name("scale-modifier")
-        .description("幻影每秒变化多少。")
+        .name("比例-修正")
+        .description("幽灵的比例每秒改变的量。")
         .defaultValue(-0.25)
         .sliderRange(-4, 4)
         .build()
     );
 
     private final Setting<Boolean> fadeOut = sgGeneral.add(new BoolSetting.Builder()
-        .name("fade-out")
+        .name("淡出")
         .description("淡出颜色。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgGeneral.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何形状被渲染。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgGeneral.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("侧面颜色。")
+        .name("边缘颜色")
+        .description("边缘的颜色。")
         .defaultValue(new SettingColor(255, 255, 255, 25))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgGeneral.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("线条颜色。")
+        .name("线条颜色")
+        .description("线条的颜色。")
         .defaultValue(new SettingColor(255, 255, 255, 127))
         .build()
     );
@@ -90,7 +90,7 @@ public class PopChams extends Module {
     private final List<GhostPlayer> ghosts = new ArrayList<>();
 
     public PopChams() {
-        super(Categories.Render, "pop-chams", "在玩家弹出图腾的地方渲染幽灵。");
+        super(Categories.Render, "图腾幽灵", "在玩家爆图腾的地方渲染幽灵。");
     }
 
     @Override
@@ -127,7 +127,7 @@ public class PopChams extends Module {
         private double timer, scale = 1;
 
         public GhostPlayer(PlayerEntity player) {
-            super(player, "鬼", 20, false);
+            super(player, "幽灵", 20, false);
 
             uuid = player.getUuid();
         }

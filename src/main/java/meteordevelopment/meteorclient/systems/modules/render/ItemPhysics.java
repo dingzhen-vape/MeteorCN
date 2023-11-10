@@ -36,7 +36,7 @@ public class ItemPhysics extends Module {
 
     private final Setting<Boolean> randomRotation = sgGeneral.add(new BoolSetting.Builder()
             .name("随机旋转")
-            .description("为每个项目添加随机旋转。")
+            .description("为每个物品添加一个随机旋转。")
             .defaultValue(true)
             .build()
     );
@@ -45,7 +45,7 @@ public class ItemPhysics extends Module {
     private boolean renderingItem;
 
     public ItemPhysics() {
-        super(Categories.Render, "项目物理", "将物理应用于地面上的项目。");
+        super(Categories.Render, "物品物理", "为地面上的物品应用物理效果。");
     }
 
     @EventHandler

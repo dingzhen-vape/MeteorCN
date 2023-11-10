@@ -36,56 +36,56 @@ public class AutoTrap extends Module {
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
         .name("白名单")
-        .description("使用哪些块。")
+        .description("要使用的方块。")
         .defaultValue(Blocks.OBSIDIAN, Blocks.NETHERITE_BLOCK)
         .build()
     );
 
     private final Setting<Integer> range = sgGeneral.add(new IntSetting.Builder()
         .name("目标范围")
-        .description("可以定位的玩家范围。")
+        .description("可以被目标的玩家的范围。")
         .defaultValue(4)
         .build()
     );
 
     private final Setting<SortPriority> priority = sgGeneral.add(new EnumSetting.Builder<SortPriority>()
         .name("目标优先级")
-        .description("如何选择要定位的玩家。")
+        .description("如何选择要目标的玩家。")
         .defaultValue(SortPriority.LowestHealth)
         .build()
     );
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
-        .name("place-delay")
-        .description("块放置之间有多少个刻度。")
+        .name("放置延迟")
+        .description("放置方块之间的延迟，以刻为单位。")
         .defaultValue(1)
         .build()
     );
 
     private final Setting<TopMode> topPlacement = sgGeneral.add(new EnumSetting.Builder<TopMode>()
-        .name("top-blocks")
-        .description("哪些块放置在目标的上半部分。")
+        .name("顶部方块")
+        .description("放置在目标上半部的方块。")
         .defaultValue(TopMode.Full)
         .build()
     );
 
     private final Setting<BottomMode> bottomPlacement = sgGeneral.add(new EnumSetting.Builder<BottomMode>()
-        .name("bottom-blocks")
-        .description("哪些块放置在目标的上半部分。目标的下半部分。")
+        .name("底部方块")
+        .description("放置在目标下半部的方块。")
         .defaultValue(BottomMode.Platform)
         .build()
     );
 
     private final Setting<Boolean> selfToggle = sgGeneral.add(new BoolSetting.Builder()
-        .name("自切换")
-        .description("放置所有块后关闭。")
+        .name("自动关闭")
+        .description("放置完所有方块后关闭。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("放置时朝块旋转。")
+        .description("放置时向方块旋转。")
         .defaultValue(true)
         .build()
     );
@@ -94,42 +94,42 @@ public class AutoTrap extends Module {
 
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
         .name("渲染")
-        .description("渲染将放置块的覆盖层.")
+        .description("是否渲染将要放置的方块的覆盖层。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("形状如何渲染。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("目标块渲染的侧面颜色。")
+        .name("侧面颜色")
+        .description("目标方块渲染的侧面颜色。")
         .defaultValue(new SettingColor(197, 137, 232, 10))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("目标块的线条颜色渲染。")
+        .name("线条颜色")
+        .description("目标方块渲染的线条颜色。")
         .defaultValue(new SettingColor(197, 137, 232))
         .build()
     );
 
     private final Setting<SettingColor> nextSideColor = sgRender.add(new ColorSetting.Builder()
-        .name("next-side-color")
-        .description("下一个要放置的块的侧面颜色。")
+        .name("下一个侧面颜色")
+        .description("下一个要放置的方块的侧面颜色。")
         .defaultValue(new SettingColor(227, 196, 245, 10))
         .build()
     );
 
     private final Setting<SettingColor> nextLineColor = sgRender.add(new ColorSetting.Builder()
-        .name("next-line-color")
-        .description("下一个要放置的块的线条颜色。")
+        .name("下一个线条颜色")
+        .description("下一个要放置的方块的线条颜色。")
         .defaultValue(new SettingColor(227, 196, 245))
         .build()
     );
@@ -140,7 +140,7 @@ public class AutoTrap extends Module {
     private int timer;
 
     public AutoTrap() {
-        super(Categories.Combat, "auto -trap", "将人困在盒子里以防止他们移动。");
+        super(Categories.Combat, "自动困住", "把人困在一个箱子里，防止他们移动。");
     }
 
     @Override

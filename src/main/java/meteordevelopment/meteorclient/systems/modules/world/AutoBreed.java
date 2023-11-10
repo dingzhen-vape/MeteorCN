@@ -37,22 +37,22 @@ public class AutoBreed extends Module {
 
     private final Setting<Double> range = sgGeneral.add(new DoubleSetting.Builder()
         .name("范围")
-        .description("动物可以繁殖的距离有多远。")
+        .description("动物可以被繁殖的距离。")
         .min(0)
         .defaultValue(4.5)
         .build()
     );
 
     private final Setting<Hand> hand = sgGeneral.add(new EnumSetting.Builder<Hand>()
-        .name("用于繁殖的手")
+        .name("繁殖用的手")
         .description("用于繁殖的手。")
         .defaultValue(Hand.MAIN_HAND)
         .build()
     );
 
     private final Setting<Boolean> ignoreBabies = sgGeneral.add(new BoolSetting.Builder()
-        .name("忽略-babies")
-        .description("是否忽略指定实体的婴儿变体。")
+        .name("忽略幼崽")
+        .description("是否忽略指定实体的幼崽变种。")
         .defaultValue(true)
         .build()
     );
@@ -60,7 +60,7 @@ public class AutoBreed extends Module {
     private final List<Entity> animalsFed = new ArrayList<>();
 
     public AutoBreed() {
-        super(Categories.World, "自动繁殖", "自动繁殖指定动物。");
+        super(Categories.World, "自动繁殖", "自动繁殖指定的动物。");
     }
 
     @Override

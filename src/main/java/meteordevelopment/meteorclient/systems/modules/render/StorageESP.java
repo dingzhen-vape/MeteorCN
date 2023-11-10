@@ -32,35 +32,35 @@ public class StorageESP extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
+        .name("模式")
         .description("渲染模式。")
         .defaultValue(Mode.Shader)
         .build()
     );
 
     private final Setting<List<BlockEntityType<?>>> storageBlocks = sgGeneral.add(new StorageBlockListSetting.Builder()
-        .name("storage-blocks")
-        .description("选择要显示的存储块。")
+        .name("存储方块")
+        .description("选择要显示的存储方块。")
         .defaultValue(StorageBlockListSetting.STORAGE_BLOCKS)
         .build()
     );
 
     private final Setting<Boolean> tracers = sgGeneral.add(new BoolSetting.Builder()
-        .name("tracers")
-        .description("将跟踪器绘制到存储块。")
+        .name("追踪线")
+        .description("向存储方块画追踪线。")
         .defaultValue(false)
         .build()
     );
 
     public final Setting<ShapeMode> shapeMode = sgGeneral.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("形状如何被渲染。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     public final Setting<Integer> fillOpacity = sgGeneral.add(new IntSetting.Builder()
-        .name("fill-opacity")
+        .name("填充不透明度")
         .description("形状填充的不透明度。")
         .visible(() -> shapeMode.get() != ShapeMode.Lines)
         .defaultValue(50)
@@ -70,7 +70,7 @@ public class StorageESP extends Module {
     );
 
     public final Setting<Integer> outlineWidth = sgGeneral.add(new IntSetting.Builder()
-        .name("width")
+        .name("宽度")
         .description("着色器轮廓的宽度。")
         .visible(() -> mode.get() == Mode.Shader)
         .defaultValue(1)
@@ -80,8 +80,8 @@ public class StorageESP extends Module {
     );
 
     public final Setting<Double> glowMultiplier = sgGeneral.add(new DoubleSetting.Builder()
-        .name("glow-multiplier")
-        .description("发光效果乘数")
+        .name("发光倍数")
+        .description("发光效果的倍数。")
         .visible(() -> mode.get() == Mode.Shader)
         .decimalPlaces(3)
         .defaultValue(3.5)
@@ -91,15 +91,15 @@ public class StorageESP extends Module {
     );
 
     private final Setting<SettingColor> chest = sgGeneral.add(new ColorSetting.Builder()
-        .name("胸部")
+        .name("箱子")
         .description("箱子的颜色。")
         .defaultValue(new SettingColor(255, 160, 0, 255))
         .build()
     );
 
     private final Setting<SettingColor> trappedChest = sgGeneral.add(new ColorSetting.Builder()
-        .name("被困箱子")
-        .description("被困箱子的颜色。")
+        .name("陷阱箱")
+        .description("陷阱箱的颜色。")
         .defaultValue(new SettingColor(255, 0, 0, 255))
         .build()
     );
@@ -112,7 +112,7 @@ public class StorageESP extends Module {
     );
 
     private final Setting<SettingColor> shulker = sgGeneral.add(new ColorSetting.Builder()
-        .name("潜影贝")
+        .name("潜影盒")
         .description("潜影盒的颜色。")
         .defaultValue(new SettingColor(255, 160, 0, 255))
         .build()
@@ -127,14 +127,14 @@ public class StorageESP extends Module {
 
     private final Setting<SettingColor> other = sgGeneral.add(new ColorSetting.Builder()
         .name("其他")
-        .description("熔炉,分配器,滴管和料斗的颜色。")
+        .description("熔炉、发射器、投掷器和漏斗的颜色。")
         .defaultValue(new SettingColor(140, 140, 140, 255))
         .build()
     );
 
     private final Setting<Double> fadeDistance = sgGeneral.add(new DoubleSetting.Builder()
         .name("淡出距离")
-        .description("颜色褪色的距离。")
+        .description("颜色开始淡出的距离。")
         .defaultValue(6)
         .min(0)
         .sliderMax(12)
@@ -150,7 +150,7 @@ public class StorageESP extends Module {
     private final MeshVertexConsumerProvider vertexConsumerProvider;
 
     public StorageESP() {
-        super(Categories.Render, "storage-esp", "渲染所有指定的存储块。");
+        super(Categories.Render, "存储esp", "渲染所有指定的存储方块。");
 
         mesh = new ShaderMesh(Shaders.POS_COLOR, DrawMode.Triangles, Mesh.Attrib.Vec3, Mesh.Attrib.Color);
         vertexConsumerProvider = new MeshVertexConsumerProvider(mesh);

@@ -33,13 +33,13 @@ import java.util.List;
 
 public class HoleESP extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgRender = settings.createGroup("Render");
+    private final SettingGroup sgRender = settings.createGroup("渲染");
 
     // General
 
     private final Setting<Integer> horizontalRadius = sgGeneral.add(new IntSetting.Builder()
-        .name("horizo​​ntal-radius")
-        .description("搜索孔的水平半径。")
+        .name("水平搜索范围")
+        .description("水平搜索洞穴的范围。")
         .defaultValue(10)
         .min(0)
         .sliderMax(32)
@@ -47,8 +47,8 @@ public class HoleESP extends Module {
     );
 
     private final Setting<Integer> verticalRadius = sgGeneral.add(new IntSetting.Builder()
-        .name("vertical-radius")
-        .description("搜索孔的垂直半径。")
+        .name("垂直搜索范围")
+        .description("垂直搜索洞穴的范围。")
         .defaultValue(5)
         .min(0)
         .sliderMax(32)
@@ -56,8 +56,8 @@ public class HoleESP extends Module {
     );
 
     private final Setting<Integer> holeHeight = sgGeneral.add(new IntSetting.Builder()
-        .name("min-height")
-        .description("最小孔需要渲染的高度。")
+        .name("最低高度")
+        .description("需要渲染的洞穴的最低高度。")
         .defaultValue(3)
         .min(1)
         .sliderMin(1)
@@ -65,22 +65,22 @@ public class HoleESP extends Module {
     );
 
     private final Setting<Boolean> doubles = sgGeneral.add(new BoolSetting.Builder()
-        .name("doubles")
-        .description("突出显示可以站立的双孔。")
+        .name("双洞")
+        .description("高亮可以横跨的双洞。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> ignoreOwn = sgGeneral.add(new BoolSetting.Builder()
-        .name("ignore-own")
-        .description("忽略渲染您当前站立的孔。")
+        .name("忽略自己")
+        .description("忽略渲染你当前站在的洞穴。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> webs = sgGeneral.add(new BoolSetting.Builder()
-        .name("webs")
-        .description("是否显示内部有网的孔。")
+        .name("蜘蛛网")
+        .description("是否显示有蜘蛛网的洞穴。")
         .defaultValue(false)
         .build()
     );
@@ -88,14 +88,14 @@ public class HoleESP extends Module {
     // Render
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<Double> height = sgRender.add(new DoubleSetting.Builder()
-        .name("height")
+        .name("高度")
         .description("渲染的高度。")
         .defaultValue(0.2)
         .min(0)
@@ -103,57 +103,57 @@ public class HoleESP extends Module {
     );
 
     private final Setting<Boolean> topQuad = sgRender.add(new BoolSetting.Builder()
-        .name("top-quad")
-        .description("是否渲染四边形在孔的顶部。")
+        .name("顶部四边形")
+        .description("是否在洞穴的顶部渲染一个四边形。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> bottomQuad = sgRender.add(new BoolSetting.Builder()
-        .name("bottom-quad")
-        .description("是否在孔的底部渲染四边形。")
+        .name("底部四边形")
+        .description("是否在洞穴的底部渲染一个四边形。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<SettingColor> bedrockColorTop = sgRender.add(new ColorSetting.Builder()
-        .name("bedrock-top")
-        .description("完全基岩的孔的顶部颜色。")
+        .name("基岩顶部")
+        .description("完全是基岩的洞穴的顶部颜色。")
         .defaultValue(new SettingColor(100, 255, 0, 200))
         .build()
     );
 
     private final Setting<SettingColor> bedrockColorBottom = sgRender.add(new ColorSetting.Builder()
-        .name(" bedrock-bottom")
-        .description("完全基岩的孔的底部颜色。")
+        .name("基岩底部")
+        .description("完全是基岩的洞穴的底部颜色。")
         .defaultValue(new SettingColor(100, 255, 0, 0))
         .build()
     );
 
     private final Setting<SettingColor> obsidianColorTop = sgRender.add(new ColorSetting.Builder()
-        .name("obsidian-top")
-        .description("完全黑曜石的孔的顶部颜色。")
+        .name("黑曜石顶部")
+        .description("完全是黑曜石的洞穴的顶部颜色。")
         .defaultValue(new SettingColor(255, 0, 0, 200))
         .build()
     );
 
     private final Setting<SettingColor> obsidianColorBottom = sgRender.add(new ColorSetting.Builder()
-        .name("obsidian-bottom")
-        .description("孔的底部颜色完全是黑曜石的。")
+        .name("黑曜石底部")
+        .description("完全是黑曜石的洞穴的底部颜色。")
         .defaultValue(new SettingColor(255, 0, 0, 0))
         .build()
     );
 
     private final Setting<SettingColor> mixedColorTop = sgRender.add(new ColorSetting.Builder()
-        .name("mixed-top")
-        .description("混合基岩和黑曜石的洞的顶部颜色。")
+        .name("混合顶部")
+        .description("有混合基岩和黑曜石的洞穴的顶部颜色。")
         .defaultValue(new SettingColor(255, 127, 0, 200))
         .build()
     );
 
     private final Setting<SettingColor> mixedColorBottom = sgRender.add(new ColorSetting.Builder()
-        .name("mixed-bottom")
-        .description("混合基岩和黑曜石的洞的底部颜色。")
+        .name("混合底部")
+        .description("有混合基岩和黑曜石的洞穴的底部颜色。")
         .defaultValue(new SettingColor(255, 127, 0, 0))
         .build()
     );
@@ -164,7 +164,7 @@ public class HoleESP extends Module {
     private final byte NULL = 0;
 
     public HoleESP() {
-        super(Categories.Render, " hole-esp", "显示你受到较少伤害的洞。");
+        super(Categories.Render, "洞穴ESP", "显示你会受到更少伤害的洞穴。");
     }
 
     @EventHandler

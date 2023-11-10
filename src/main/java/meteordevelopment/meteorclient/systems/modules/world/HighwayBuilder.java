@@ -75,8 +75,8 @@ public class HighwayBuilder extends Module {
     private static final BlockPos ZERO = new BlockPos(0, 0, 0);
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgRenderMine = settings.createGroup("渲染地雷");
-    private final SettingGroup sgRenderPlace = settings.createGroup("渲染地点");
+    private final SettingGroup sgRenderMine = settings.createGroup("渲染挖掘");
+    private final SettingGroup sgRenderPlace = settings.createGroup("渲染放置");
 
     // General
 
@@ -99,8 +99,8 @@ public class HighwayBuilder extends Module {
     );
 
     private final Setting<Floor> floor = sgGeneral.add(new EnumSetting.Builder<Floor>()
-        .name("楼层")
-        .description("使用什么楼层放置模式。")
+        .name("地板")
+        .description("使用什么地板放置模式。")
         .defaultValue(Floor.Replace)
         .build()
     );
@@ -113,8 +113,8 @@ public class HighwayBuilder extends Module {
     );
 
     private final Setting<Boolean> mineAboveRailings = sgGeneral.add(new BoolSetting.Builder()
-        .name("栏杆上方地雷")
-        .description("在栏杆上方地雷方块。")
+        .name("挖掘栏杆上方的方块")
+        .description("挖掘栏杆上方的方块。")
         .visible(railings::get)
         .defaultValue(true)
         .build()
@@ -122,43 +122,43 @@ public class HighwayBuilder extends Module {
 
     private final Setting<Rotation> rotation = sgGeneral.add(new EnumSetting.Builder<Rotation>()
         .name("旋转")
-        .description("旋转模式。")
+        .description("旋转的模式。")
         .defaultValue(Rotation.Both)
         .build()
     );
 
     private final Setting<List<Block>> blocksToPlace = sgGeneral.add(new BlockListSetting.Builder()
-        .name("方块到放置")
-        .description("方块允许放置。")
+        .name("可放置的方块")
+        .description("允许放置的方块。")
         .defaultValue(Blocks.OBSIDIAN)
         .filter(block -> Block.isShapeFullCube(block.getDefaultState().getCollisionShape(mc.world, ZERO)))
         .build()
     );
 
     private final Setting<List<Item>> trashItems = sgGeneral.add(new ItemListSetting.Builder()
-        .name("trash-items")
-        .description("被视为垃圾并可以扔掉的物品。")
+        .name("垃圾物品")
+        .description("被认为是垃圾并可以扔掉的物品。")
         .defaultValue(Items.NETHERRACK, Items.QUARTZ, Items.GOLD_NUGGET, Items.GLOWSTONE_DUST, Items.BLACKSTONE, Items.BASALT)
         .build()
     );
 
     private final Setting<Boolean> dontBreakTools = sgGeneral.add(new BoolSetting.Builder()
-        .name("dont-break-tools")
+        .name("不要破坏工具")
         .description("不要破坏工具。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> mineEnderChests = sgGeneral.add(new BoolSetting.Builder()
-        .name("mine-ender- chests")
-        .description("为黑曜石开采末影箱。")
+        .name("挖掘末影箱")
+        .description("挖掘末影箱获取黑曜石。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> disconnectOnToggle = sgGeneral.add(new BoolSetting.Builder()
-        .name("disconnect-on-toggle")
-        .description("模块关闭时自动断开连接,例如没有足够的方块。")
+        .name("切换时断开连接")
+        .description("当模块关闭时自动断开连接，例如没有足够的方块。")
         .defaultValue(false)
         .build()
     );
@@ -166,29 +166,29 @@ public class HighwayBuilder extends Module {
     // Render Mine
 
     private final Setting<Boolean> renderMine = sgRenderMine.add(new BoolSetting.Builder()
-        .name("render-blocks-to-mine")
-        .description("渲染要开采的方块。")
+        .name("渲染要挖掘的方块")
+        .description("渲染要挖掘的方块。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> renderMineShape = sgRenderMine.add(new EnumSetting.Builder<ShapeMode>()
-        .name("blocks-to-mine-shape-mode")
-        .description("如何渲染要开采的方块。")
+        .name("要挖掘的方块的形状模式")
+        .description("要挖掘的方块的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> renderMineSideColor = sgRenderMine.add(new ColorSetting.Builder()
-        .name("blocks-to-mine-side-color")
-        .description("要开采的方块的颜色被开采。")
+        .name("要挖掘的方块的侧面颜色")
+        .description("要挖掘的方块的颜色。")
         .defaultValue(new SettingColor(225, 25, 25, 25))
         .build()
     );
 
     private final Setting<SettingColor> renderMineLineColor = sgRenderMine.add(new ColorSetting.Builder()
-        .name("blocks-to-mine-line-color")
-        .description("要开采的方块的颜色被开采。")
+        .name("要挖掘的方块的线条颜色")
+        .description("要挖掘的方块的颜色。")
         .defaultValue(new SettingColor(225, 25, 25))
         .build()
     );
@@ -196,29 +196,29 @@ public class HighwayBuilder extends Module {
     // Render Place
 
     private final Setting<Boolean> renderPlace = sgRenderPlace.add(new BoolSetting.Builder()
-        .name("render-blocks-to-place")
-        .description("渲染要放置的块。")
+        .name("渲染要放置的方块")
+        .description("渲染要放置的方块。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShapeMode> renderPlaceShape = sgRenderPlace.add(new EnumSetting.Builder<ShapeMode>()
-        .name("blocks-to -place-shape-mode")
-        .description("如何渲染要放置的块。")
+        .name("要放置的方块的形状模式")
+        .description("要放置的方块的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> renderPlaceSideColor = sgRenderPlace.add(new ColorSetting.Builder()
-        .name("blocks-to-place-side-color")
-        .description("要放置的块的颜色。")
+        .name("要放置的方块的侧面颜色")
+        .description("要放置的方块的颜色。")
         .defaultValue(new SettingColor(25, 25, 225, 25))
         .build()
     );
 
     private final Setting<SettingColor> renderPlaceLineColor = sgRenderPlace.add(new ColorSetting.Builder()
-        .name("blocks-to-place-line -color")
-        .description("要放置的块的颜色。")
+        .name("要放置的方块的线条颜色")
+        .description("要放置的方块的颜色。")
         .defaultValue(new SettingColor(25, 25, 225))
         .build()
     );
@@ -240,7 +240,7 @@ public class HighwayBuilder extends Module {
     private final MBlockPos posRender3 = new MBlockPos();
 
     public HighwayBuilder() {
-        super(Categories.World, "highway-builder", "自动建造高速公路。");
+        super(Categories.World, "高速公路建造者", "自动建造高速公路。");
     }
 
     @Override
@@ -270,8 +270,8 @@ public class HighwayBuilder extends Module {
 
         if (displayInfo) {
             info("距离: (highlight)%.0f", PlayerUtils.distanceTo(start));
-            info("损坏的方块: (highlight)%d", blocksBroken);
-            info("放置的方块: (突出显示)%d", blocksPlaced);
+            info("破坏的方块: (highlight)%d", blocksBroken);
+            info("放置的方块: (highlight)%d", blocksPlaced);
         }
     }
 
@@ -295,7 +295,7 @@ public class HighwayBuilder extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         if (width.get() < 3 && dir.diagonal) {
-            errorEarly("不支持宽度小于 3 的对角公路。");
+            errorEarly("不支持宽度小于3的对角线高速公路。");
             return;
         }
 
@@ -389,8 +389,8 @@ public class HighwayBuilder extends Module {
     }
 
     public MutableText getStatsText() {
-        MutableText text = Text.literal(String.format("%s距离: % s%.0f\n", Formatting.GRAY, Formatting.WHITE, mc.player == null ? 0.0f : PlayerUtils.distanceTo(start)));
-        text.append(String.format("%s损坏的方块: %s%d\n", Formatting.GRAY, Formatting.WHITE, blocksBroken));
+        MutableText text = Text.literal(String.format("%s距离: %s%.0f\n", Formatting.GRAY, Formatting.WHITE, mc.player == null ? 0.0f : PlayerUtils.distanceTo(start)));
+        text.append(String.format("%s破坏的方块: %s%d\n", Formatting.GRAY, Formatting.WHITE, blocksBroken));
         text.append(String.format("%s放置的方块: %s%d", Formatting.GRAY, Formatting.WHITE, blocksPlaced));
 
         return text;
@@ -689,7 +689,7 @@ public class HighwayBuilder extends Module {
                     // Mine ender chest
                     int slot = findAndMoveBestToolToHotbar(b, blockState, true, false);
                     if (slot == -1) {
-                        b.error("找不到带有丝绸触感的镐来开采末影箱。");
+                        b.error("找不到带有精准采集的镐子来挖掘末影箱。");
                         return;
                     }
 
@@ -815,7 +815,7 @@ public class HighwayBuilder extends Module {
             if (slotsWithBlocks > 1) return slotWithLeastBlocks;
 
             // No space found in hotbar
-            b.error("快捷栏中没有空白空间。");
+            b.error("热栏没有空位。");
             return -1;
         }
 
@@ -842,7 +842,7 @@ public class HighwayBuilder extends Module {
             // Stop if no items were found and are required
             if (slot == -1) {
                 if (required) {
-                    b.error("物品用完。");
+                    b.error("物品用完了。");
                 }
 
                 return -1;
@@ -877,7 +877,7 @@ public class HighwayBuilder extends Module {
 
             // Stop if not found
             if (bestSlot == -1) {
-                if (error) b.error("未能找到合适的采矿工具。");
+                if (error) b.error("找不到适合挖掘的工具。");
                 return -1;
             }
 
@@ -900,11 +900,11 @@ public class HighwayBuilder extends Module {
 
             if (slot == -1) {
                 if (!b.mineEnderChests.get()) {
-                    b.error("没有放置的方块。");
+                    b.error("没有要放置的方块。");
                 }
                 else {
                     if (hasItem(b, Items.ENDER_CHEST)) b.setState(MineEnderChests);
-                    else b.error("没有放置的方块。");
+                    else b.error("没有要放置的方块。");
                 }
 
                 return -1;

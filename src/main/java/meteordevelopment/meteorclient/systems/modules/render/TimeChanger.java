@@ -19,8 +19,8 @@ public class TimeChanger extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> time = sgGeneral.add(new DoubleSetting.Builder()
-        .name("time")
-        .description("要设置的指定时间。")
+        .name("时间")
+        .description("要设置的自定义时间。")
         .defaultValue(0)
         .sliderRange(-20000, 20000)
         .build()
@@ -29,7 +29,7 @@ public class TimeChanger extends Module {
     long oldTime;
 
     public TimeChanger() {
-        super(Categories.Render, "time-changer", "使您能够设置自定义时间。");
+        super(Categories.Render, "时间改变", "让你能够设置自定义时间。");
     }
 
     @Override

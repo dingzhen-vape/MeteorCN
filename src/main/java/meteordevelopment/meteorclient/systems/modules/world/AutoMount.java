@@ -35,28 +35,28 @@ public class AutoMount extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> checkSaddle = sgGeneral.add(new BoolSetting.Builder()
-        .name("check-saddle")
-        .description("在安装之前检查实体是否包含马鞍。")
+        .name("检查鞍")
+        .description("在骑乘之前检查实体是否有鞍。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("面向您安装的实体。")
+        .description("面向你骑乘的实体。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Set<EntityType<?>>> entities = sgGeneral.add(new EntityTypeListSetting.Builder()
-        .name("entities")
+        .name("实体")
         .description("可骑乘的实体。")
         .filter(EntityUtils::isRideable)
         .build()
     );
 
     public AutoMount() {
-        super(Categories.World, "自动安装", "自动安装实体。");
+        super(Categories.World, "自动骑乘", "自动骑乘实体。");
     }
 
     @EventHandler

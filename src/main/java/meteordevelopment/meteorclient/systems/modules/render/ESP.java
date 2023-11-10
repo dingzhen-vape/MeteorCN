@@ -44,7 +44,7 @@ public class ESP extends Module {
     );
 
     public final Setting<Integer> outlineWidth = sgGeneral.add(new IntSetting.Builder()
-        .name("outline-width")
+        .name("轮廓宽度")
         .description("着色器轮廓的宽度。")
         .visible(() -> mode.get() == Mode.Shader)
         .defaultValue(2)
@@ -54,8 +54,8 @@ public class ESP extends Module {
     );
 
     public final Setting<Double> glowMultiplier = sgGeneral.add(new DoubleSetting.Builder()
-        .name("glow-multiplier")
-        .description("发光效果乘数")
+        .name("发光倍数")
+        .description("发光效果的倍数。")
         .visible(() -> mode.get() == Mode.Shader)
         .decimalPlaces(3)
         .defaultValue(3.5)
@@ -65,21 +65,21 @@ public class ESP extends Module {
     );
 
     public final Setting<Boolean> ignoreSelf = sgGeneral.add(new BoolSetting.Builder()
-        .name("ignore-self")
-        .description("忽略自己绘制着色器。")
+        .name("忽略自己")
+        .description("不在着色器中绘制自己。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<ShapeMode> shapeMode = sgGeneral.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     public final Setting<Double> fillOpacity = sgGeneral.add(new DoubleSetting.Builder()
-        .name("fill-opacity")
+        .name("填充不透明度")
         .description("形状填充的不透明度。")
         .visible(() -> shapeMode.get() != ShapeMode.Lines)
         .defaultValue(0.3)
@@ -89,8 +89,8 @@ public class ESP extends Module {
     );
 
     private final Setting<Double> fadeDistance = sgGeneral.add(new DoubleSetting.Builder()
-        .name("fade-distance")
-        .description("距离颜色开始褪色的实体。")
+        .name("淡出距离")
+        .description("实体离开颜色开始淡出的距离。")
         .defaultValue(3)
         .min(0)
         .sliderMax(12)
@@ -98,8 +98,8 @@ public class ESP extends Module {
     );
 
     private final Setting<Set<EntityType<?>>> entities = sgGeneral.add(new EntityTypeListSetting.Builder()
-        .name("entities")
-        .description("选择特定实体。")
+        .name("实体")
+        .description("选择特定的实体。")
         .defaultValue(EntityType.PLAYER)
         .build()
     );
@@ -107,22 +107,22 @@ public class ESP extends Module {
     // Colors
 
     public final Setting<Boolean> distance = sgColors.add(new BoolSetting.Builder()
-        .name("distance-colors")
-        .description("根据距离更改示踪剂的颜色。")
+        .name("距离颜色")
+        .description("根据距离改变追踪线的颜色。")
         .defaultValue(false)
         .build()
     );
 
     public final Setting<Boolean> friendOverride = sgColors.add(new BoolSetting.Builder()
-        .name("show-friend-colors")
-        .description("是否或者不要用朋友的颜色覆盖朋友的距离颜色。")
+        .name("显示好友颜色")
+        .description("是否用好友颜色覆盖好友的距离颜色。")
         .defaultValue(true)
         .visible(distance::get)
         .build()
     );
 
     private final Setting<SettingColor> playersColor = sgColors.add(new ColorSetting.Builder()
-        .name("players-color")
+        .name("玩家颜色")
         .description("其他玩家的颜色。")
         .defaultValue(new SettingColor(255, 255, 255))
         .visible(() -> !distance.get())
@@ -130,7 +130,7 @@ public class ESP extends Module {
     );
 
     private final Setting<SettingColor> animalsColor = sgColors.add(new ColorSetting.Builder()
-        .name("animals-color")
+        .name("动物颜色")
         .description("动物的颜色。")
         .defaultValue(new SettingColor(25, 255, 25, 255))
         .visible(() -> !distance.get())
@@ -138,7 +138,7 @@ public class ESP extends Module {
     );
 
     private final Setting<SettingColor> waterAnimalsColor = sgColors.add(new ColorSetting.Builder()
-        .name("water-animals-color")
+        .name("水生动物颜色")
         .description("水生动物的颜色。")
         .defaultValue(new SettingColor(25, 25, 255, 255))
         .visible(() -> !distance.get())
@@ -155,15 +155,15 @@ public class ESP extends Module {
 
     private final Setting<SettingColor> ambientColor = sgColors.add(new ColorSetting.Builder()
         .name("环境颜色")
-        .description("环境颜色。")
+        .description("环境的颜色。")
         .defaultValue(new SettingColor(25, 25, 25, 255))
         .visible(() -> !distance.get())
         .build()
     );
 
     private final Setting<SettingColor> miscColor = sgColors.add(new ColorSetting.Builder()
-        .name("misc-color")
-        .description("杂项颜色。")
+        .name("杂项颜色")
+        .description("杂项的颜色。")
         .defaultValue(new SettingColor(175, 175, 175, 255))
         .visible(() -> !distance.get())
         .build()
@@ -180,7 +180,7 @@ public class ESP extends Module {
     private int count;
 
     public ESP() {
-        super(Categories.Render, "esp ", "穿过墙壁渲染实体。");
+        super(Categories.Render, "esp", "透过墙壁渲染实体。");
     }
 
     // Box

@@ -23,7 +23,7 @@ public class SwarmWorker extends Thread {
             socket = new Socket(ip, port);
         } catch (Exception e) {
             socket = null;
-            ChatUtils.warningPrefix("Swarm", "在端口 %s 上的 %s 处找不到服务器。", ip, port);
+            ChatUtils.warningPrefix("Swarm", "在端口%s上的%s找不到服务器。", ip, port);
             e.printStackTrace();
         }
 
@@ -32,7 +32,7 @@ public class SwarmWorker extends Thread {
 
     @Override
     public void run() {
-        ChatUtils.infoPrefix("Swarm", "已连接到端口 %s 上 %s 上的 Swarm 主机。", getIp(socket.getInetAddress().getHostAddress()), socket.getPort());
+        ChatUtils.infoPrefix("Swarm", "在端口%s上的%s连接到Swarm主机。", getIp(socket.getInetAddress().getHostAddress()), socket.getPort());
 
         try {
             DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -42,12 +42,12 @@ public class SwarmWorker extends Thread {
                 String read = in.readUTF();
 
                 if (!read.equals("")) {
-                    ChatUtils.infoPrefix("Swarm", "收到命令: (突出显示)%s", read);
+                    ChatUtils.infoPrefix("Swarm", "收到命令：(高亮)%s", read);
 
                     try {
                         Commands.dispatch(read);
                     } catch (Exception e) {
-                        ChatUtils.error("获取命令时出错。");
+                        ChatUtils.error("获取命令失败。");
                         e.printStackTrace();
                     }
                 }
@@ -55,7 +55,7 @@ public class SwarmWorker extends Thread {
 
             in.close();
         } catch (IOException e) {
-            ChatUtils.errorPrefix("Swarm", "连接到主机时出错。");
+            ChatUtils.errorPrefix("Swarm", "与主机的连接出错。");
             e.printStackTrace();
             disconnect();
         }
@@ -89,6 +89,6 @@ public class SwarmWorker extends Thread {
     }
 
     private String getIp(String ip) {
-        return ip.equals("127.0.0.1") ? "localhost " : ip;
+        return ip.equals("127.0.0.1") ? "localhost" : ip;
     }
 }

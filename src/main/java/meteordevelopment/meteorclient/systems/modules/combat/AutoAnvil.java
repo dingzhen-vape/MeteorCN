@@ -31,8 +31,8 @@ public class AutoAnvil extends Module {
     // General
 
     private final Setting<Double> range = sgGeneral.add(new DoubleSetting.Builder()
-        .name("target-range")
-        .description("玩家被瞄准的半径。")
+        .name("目标范围")
+        .description("玩家被目标的半径。")
         .defaultValue(4)
         .min(0)
         .sliderMax(5)
@@ -40,14 +40,14 @@ public class AutoAnvil extends Module {
     );
 
     private final Setting<SortPriority> priority = sgGeneral.add(new EnumSetting.Builder<SortPriority>()
-        .name("target-priority")
-        .description("如何选择要瞄准的玩家。")
+        .name("目标优先级")
+        .description("如何选择要目标的玩家。")
         .defaultValue(SortPriority.LowestHealth)
         .build()
     );
 
     private final Setting<Integer> height = sgGeneral.add(new IntSetting.Builder()
-        .name("height")
+        .name("高度")
         .description("放置铁砧的高度。")
         .defaultValue(2)
         .range(0, 5)
@@ -57,7 +57,7 @@ public class AutoAnvil extends Module {
 
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
         .name("延迟")
-        .description("砧放置之间的延迟。")
+        .description("铁砧放置之间的延迟。")
         .defaultValue(10)
         .min(0)
         .sliderMax(50)
@@ -65,29 +65,29 @@ public class AutoAnvil extends Module {
     );
 
     private final Setting<Boolean> placeButton = sgGeneral.add(new BoolSetting.Builder()
-        .name("放置在脚上")
-        .description("自动在目标脚处放置按钮或压力板以打破砧。")
+        .name("放在脚下")
+        .description("自动在目标的脚下放置一个按钮或压力板来打破铁砧。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> multiPlace = sgGeneral.add(new BoolSetting.Builder()
-        .name("多位置")
-        .description("放置多个砧立即..")
+        .name("多重放置")
+        .description("一次放置多个铁砧。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> toggleOnBreak = sgGeneral.add(new BoolSetting.Builder()
-        .name("断开时切换")
-        .description("当目标的头盔插槽为空时切换。")
+        .name("在破坏时切换")
+        .description("当目标的头盔槽为空时切换。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("自动旋转到放置砧座/压力板/按钮的位置。")
+        .description("自动旋转到铁砧/压力板/按钮放置的位置。")
         .defaultValue(true)
         .build()
     );
@@ -96,7 +96,7 @@ public class AutoAnvil extends Module {
     private int timer;
 
     public AutoAnvil() {
-        super(Categories.Combat, "自动-铁砧", "自动将铁砧放置在玩家上方以摧毁头盔。");
+        super(Categories.Combat, "自动铁砧", "自动在玩家头上放置铁砧来破坏头盔。");
     }
 
     @Override
@@ -114,7 +114,7 @@ public class AutoAnvil extends Module {
     private void onTick(TickEvent.Pre event) {
         // Head check
         if (toggleOnBreak.get() && target != null && target.getInventory().getArmorStack(3).isEmpty()) {
-            error("目标头部插槽为空...禁用。");
+            error("目标头盔槽为空... 禁用。");
             toggle();
             return;
         }

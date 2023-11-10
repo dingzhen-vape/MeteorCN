@@ -25,49 +25,49 @@ import org.lwjgl.glfw.GLFW;
 public class Excavator extends Module {
     private final IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgRendering = settings.createGroup("Rendering");
+    private final SettingGroup sgRendering = settings.createGroup("渲染");
 
     // Keybindings
     private final Setting<Keybind> selectionKey = sgGeneral.add(new KeybindSetting.Builder()
-        .name("selection-key")
-        .description("绘制选区的键。")
+        .name("选择键")
+        .description("绘制选择区域的键。")
         .defaultValue(Keybind.fromButton(GLFW.GLFW_MOUSE_BUTTON_RIGHT))
         .build()
     );
 
     // Logging
     private final Setting<Boolean> logSelection = sgGeneral.add(new BoolSetting.Builder()
-        .name("log-selection")
-        .description("将选区坐标记录到聊天中。")
+        .name("记录选择")
+        .description("将选择区域的坐标记录到聊天框。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> keepActive = sgGeneral.add(new BoolSetting.Builder()
-        .name("keep-active")
-        .description("完成后保持模块处于活动状态挖掘。")
+        .name("保持激活")
+        .description("完成挖掘后保持模块激活。")
         .defaultValue(false)
         .build()
     );
 
     // Rendering
     private final Setting<ShapeMode> shapeMode = sgRendering.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRendering.add(new ColorSetting.Builder()
-        .name("side-color")
-        .description("侧面颜色。")
+        .name("边缘颜色")
+        .description("边缘的颜色。")
         .defaultValue(new SettingColor(255, 255, 255, 50))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRendering.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("线条颜色。")
+        .name("线条颜色")
+        .description("线条的颜色。")
         .defaultValue(new SettingColor(255, 255, 255, 255))
         .build()
     );
@@ -82,7 +82,7 @@ public class Excavator extends Module {
     private BetterBlockPos start, end;
 
     public Excavator() {
-        super(Categories.World, "挖掘机", "挖掘选择区域。");
+        super(Categories.World, "挖掘器", "挖掘一个选择区域。");
     }
 
     @Override
@@ -115,13 +115,13 @@ public class Excavator extends Module {
             start = BetterBlockPos.from(result.getBlockPos());
             status = Status.SEL_END;
             if (logSelection.get()) {
-                info("开始角集: (%d, %d, %d)".formatted(start.getX(), start.getY(), start.getZ()));
+                info("开始角设置为: (%d, %d, %d)".formatted(start.getX(), start.getY(), start.getZ()));
             }
         } else if (status == Status.SEL_END) {
             end = BetterBlockPos.from(result.getBlockPos());
             status = Status.WORKING;
             if (logSelection.get()) {
-                info("结束角集: (%d, %d, %d)".formatted(end.getX(), end.getY(), end.getZ()));
+                info("结束角设置为: (%d, %d, %d)".formatted(end.getX(), end.getY(), end.getZ()));
             }
             baritone.getSelectionManager().addSelection(start, end);
             baritone.getBuilderProcess().clearArea(start, end);

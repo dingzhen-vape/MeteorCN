@@ -23,22 +23,22 @@ public class Swarm extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
-        .name("mode")
-        .description("运行什么类型的客户端。")
+        .name("模式")
+        .description("要运行的客户端的类型。")
         .defaultValue(Mode.Host)
         .build()
     );
 
     private final Setting<String> ipAddress = sgGeneral.add(new StringSetting.Builder()
         .name("ip")
-        .description("主机服务器的 IP 地址。")
+        .description("主机服务器的IP地址。")
         .defaultValue("localhost")
         .visible(() -> mode.get() == Mode.Worker)
         .build()
     );
 
     private final Setting<Integer> serverPort = sgGeneral.add(new IntSetting.Builder()
-        .name("port")
+        .name("端口")
         .description("用于连接的端口。")
         .defaultValue(6969)
         .range(1, 65535)
@@ -50,7 +50,7 @@ public class Swarm extends Module {
     public SwarmWorker worker;
 
     public Swarm() {
-        super(Categories.Misc, "swarm", "允许您从一台中央主机控制 Meteor 的多个实例。");
+        super(Categories.Misc, "远程控制", "让你从一个中心主机控制多个Meteor实例。");
     }
 
     @Override

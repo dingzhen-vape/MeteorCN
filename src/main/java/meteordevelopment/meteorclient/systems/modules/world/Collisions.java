@@ -27,35 +27,35 @@ public class Collisions extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     public final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
-        .name("blocks")
-        .description("应该添加哪些块碰撞盒。")
+        .name("方块")
+        .description("应该添加碰撞箱的方块。")
         .filter(this::blockFilter)
         .build()
     );
 
     private final Setting<Boolean> magma = sgGeneral.add(new BoolSetting.Builder()
-        .name("magma")
-        .description("防止你走过​​岩浆块。")
+        .name("岩浆")
+        .description("防止你走在岩浆方块上。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> unloadedChunks = sgGeneral.add(new BoolSetting.Builder()
-        .name("unloaded-chunks")
-        .description("阻止你进入卸载的块。")
+        .name("未加载的区块")
+        .description("阻止你进入未加载的区块。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> ignoreBorder = sgGeneral.add(new BoolSetting.Builder()
-        .name("忽略-border")
-        .description("删除世界边界碰撞。")
+        .name("忽略边界")
+        .description("移除世界边界的碰撞。")
         .defaultValue(false)
         .build()
     );
 
     public Collisions() {
-        super(Categories.World, "碰撞", "将碰撞框添加到某些块/区域。");
+        super(Categories.World, "碰撞", "给某些方块/区域添加碰撞箱。");
     }
 
     @EventHandler

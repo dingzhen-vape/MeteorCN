@@ -31,7 +31,7 @@ public class Marker extends Module {
     private final ArrayList<BaseMarker> markers = new ArrayList<>();
 
     public Marker() {
-        super(Categories.Render, "标记", "渲染形状。对于大型项目很有用");
+        super(Categories.Render, "标记", "渲染形状。适用于大规模的项目");
     }
 
     @EventHandler
@@ -55,13 +55,13 @@ public class Marker extends Module {
         NbtList list = new NbtList();
         for (BaseMarker marker : markers) {
             NbtCompound mTag = new NbtCompound();
-            mTag.putString("类型", marker.getTypeName());
+            mTag.putString("type", marker.getTypeName());
             mTag.put("标记", marker.toTag());
 
             list.add(mTag);
         }
 
-        tag.put("标记", list);
+        tag.put("markers", list);
         return tag;
     }
 
@@ -70,12 +70,12 @@ public class Marker extends Module {
         super.fromTag(tag);
 
         markers.clear();
-        NbtList list = tag.getList("标记", 10);
+        NbtList list = tag.getList("markers", 10);
 
         for (NbtElement tagII : list) {
             NbtCompound tagI = (NbtCompound) tagII;
 
-            String type = tagI.getString("类型");
+            String type = tagI.getString("type");
             BaseMarker marker = factory.createMarker(type);
 
             if (marker != null) {

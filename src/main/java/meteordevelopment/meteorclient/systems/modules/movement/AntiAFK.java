@@ -39,14 +39,14 @@ public class AntiAFK extends Module {
 
     private final Setting<Boolean> sneak = sgActions.add(new BoolSetting.Builder()
         .name("潜行")
-        .description("快速潜行和取消潜行。")
+        .description("快速地潜行和取消潜行。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> sneakTime = sgActions.add(new IntSetting.Builder()
         .name("潜行时间")
-        .description("如何许多滴答以保持潜行。")
+        .description("保持潜行的刻数。")
         .defaultValue(5)
         .min(1)
         .sliderMin(1)
@@ -72,7 +72,7 @@ public class AntiAFK extends Module {
 
     private final Setting<Boolean> spin = sgActions.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("将玩家旋转到位。")
+        .description("在原地旋转玩家。")
         .defaultValue(true)
         .build()
     );
@@ -94,8 +94,8 @@ public class AntiAFK extends Module {
     );
 
     private final Setting<Integer> pitch = sgActions.add(new IntSetting.Builder()
-        .name("音调")
-        .description("发送到服务器的音调。")
+        .name("俯仰角")
+        .description("发送到服务器的俯仰角。")
         .defaultValue(0)
         .range(-90, 90)
         .sliderRange(-90, 90)
@@ -108,14 +108,14 @@ public class AntiAFK extends Module {
 
     private final Setting<Boolean> sendMessages = sgMessages.add(new BoolSetting.Builder()
         .name("发送消息")
-        .description("发送消息以防止被踢出 AFK。")
+        .description("发送消息以防止因为AFK而被踢出。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> randomMessage = sgMessages.add(new BoolSetting.Builder()
         .name("随机")
-        .description("选择一个消息列表中的随机消息。")
+        .description("从你的消息列表中选择一个随机消息。")
         .defaultValue(false)
         .visible(sendMessages::get)
         .build()
@@ -123,7 +123,7 @@ public class AntiAFK extends Module {
 
     private final Setting<Integer> delay = sgMessages.add(new IntSetting.Builder()
         .name("延迟")
-        .description("指定消息之间的延迟(以秒为单位)。")
+        .description("以秒为单位指定消息之间的延迟。")
         .defaultValue(15)
         .min(0)
         .sliderMax(30)
@@ -135,15 +135,15 @@ public class AntiAFK extends Module {
         .name("消息")
         .description("可供选择的消息。")
         .defaultValue(
-            "流星在上面！",
-            "流星破解！"
+            "Meteor on top!",
+            "Meteor on crack!"
         )
         .visible(sendMessages::get)
         .build()
     );
 
     public AntiAFK() {
-        super(Categories.Player, "防挂机", "执行不同的操作以防止挂机时被踢。");
+        super(Categories.Player, "防AFK", "执行不同的动作以防止在AFK时被踢出。");
     }
 
     private final Random random = new Random();
@@ -157,7 +157,7 @@ public class AntiAFK extends Module {
     @Override
     public void onActivate() {
         if (sendMessages.get() && messages.get().isEmpty()) {
-            warning("消息列表为空,禁用消息...");
+            warning("消息列表为空，关闭消息...");
             sendMessages.set(false);
         }
 

@@ -30,22 +30,22 @@ public class Sphere2dMarker extends BaseMarker {
         }
     }
 
-    public static final String type = "Sphere-2D";
+    public static final String type = "二维球体";
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("渲染");
-    private final SettingGroup sgKeybinding = settings.createGroup("按键绑定");
+    private final SettingGroup sgKeybinding = settings.createGroup("Keybinding");
 
     private final Setting<BlockPos> center = sgGeneral.add(new BlockPosSetting.Builder()
-        .name("中心")
-        .description("球体中心")
+        .name("center")
+        .description("球体的中心")
         .onChanged(bp -> dirty = true)
         .build()
     );
 
     private final Setting<Integer> radius = sgGeneral.add(new IntSetting.Builder()
-        .name("半径")
-        .description("球体半径")
+        .name("radius")
+        .description("球体的半径")
         .defaultValue(20)
         .min(1)
         .noSlider()
@@ -54,8 +54,8 @@ public class Sphere2dMarker extends BaseMarker {
     );
 
     private final Setting<Integer> layer = sgGeneral.add(new IntSetting.Builder()
-        .name("层")
-        .description("渲染哪一层")
+        .name("layer")
+        .description("要渲染的层")
         .defaultValue(0)
         .min(0)
         .noSlider()
@@ -66,8 +66,8 @@ public class Sphere2dMarker extends BaseMarker {
     // Render
 
     private final Setting<Boolean> limitRenderRange = sgRender.add(new BoolSetting.Builder()
-        .name("限制-render-range")
-        .description("是否限制渲染范围(在非常大的圆圈中有用)")
+        .name("limit-render-range")
+        .description("是否限制渲染范围（在非常大的圆中有用）")
         .defaultValue(false)
         .build()
     );
@@ -83,22 +83,22 @@ public class Sphere2dMarker extends BaseMarker {
     );
 
     private final Setting<ShapeMode> shapeMode = sgRender.add(new EnumSetting.Builder<ShapeMode>()
-        .name("shape-mode")
-        .description("如何渲染形状。")
+        .name("形状模式")
+        .description("形状的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("side- color")
-        .description("正在渲染的块侧面的颜色。")
+        .name("侧面颜色")
+        .description("被渲染的方块的侧面颜色。")
         .defaultValue(new SettingColor(0, 100, 255, 50))
         .build()
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("line-color")
-        .description("正在渲染的块的线条颜色。")
+        .name("线条颜色")
+        .description("被渲染的方块的线条颜色。")
         .defaultValue(new SettingColor(0, 100, 255, 255))
         .build()
     );
@@ -107,7 +107,7 @@ public class Sphere2dMarker extends BaseMarker {
 
     private final Setting<Keybind> nextLayerKey = sgKeybinding.add(new KeybindSetting.Builder()
         .name("next-layer-keybind")
-        .description("按键绑定到增量层")
+        .description("增加层的键绑定")
         .action(() -> {
             if (isVisible() && layer.get() < radius.get() * 2) layer.set(layer.get() + 1);
         })
@@ -116,7 +116,7 @@ public class Sphere2dMarker extends BaseMarker {
 
     private final Setting<Keybind> prevLayerKey = sgKeybinding.add(new KeybindSetting.Builder()
         .name("prev-layer-keybind")
-        .description("按键绑定到增量层")
+        .description("增加层的键绑定")
         .action(() -> {
             if (isVisible()) layer.set(layer.get() - 1);
         })

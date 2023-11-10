@@ -21,12 +21,12 @@ public class SoundBlocker extends Module {
 
     private final Setting<List<SoundEvent>> sounds = sgGeneral.add(new SoundEventListSetting.Builder()
         .name("声音")
-        .description("要阻止的声音。")
+        .description("要屏蔽的声音。")
         .build()
     );
 
     public SoundBlocker() {
-        super(Categories.Misc, "声音拦截器", "取消选定的声音。");
+        super(Categories.Misc, "声音屏蔽器", "取消选中的声音。");
     }
 
     @EventHandler

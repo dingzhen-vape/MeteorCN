@@ -37,29 +37,29 @@ public class Burrow extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Block> block = sgGeneral.add(new EnumSetting.Builder<Block>()
-        .name("block-to-use")
-        .description("用于挖掘的块。")
+        .name("使用方块")
+        .description("用于埋身的方块.")
         .defaultValue(Block.EChest)
         .build()
     );
 
     private final Setting<Boolean> instant = sgGeneral.add(new BoolSetting.Builder()
-        .name("instant")
-        .description("使用数据包跳转而不是普通跳转。")
+        .name("瞬间")
+        .description("用数据包跳跃而不是原版跳跃.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> automatic = sgGeneral.add(new BoolSetting.Builder()
-        .name("automatic")
-        .description("激活时自动挖掘而不是等待跳转。")
+        .name("自动")
+        .description("激活后自动埋身而不是等待跳跃.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Double> triggerHeight = sgGeneral.add(new DoubleSetting.Builder()
-        .name("trigger-height")
-        .description("在触发橡皮筋之前你必须跳多高。")
+        .name("触发高度")
+        .description("跳跃多高才触发橡皮筋.")
         .defaultValue(1.12)
         .range(0.01, 1.4)
         .sliderRange(0.01, 1.4)
@@ -67,8 +67,8 @@ public class Burrow extends Module {
     );
 
     private final Setting<Double> rubberbandHeight = sgGeneral.add(new DoubleSetting.Builder()
-        .name("rubberband-height")
-        .description("尝试触发橡皮筋多远。")
+        .name("橡皮筋高度")
+        .description("尝试造成橡皮筋的距离.")
         .defaultValue(12)
         .sliderMin(-30)
         .sliderMax(30)
@@ -77,7 +77,7 @@ public class Burrow extends Module {
 
     private final Setting<Double> timer = sgGeneral.add(new DoubleSetting.Builder()
         .name("计时器")
-        .description("计时器覆盖。")
+        .description("计时器覆盖.")
         .defaultValue(1)
         .min(0.01)
         .sliderRange(0.01, 10)
@@ -85,22 +85,22 @@ public class Burrow extends Module {
     );
 
     private final Setting<Boolean> onlyInHole = sgGeneral.add(new BoolSetting.Builder()
-        .name(" only-in-holes")
-        .description("不在洞中时阻止你挖掘。")
+        .name("只在洞里")
+        .description("不在洞里时停止埋身.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> center = sgGeneral.add(new BoolSetting.Builder()
-        .name("center")
-        .description("在挖掘之前将你置于方块的中间。")
+        .name("居中")
+        .description("埋身前将你居中到方块的中间.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("面对你放置服务器的方块- ")
+        .description("服务器端面向你放置的方块.")
         .defaultValue(true)
         .build()
     );
@@ -109,25 +109,25 @@ public class Burrow extends Module {
     private boolean shouldBurrow;
 
     public Burrow() {
-        super(Categories.Combat, "挖洞", "试图将你夹入方块中。");
+        super(Categories.Combat, "埋身", "尝试将你卡进方块里.");
     }
 
     @Override
     public void onActivate() {
         if (!mc.world.getBlockState(mc.player.getBlockPos()).isReplaceable()) {
-            error("已经挖洞,致残。");
+            error("已经埋身，禁用.");
             toggle();
             return;
         }
 
         if (!PlayerUtils.isInHole(false) && onlyInHole.get()) {
-            error("不在洞里,致残。");
+            error("不在洞里，禁用.");
             toggle();
             return;
         }
 
         if (!checkHead()) {
-            error("没有足够的空间来挖洞,致残。");
+            error("头顶空间不足，禁用.");
             toggle();
             return;
         }
@@ -135,7 +135,7 @@ public class Burrow extends Module {
         FindItemResult result = getItem();
 
         if (!result.isHotbar() && !result.isOffhand()) {
-            error("否发现洞穴块,禁用。");
+            error("没有找到埋身方块，禁用.");
             toggle();
             return;
         }
@@ -150,7 +150,7 @@ public class Burrow extends Module {
             if (instant.get()) shouldBurrow = true;
             else mc.player.jump();
         } else {
-            info("等待手动跳跃。");
+            info("等待手动跳跃.");
         }
     }
 

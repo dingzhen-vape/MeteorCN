@@ -22,8 +22,8 @@ public class EntitySpeed extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> speed = sgGeneral.add(new DoubleSetting.Builder()
-        .name("speed")
-        .description("每秒块的水平速度。")
+        .name("速度")
+        .description("水平速度，单位为每秒方块数.")
         .defaultValue(10)
         .min(0)
         .sliderMax(50)
@@ -31,21 +31,21 @@ public class EntitySpeed extends Module {
     );
 
     private final Setting<Boolean> onlyOnGround = sgGeneral.add(new BoolSetting.Builder()
-        .name("仅在地面上")
-        .description("仅当站在块上时使用速度。")
+        .name("只在地面上")
+        .description("只有站在方块上时才使用速度.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> inWater = sgGeneral.add(new BoolSetting.Builder()
-        .name("in-water")
-        .description("在水中时使用速度。")
+        .name("在水中")
+        .description("在水中时使用速度.")
         .defaultValue(false)
         .build()
     );
 
     public EntitySpeed() {
-        super(Categories.Movement, "entity-speed", "让你在骑实体时走得更快。");
+        super(Categories.Movement, "实体速度", "骑乘实体时让你更快.");
     }
 
     @EventHandler

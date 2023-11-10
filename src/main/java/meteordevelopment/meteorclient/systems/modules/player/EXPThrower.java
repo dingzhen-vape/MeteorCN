@@ -16,7 +16,7 @@ import net.minecraft.item.Items;
 
 public class EXPThrower extends Module {
     public EXPThrower() {
-        super(Categories.Player, "exp- thrower", "自动从你的快捷栏中扔出 XP 瓶。");
+        super(Categories.Player, "经验投掷器", "自动从你的快捷栏扔经验瓶。");
     }
 
     @EventHandler

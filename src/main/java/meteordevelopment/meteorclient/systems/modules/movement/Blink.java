@@ -27,15 +27,15 @@ public class Blink extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Boolean> renderOriginal = sgGeneral.add(new BoolSetting.Builder()
-        .name("render-original")
-        .description("在原始位置渲染你的玩家模型。")
+        .name("渲染原始")
+        .description("在原始位置渲染你的玩家模型.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Keybind> cancelBlink = sgGeneral.add(new KeybindSetting.Builder()
-        .name("cancel-blink")
-        .description("取消发送数据包并将你送回原始位置。")
+        .name("取消闪烁")
+        .description("取消发送数据包并将你返回到原始位置.")
         .defaultValue(Keybind.none())
         .action(() -> {
             cancelled = true;
@@ -52,7 +52,7 @@ public class Blink extends Module {
     private int timer = 0;
 
     public Blink() {
-        super(Categories.Movement, "blink", "允许你本质上传送正在暂停运动更新。");
+        super(Categories.Movement, "闪烁", "让你在暂停运动更新的同时实质上传送.");
     }
 
     @Override

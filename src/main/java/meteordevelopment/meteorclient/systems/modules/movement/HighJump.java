@@ -17,15 +17,15 @@ public class HighJump extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Double> multiplier = sgGeneral.add(new DoubleSetting.Builder()
-        .name("jump-multiplier")
-        .description("跳跃高度乘数。")
+        .name("跳跃倍数")
+        .description("跳跃高度的倍数.")
         .defaultValue(1)
         .min(0)
         .build()
     );
 
     public HighJump() {
-        super(Categories.Movement, "high-jump", "让你跳得比平常更高。");
+        super(Categories.Movement, "高跳", "让你比正常跳得更高.");
     }
 
     @EventHandler
