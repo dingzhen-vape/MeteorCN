@@ -17,5 +17,7 @@
     <img src="https://tokei.rs/b1/github/MeteorDevelopment/meteor-client" alt="GitHub lines of code"/>
 </div>
 
-## 警告
--- 此版本为测试版
+## 提示
+-由于我还有另一个汉化的模组正在维护，此项目可能不会更新的很快
+-下载可以在这里下载[https://wwfb.lanzouu.com/b0336wsha]
+-密码:7wgn
