@@ -100,12 +100,12 @@ public class ServerSpoof extends Module {
                 if (!(event.packet instanceof ResourcePackSendS2CPacket packet)) return;
                 event.cancel();
                 MutableText msg = Text.literal("这个服务器有 ");
-                msg.append(packet.isRequired() ? "一个必须的 " : "一个可选的 ");
+                msg.append(packet.required() ? "一个必须的 " : "一个可选的 ");
                 MutableText link = Text.literal("资源包");
                 link.setStyle(link.getStyle()
                     .withColor(Formatting.BLUE)
                     .withUnderline(true)
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, packet.getUrl()))
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, packet.url()))
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击下载")))
                 );
                 msg.append(link);

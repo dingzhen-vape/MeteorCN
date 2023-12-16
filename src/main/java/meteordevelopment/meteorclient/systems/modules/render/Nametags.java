@@ -7,8 +7,10 @@ package meteordevelopment.meteorclient.systems.modules.render;
 
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
+import meteordevelopment.meteorclient.renderer.Fonts;
 import meteordevelopment.meteorclient.renderer.Renderer2D;
 import meteordevelopment.meteorclient.renderer.text.TextRenderer;
+import meteordevelopment.meteorclient.renderer.text.VanillaTextRenderer;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.config.Config;
 import meteordevelopment.meteorclient.systems.friends.Friends;
@@ -287,14 +289,14 @@ public class Nametags extends Module {
     private static String ticksToTime(int ticks) {
         if (ticks > 20 * 3600) {
             int h = ticks / 20 / 3600;
-            return h + " 小时";
+            return h + " h";
         } else if (ticks > 20 * 60) {
             int m = ticks / 20 / 60;
-            return m + " 分钟";
+            return m + " m";
         } else {
             int s = ticks / 20;
             int ms = (ticks % 20) / 2;
-            return s + "。" + ms + " 秒";
+            return s + "." + ms + " s";
         }
     }
 
@@ -327,7 +329,7 @@ public class Nametags extends Module {
     @EventHandler
     private void onRender2D(Render2DEvent event) {
         int count = getRenderCount();
-        boolean shadow = Config.get().customFont.get();
+        boolean shadow = false;
 
         for (int i = count - 1; i > -1; i--) {
             Entity entity = entityList.get(i);
@@ -370,18 +372,18 @@ public class Nametags extends Module {
     }
 
     private void renderNametagPlayer(Render2DEvent event, PlayerEntity player, boolean shadow) {
-        TextRenderer text = TextRenderer.get();
+        TextRenderer text = Fonts.RENDERER;
         NametagUtils.begin(pos, event.drawContext);
 
         // Gamemode
         GameMode gm = EntityUtils.getGameMode(player);
-        String gmText = "机器人";
+        String gmText = "BOT";
         if (gm != null) {
             gmText = switch (gm) {
-                case SPECTATOR -> "生存";
-                case SURVIVAL -> "创造";
-                case CREATIVE -> "冒险";
-                case ADVENTURE -> "观察";
+                case SPECTATOR -> "Sp";
+                case SURVIVAL -> "S";
+                case CREATIVE -> "C";
+                case ADVENTURE -> "A";
             };
         }
 
@@ -391,8 +393,8 @@ public class Nametags extends Module {
         String name;
         Color nameColor = PlayerUtils.getPlayerColor(player, this.nameColor.get());
 
-        if (player == mc.player) name = Modules.get().get(NameProtect.class).getName(player.getEntityName());
-        else name = player.getEntityName();
+        if (player == mc.player) name = Modules.get().get(NameProtect.class).getName(player.getName().getString());
+        else name = player.getName().getString();
 
         // Health
         float absorption = player.getAbsorptionAmount();
@@ -408,11 +410,11 @@ public class Nametags extends Module {
 
         // Ping
         int ping = EntityUtils.getPing(player);
-        String pingText = " [" + ping + "毫秒]";
+        String pingText = " [" + ping + "ms]";
 
         // Distance
         double dist = Math.round(PlayerUtils.distanceToCamera(player) * 10.0) / 10.0;
-        String distText = " " + dist + "米";
+        String distText = " " + dist + "m";
 
         // Calc widths
         double gmWidth = text.getWidth(gmText, shadow);
@@ -547,7 +549,7 @@ public class Nametags extends Module {
     }
 
     private void renderNametagItem(ItemStack stack, boolean shadow) {
-        TextRenderer text = TextRenderer.get();
+        TextRenderer text = VanillaTextRenderer.INSTANCE;
         NametagUtils.begin(pos);
 
         String name = stack.getName().getString();
@@ -575,7 +577,7 @@ public class Nametags extends Module {
     }
 
     private void renderGenericNametag(LivingEntity entity, boolean shadow) {
-        TextRenderer text = TextRenderer.get();
+        TextRenderer text = VanillaTextRenderer.INSTANCE;
         NametagUtils.begin(pos);
 
         //Name
@@ -615,7 +617,7 @@ public class Nametags extends Module {
     }
 
     private void renderTntNametag(TntEntity entity, boolean shadow) {
-        TextRenderer text = TextRenderer.get();
+        TextRenderer text = VanillaTextRenderer.INSTANCE;
         NametagUtils.begin(pos);
 
         String fuseText = ticksToTime(entity.getFuse());

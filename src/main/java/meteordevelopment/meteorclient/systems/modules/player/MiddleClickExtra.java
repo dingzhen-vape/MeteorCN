@@ -98,11 +98,11 @@ public class MiddleClickExtra extends Module {
 
             if (!Friends.get().isFriend(player)) {
                 Friends.get().add(new Friend(player));
-                info("添加 %s 为好友", player.getEntityName());
-                if (message.get()) ChatUtils.sendPlayerMsg("/msg " + player.getEntityName() + " 我刚刚在Meteor上加了你为好友。");
+                info("添加 %s 为好友", player.getName().getString());
+                if (message.get()) ChatUtils.sendPlayerMsg("/msg " + player.getName() + " 我刚刚在Meteor上加了你为好友。");
             } else {
                 Friends.get().remove(Friends.get().get(player));
-                info("移除 %s 为好友", player.getEntityName());
+                info("移除 %s 为好友", player.getName().getString());
             }
 
             return;

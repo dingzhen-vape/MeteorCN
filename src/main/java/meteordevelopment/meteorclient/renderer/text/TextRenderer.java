@@ -12,7 +12,7 @@ import net.minecraft.client.util.math.MatrixStack;
 
 public interface TextRenderer {
     static TextRenderer get() {
-        return Config.get().customFont.get() ? Fonts.RENDERER : VanillaTextRenderer.INSTANCE;
+        return VanillaTextRenderer.INSTANCE;
     }
 
     void setAlpha(double a);

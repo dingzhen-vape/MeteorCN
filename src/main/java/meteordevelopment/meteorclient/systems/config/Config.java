@@ -34,7 +34,7 @@ public class Config extends System<Config> {
     public final Setting<Boolean> customFont = sgVisual.add(new BoolSetting.Builder()
         .name("custom-font|自定义字体(开启此功能将会无法渲染中文!)")
         .description("使用自定义字体。")
-        .defaultValue(false)
+        .defaultValue(true)
         .build()
     );
 
