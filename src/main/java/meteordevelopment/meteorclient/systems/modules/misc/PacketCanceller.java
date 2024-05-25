@@ -37,6 +37,7 @@ public class PacketCanceller extends Module {
 
     public PacketCanceller() {
         super(Categories.Misc, "数据包取消器", "让你可以取消某些数据包。");
+        runInMainMenu = true;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST + 1)

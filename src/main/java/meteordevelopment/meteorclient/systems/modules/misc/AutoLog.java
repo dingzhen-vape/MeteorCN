@@ -15,7 +15,7 @@ import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.Utils;
-import meteordevelopment.meteorclient.utils.player.DamageUtils;
+import meteordevelopment.meteorclient.utils.entity.DamageUtils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.entity.Entity;
@@ -116,13 +116,13 @@ public class AutoLog extends Module {
         if (!onlyTrusted.get() && !instantDeath.get() && !crystalLog.get()) return; // only check all entities if needed
 
         for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof PlayerEntity && entity.getUuid() != mc.player.getUuid()) {
-                if (onlyTrusted.get() && entity != mc.player && !Friends.get().isFriend((PlayerEntity) entity)) {
+            if (entity instanceof PlayerEntity player && player.getUuid() != mc.player.getUuid()) {
+                if (onlyTrusted.get() && player != mc.player && !Friends.get().isFriend(player)) {
                         disconnect("一个不受信任的玩家出现在你的渲染距离。");
                         if (toggleOff.get()) this.toggle();
                         break;
                 }
-                if (instantDeath.get() && PlayerUtils.isWithin(entity, 8) && DamageUtils.getSwordDamage((PlayerEntity) entity, true)
+                if (instantDeath.get() && PlayerUtils.isWithin(entity, 8) && DamageUtils.getAttackDamage(player, mc.player)
                         > playerHealth + mc.player.getAbsorptionAmount()) {
                     disconnect("反32k措施。");
                     if (toggleOff.get()) this.toggle();

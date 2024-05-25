@@ -9,11 +9,14 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.systems.VertexSorter;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.gui.tabs.TabScreen;
 import meteordevelopment.meteorclient.mixin.*;
 import meteordevelopment.meteorclient.mixininterface.IMinecraftClient;
+import meteordevelopment.meteorclient.settings.StatusEffectAmplifierMapSetting;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.render.BetterTooltips;
 import meteordevelopment.meteorclient.systems.modules.world.Timer;
@@ -32,16 +35,21 @@ import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.client.gui.screen.multiplayer.MultiplayerScreen;
 import net.minecraft.client.gui.screen.world.SelectWorldScreen;
 import net.minecraft.client.resource.ResourceReloadLogger;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.component.type.NbtComponent;
 import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -57,9 +65,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -77,6 +85,9 @@ public class Utils {
     public static double frameTime;
     public static Screen screenToOpen;
     public static VertexSorter vertexSorter;
+
+    private Utils() {
+    }
 
     @PreInit
     public static void init() {
@@ -138,12 +149,12 @@ public class Utils {
         enchantments.clear();
 
         if (!itemStack.isEmpty()) {
-            NbtList listTag = itemStack.getItem() == Items.ENCHANTED_BOOK ? EnchantedBookItem.getEnchantmentNbt(itemStack) : itemStack.getEnchantments();
+            Set<RegistryEntry<Enchantment>> itemEnchantments = itemStack.getItem() == Items.ENCHANTED_BOOK
+                ? itemStack.get(DataComponentTypes.STORED_ENCHANTMENTS).getEnchantments()
+                : itemStack.getEnchantments().getEnchantments();
 
-            for (int i = 0; i < listTag.size(); ++i) {
-                NbtCompound tag = listTag.getCompound(i);
-
-                Registries.ENCHANTMENT.getOrEmpty(Identifier.tryParse(tag.getString("id"))).ifPresent((enchantment) -> enchantments.put(enchantment, tag.getInt("lvl")));
+            for (RegistryEntry<Enchantment> itemEnchantment : itemEnchantments) {
+                enchantments.put(itemEnchantment.value(), itemStack.getEnchantments().getLevel(itemEnchantment.value()));
             }
         }
     }
@@ -206,17 +217,26 @@ public class Utils {
         }
 
         Arrays.fill(items, ItemStack.EMPTY);
-        NbtCompound nbt = itemStack.getNbt();
+        ComponentMap components = itemStack.getComponents();
 
-        if (nbt != null && nbt.contains("BlockEntityTag")) {
-            NbtCompound nbt2 = nbt.getCompound("BlockEntityTag");
+        if (components.contains(DataComponentTypes.CONTAINER)) {
+            ContainerComponentAccessor container = ((ContainerComponentAccessor) (Object) components.get(DataComponentTypes.CONTAINER));
+            DefaultedList<ItemStack> stacks = container.getStacks();
+
+            for (int i = 0; i < stacks.size(); i++) {
+                if (i >= 0 && i < items.length) items[i] = stacks.get(i);
+            }
+        }
+        else if (components.contains(DataComponentTypes.BLOCK_ENTITY_DATA)) {
+            NbtComponent nbt2 = components.get(DataComponentTypes.BLOCK_ENTITY_DATA);
 
             if (nbt2.contains("Items")) {
-                NbtList nbt3 = (NbtList) nbt2.get("Items");
+                NbtList nbt3 = (NbtList) nbt2.getNbt().get("Items");
 
                 for (int i = 0; i < nbt3.size(); i++) {
                     int slot = nbt3.getCompound(i).getByte("Slot"); // Apparently shulker boxes can store more than 27 items, good job Mojang
-                    if (slot >= 0 && slot < items.length) items[slot] = ItemStack.fromNbt(nbt3.getCompound(i));
+                    // now NPEs when mc.world == null
+                    if (slot >= 0 && slot < items.length) items[slot] = ItemStack.fromNbtOrEmpty(mc.player.getRegistryManager(), nbt3.getCompound(i));
                 }
             }
         }
@@ -237,20 +257,20 @@ public class Utils {
     }
 
     public static boolean hasItems(ItemStack itemStack) {
-        NbtCompound compoundTag = itemStack.getSubNbt("BlockEntityTag");
+        ContainerComponentAccessor container = ((ContainerComponentAccessor) (Object) itemStack.get(DataComponentTypes.CONTAINER));
+        if (container != null && !container.getStacks().isEmpty()) return true;
+
+        NbtCompound compoundTag = itemStack.getOrDefault(DataComponentTypes.BLOCK_ENTITY_DATA, NbtComponent.DEFAULT).getNbt();
         return compoundTag != null && compoundTag.contains("Items", 9);
     }
 
-    public static Object2IntMap<StatusEffect> createStatusEffectMap() {
-        Object2IntMap<StatusEffect> map = new Object2IntArrayMap<>(Registries.STATUS_EFFECT.getIds().size());
-
-        Registries.STATUS_EFFECT.forEach(potion -> map.put(potion, 0));
-
-        return map;
+    public static Reference2IntMap<StatusEffect> createStatusEffectMap() {
+        return new Reference2IntArrayMap<>(StatusEffectAmplifierMapSetting.EMPTY_STATUS_EFFECT_MAP);
     }
 
     public static String getEnchantSimpleName(Enchantment enchantment, int length) {
-        return enchantment.getName(0).getString().substring(0, length);
+        String name = I18n.translate(enchantment.getTranslationKey());
+        return name.length() > length ? name.substring(0, length) : name;
     }
 
     public static boolean searchTextDefault(String text, String filter, boolean caseSensitive) {
@@ -297,9 +317,9 @@ public class Utils {
         // Find best route
         for (int i = 1; i <= textLength; i++) {
             for (int j = 1; j <= filterLength; j++) {
-                int sCost = d[i-1][j-1] + (from.charAt(i-1) == to.charAt(j-1) ? 0 : subCost);
-                int dCost = d[i-1][j] + delCost;
-                int iCost = d[i][j-1] + insCost;
+                int sCost = d[i - 1][j - 1] + (from.charAt(i - 1) == to.charAt(j - 1) ? 0 : subCost);
+                int dCost = d[i - 1][j] + delCost;
+                int iCost = d[i][j - 1] + insCost;
                 d[i][j] = Math.min(Math.min(dCost, iCost), sCost);
             }
         }
@@ -489,59 +509,18 @@ public class Utils {
     }
 
     public static void addEnchantment(ItemStack itemStack, Enchantment enchantment, int level) {
-        NbtCompound tag = itemStack.getOrCreateNbt();
-        NbtList listTag;
+        ItemEnchantmentsComponent.Builder b = new ItemEnchantmentsComponent.Builder(EnchantmentHelper.getEnchantments(itemStack));
+        b.add(enchantment, level);
 
-        // Get list tag
-        if (!tag.contains("Enchantments", 9)) {
-            listTag = new NbtList();
-            tag.put("Enchantments", listTag);
-        } else {
-            listTag = tag.getList("Enchantments", 10);
-        }
-
-        // Check if item already has the enchantment and modify the level
-        String enchId = Registries.ENCHANTMENT.getId(enchantment).toString();
-
-        for (NbtElement _t : listTag) {
-            NbtCompound t = (NbtCompound) _t;
-
-            if (t.getString("id").equals(enchId)) {
-                t.putShort("lvl", (short) level);
-                return;
-            }
-        }
-
-        // Add the enchantment if it doesn't already have it
-        NbtCompound enchTag = new NbtCompound();
-        enchTag.putString("id", enchId);
-        enchTag.putShort("lvl", (short) level);
-
-        listTag.add(enchTag);
+        EnchantmentHelper.set(itemStack, b.build());
     }
 
     public static void clearEnchantments(ItemStack itemStack) {
-        NbtCompound nbt = itemStack.getNbt();
-        if (nbt != null) nbt.remove("Enchantments");
+        EnchantmentHelper.apply(itemStack, components -> components.remove(a -> true));
     }
 
     public static void removeEnchantment(ItemStack itemStack, Enchantment enchantment) {
-        NbtCompound nbt = itemStack.getNbt();
-        if (nbt == null) return;
-
-        if (!nbt.contains("Enchantments", 9)) return;
-        NbtList list = nbt.getList("Enchantments", 10);
-
-        String enchId = Registries.ENCHANTMENT.getId(enchantment).toString();
-
-        for (Iterator<NbtElement> it = list.iterator(); it.hasNext();) {
-            NbtCompound ench = (NbtCompound) it.next();
-
-            if (ench.getString("id").equals(enchId)) {
-                it.remove();
-                break;
-            }
-        }
+        EnchantmentHelper.apply(itemStack, components -> components.remove(enchantment1 -> enchantment1.value().equals(enchantment)));
     }
 
     public static Color lerp(Color first, Color second, @Range(from = 0, to = 1) float v) {
@@ -564,8 +543,7 @@ public class Utils {
 
         try {
             port = Integer.parseInt(full.substring(full.lastIndexOf(':') + 1, full.length() - 1));
-        }
-        catch (NumberFormatException ignored) {
+        } catch (NumberFormatException ignored) {
             port = -1;
         }
 

@@ -30,7 +30,6 @@ import net.minecraft.entity.Tameable;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.LlamaEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.AxeItem;
@@ -149,10 +148,10 @@ public class KillAura extends Module {
         .build()
     );
 
-    private final Setting<Boolean> ignoreBabies = sgTargeting.add(new BoolSetting.Builder()
+    private final Setting<EntityAge> mobAgeFilter = sgTargeting.add(new EnumSetting.Builder<EntityAge>()
         .name("忽略幼体")
         .description("是否攻击实体的幼体变种。")
-        .defaultValue(true)
+        .defaultValue(EntityAge.Adult)
         .build()
     );
 
@@ -233,10 +232,10 @@ public class KillAura extends Module {
         .build()
     );
 
-    CrystalAura ca = Modules.get().get(CrystalAura.class);
     private final List<Entity> targets = new ArrayList<>();
     private int switchTimer, hitTimer;
     private boolean wasPathing = false;
+    public boolean attacking;
 
     public KillAura() {
         super(Categories.Combat, "杀戮光环", "攻击你周围的指定实体。");
@@ -245,6 +244,7 @@ public class KillAura extends Module {
     @Override
     public void onDeactivate() {
         targets.clear();
+        attacking = false;
     }
 
     @EventHandler
@@ -253,7 +253,7 @@ public class KillAura extends Module {
         if (pauseOnUse.get() && (mc.interactionManager.isBreakingBlock() || mc.player.isUsingItem())) return;
         if (onlyOnClick.get() && !mc.options.attackKey.isPressed()) return;
         if (TickRate.INSTANCE.getTimeSinceLastTick() >= 1f && pauseOnLag.get()) return;
-        if (pauseOnCA.get() && ca.isActive() && ca.kaTimer > 0) return;
+        if (pauseOnCA.get() && Modules.get().get(CrystalAura.class).isActive() && Modules.get().get(CrystalAura.class).kaTimer > 0) return;
 
         if (onlyOnLook.get()) {
             Entity targeted = mc.targetedEntity;
@@ -269,6 +269,7 @@ public class KillAura extends Module {
         }
 
         if (targets.isEmpty()) {
+            attacking = false;
             if (wasPathing) {
                 PathManagers.get().resume();
                 wasPathing = false;
@@ -276,7 +277,7 @@ public class KillAura extends Module {
             return;
         }
 
-        Entity primary = targets.get(0);
+        Entity primary = targets.getFirst();
 
         if (autoSwitch.get()) {
             Predicate<ItemStack> predicate = switch (weapon.get()) {
@@ -297,6 +298,7 @@ public class KillAura extends Module {
 
         if (!itemInHand()) return;
 
+        attacking = true;
         if (rotation.get() == RotationMode.Always) Rotations.rotate(Rotations.getYaw(primary), Rotations.getPitch(primary, Target.Body));
         if (pauseOnCombat.get() && PathManagers.get().isPathing() && !wasPathing) {
             PathManagers.get().pause();
@@ -327,7 +329,7 @@ public class KillAura extends Module {
 
     private boolean entityCheck(Entity entity) {
         if (entity.equals(mc.player) || entity.equals(mc.cameraEntity)) return false;
-        if ((entity instanceof LivingEntity && ((LivingEntity) entity).isDead()) || !entity.isAlive()) return false;
+        if ((entity instanceof LivingEntity livingEntity && livingEntity.isDead()) || !entity.isAlive()) return false;
 
         Box hitbox = entity.getBoundingBox();
         if (!PlayerUtils.isWithin(
@@ -347,17 +349,23 @@ public class KillAura extends Module {
             ) return false;
         }
         if (ignorePassive.get()) {
-            if (entity instanceof EndermanEntity enderman && !enderman.isAngryAt(mc.player)) return false;
-            if (entity instanceof ZombifiedPiglinEntity piglin && !piglin.isAngryAt(mc.player)) return false;
+            if (entity instanceof EndermanEntity enderman && !enderman.isAngry()) return false;
+            if (entity instanceof ZombifiedPiglinEntity piglin && !piglin.isAttacking()) return false;
             if (entity instanceof WolfEntity wolf && !wolf.isAttacking()) return false;
-            if (entity instanceof LlamaEntity llama && !llama.isAttacking()) return false;
         }
         if (entity instanceof PlayerEntity player) {
             if (player.isCreative()) return false;
             if (!Friends.get().shouldAttack(player)) return false;
             if (shieldMode.get() == ShieldMode.Ignore && player.blockedByShield(mc.world.getDamageSources().playerAttack(mc.player))) return false;
         }
-        return !(entity instanceof AnimalEntity animal) || !ignoreBabies.get() || !animal.isBaby();
+        if (entity instanceof AnimalEntity animal) {
+            return switch (mobAgeFilter.get()) {
+                case Baby -> animal.isBaby();
+                case Adult -> !animal.isBaby();
+                case Both -> true;
+            };
+        }
+        return true;
     }
 
     private boolean delayCheck() {
@@ -398,7 +406,7 @@ public class KillAura extends Module {
     }
 
     public Entity getTarget() {
-        if (!targets.isEmpty()) return targets.get(0);
+        if (!targets.isEmpty()) return targets.getFirst();
         return null;
     }
 
@@ -425,5 +433,11 @@ public class KillAura extends Module {
         Ignore,
         Break,
         None
+    }
+
+    public enum EntityAge {
+        Baby,
+        Adult,
+        Both
     }
 }

@@ -5,6 +5,7 @@
 
 package meteordevelopment.meteorclient.systems.modules.movement;
 
+import com.google.common.collect.Streams;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
@@ -22,7 +23,7 @@ import net.minecraft.block.FallingBlock;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
@@ -35,12 +36,12 @@ public class Scaffold extends Module {
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
         .name("方块")
-        .description("选择的方块。")
+        .description("选定的方块。")
         .build()
     );
 
     private final Setting<ListMode> blocksFilter = sgGeneral.add(new EnumSetting.Builder<ListMode>()
-        .name("方块过滤")
+        .name("方块过滤器")
         .description("如何使用方块列表设置")
         .defaultValue(ListMode.Blacklist)
         .build()
@@ -48,43 +49,53 @@ public class Scaffold extends Module {
 
     private final Setting<Boolean> fastTower = sgGeneral.add(new BoolSetting.Builder()
         .name("快速塔")
-        .description("是否更快地向上搭建。")
+        .description("是否更快地向上搭建脚手架。")
         .defaultValue(false)
         .build()
     );
 
-    private final Setting<Boolean> cancelVelocity = sgGeneral.add(new BoolSetting.Builder()
-        .name("取消速度")
-        .description("在塔上时是否取消速度。")
+    private final Setting<Double> towerSpeed = sgGeneral.add(new DoubleSetting.Builder()
+        .name("塔速度")
+        .description("塔的建造速度。")
+        .defaultValue(0.5)
+        .min(0)
+        .sliderMax(1)
+        .visible(fastTower::get)
+        .build()
+    );
+
+    private final Setting<Boolean> whileMoving = sgGeneral.add(new BoolSetting.Builder()
+        .name("边移动边建造")
+        .description("允许你在移动时建造塔。")
         .defaultValue(false)
         .visible(fastTower::get)
         .build()
     );
 
     private final Setting<Boolean> onlyOnClick = sgGeneral.add(new BoolSetting.Builder()
-        .name("仅点击")
-        .description("只有在按住右键时才放置方块。")
+        .name("仅在点击时")
+        .description("仅在按住右键时放置方块。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> renderSwing = sgGeneral.add(new BoolSetting.Builder()
-        .name("摇摆")
-        .description("渲染你的客户端手部摆动。")
+        .name("摆动")
+        .description("渲染你客户端的摆动。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> autoSwitch = sgGeneral.add(new BoolSetting.Builder()
         .name("自动切换")
-        .description("在放置前自动切换到一个方块。")
+        .description("放置前自动切换到一个方块。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
         .name("旋转")
-        .description("朝向被放置的方块旋转。")
+        .description("旋转向被放置的方块。")
         .defaultValue(true)
         .build()
     );
@@ -96,9 +107,19 @@ public class Scaffold extends Module {
         .build()
     );
 
+    private final Setting<Double> aheadDistance = sgGeneral.add(new DoubleSetting.Builder()
+        .name("前方距离")
+        .description("放置方块的前方距离。")
+        .defaultValue(0)
+        .min(0)
+        .sliderMax(1)
+        .visible(() -> !airPlace.get())
+        .build()
+    );
+
     private final Setting<Double> placeRange = sgGeneral.add(new DoubleSetting.Builder()
         .name("最近方块范围")
-        .description("当你在空中时，脚手架可以放置方块的范围。")
+        .description("当你在空中时，脚手架可以放置方块的距离。")
         .defaultValue(4)
         .min(0)
         .sliderMax(8)
@@ -112,16 +133,16 @@ public class Scaffold extends Module {
         .defaultValue(0)
         .min(0)
         .max(6)
-        .visible(() -> airPlace.get())
+        .visible(airPlace::get)
         .build()
     );
 
     private final Setting<Integer> blocksPerTick = sgGeneral.add(new IntSetting.Builder()
-        .name("每刻方块")
-        .description("每刻放置多少方块。")
+        .name("每滴答放置的方块数")
+        .description("每个滴答放置多少个方块。")
         .defaultValue(3)
         .min(1)
-        .visible(() -> airPlace.get())
+        .visible(airPlace::get)
         .build()
     );
 
@@ -129,7 +150,7 @@ public class Scaffold extends Module {
 
     private final Setting<Boolean> render = sgRender.add(new BoolSetting.Builder()
         .name("渲染")
-        .description("是否渲染已经放置的方块。")
+        .description("是否渲染已放置的方块。")
         .defaultValue(true)
         .build()
     );
@@ -143,7 +164,7 @@ public class Scaffold extends Module {
     );
 
     private final Setting<SettingColor> sideColor = sgRender.add(new ColorSetting.Builder()
-        .name("侧颜色")
+        .name("侧面颜色")
         .description("目标方块渲染的侧面颜色。")
         .defaultValue(new SettingColor(197, 137, 232, 10))
         .visible(render::get)
@@ -151,7 +172,7 @@ public class Scaffold extends Module {
     );
 
     private final Setting<SettingColor> lineColor = sgRender.add(new ColorSetting.Builder()
-        .name("线颜色")
+        .name("线条颜色")
         .description("目标方块渲染的线条颜色。")
         .defaultValue(new SettingColor(197, 137, 232))
         .visible(render::get)
@@ -159,88 +180,70 @@ public class Scaffold extends Module {
     );
 
     private final BlockPos.Mutable bp = new BlockPos.Mutable();
-    private final BlockPos.Mutable prevBp = new BlockPos.Mutable();
-
-    private boolean lastWasSneaking;
-    private double lastSneakingY;
 
     public Scaffold() {
-        super(Categories.Movement, "脚手架", "自动在你下面放置方块。");
+        super(Categories.Movement, "脚手架", "自动在你下方放置方块。");
     }
 
-    @Override
-    public void onActivate() {
-        lastWasSneaking = mc.options.sneakKey.isPressed();
-        if (lastWasSneaking) lastSneakingY = mc.player.getY();
-    }
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         if (onlyOnClick.get() && !mc.options.useKey.isPressed()) return;
 
+        Vec3d vec = mc.player.getPos().add(mc.player.getVelocity()).add(0, -0.75, 0);
         if (airPlace.get()) {
-            Vec3d vec = mc.player.getPos().add(mc.player.getVelocity()).add(0, -0.5f, 0);
             bp.set(vec.getX(), vec.getY(), vec.getZ());
-        } else if (BlockUtils.getPlaceSide(mc.player.getBlockPos().down()) != null) {
-            bp.set(mc.player.getBlockPos().down());
         } else {
+            Vec3d pos = mc.player.getPos();
+            if (aheadDistance.get() != 0 && !towering() && !mc.world.getBlockState(mc.player.getBlockPos().down()).getCollisionShape(mc.world, mc.player.getBlockPos()).isEmpty()) {
+                Vec3d dir = Vec3d.fromPolar(0, mc.player.getYaw()).multiply(aheadDistance.get(), 0, aheadDistance.get());
+                if (mc.options.forwardKey.isPressed()) pos = pos.add(dir.x, 0, dir.z);
+                if (mc.options.backKey.isPressed()) pos = pos.add(-dir.x, 0, -dir.z);
+                if (mc.options.leftKey.isPressed()) pos = pos.add(dir.z, 0, -dir.x);
+                if (mc.options.rightKey.isPressed()) pos = pos.add(-dir.z, 0, dir.x);
+            }
+            bp.set(pos.x, vec.y, pos.z);
+        }
+        if (mc.options.sneakKey.isPressed() && !mc.options.jumpKey.isPressed() && mc.player.getY() + vec.y > -1) {
+            bp.setY(bp.getY() - 1);
+        }
+        if (bp.getY() >= mc.player.getBlockPos().getY()) {
+            bp.setY(mc.player.getBlockPos().getY() - 1);
+        }
+        BlockPos targetBlock = bp.toImmutable();
+
+        if (!airPlace.get() && (BlockUtils.getPlaceSide(bp) == null)) {
             Vec3d pos = mc.player.getPos();
             pos = pos.add(0, -0.98f, 0);
             pos.add(mc.player.getVelocity());
 
-            if (!PlayerUtils.isWithin(prevBp, placeRange.get())) {
-                List<BlockPos> blockPosArray = new ArrayList<>();
-
-                for (int x = (int) (mc.player.getX() - placeRange.get()); x < mc.player.getX() + placeRange.get(); x++) {
-                    for (int z = (int) (mc.player.getZ() - placeRange.get()); z < mc.player.getZ() + placeRange.get(); z++) {
-                        for (int y = (int) Math.max(mc.world.getBottomY(), mc.player.getY() - placeRange.get()); y < Math.min(mc.world.getTopY(), mc.player.getY() + placeRange.get()); y++) {
-                            bp.set(x, y, z);
-                            if (!mc.world.getBlockState(bp).isAir()) blockPosArray.add(new BlockPos(bp));
-                        }
+            List<BlockPos> blockPosArray = new ArrayList<>();
+            for (int x = (int) (mc.player.getX() - placeRange.get()); x < mc.player.getX() + placeRange.get(); x++) {
+                for (int z = (int) (mc.player.getZ() - placeRange.get()); z < mc.player.getZ() + placeRange.get(); z++) {
+                    for (int y = (int) Math.max(mc.world.getBottomY(), mc.player.getY() - placeRange.get()); y < Math.min(mc.world.getTopY(), mc.player.getY() + placeRange.get()); y++) {
+                        bp.set(x, y, z);
+                        if (BlockUtils.getPlaceSide(bp) == null) continue;
+                        if (!BlockUtils.canPlace(bp)) continue;
+                        if (mc.player.getEyePos().squaredDistanceTo(Vec3d.ofCenter(bp.offset(BlockUtils.getClosestPlaceSide(bp)))) > 36) continue;
+                        blockPosArray.add(new BlockPos(bp));
                     }
                 }
-                if (blockPosArray.size() == 0) {
-                    return;
-                }
-
-                blockPosArray.sort(Comparator.comparingDouble(PlayerUtils::squaredDistanceTo));
-
-                prevBp.set(blockPosArray.get(0));
             }
+            if (blockPosArray.isEmpty()) return;
 
-            Vec3d vecPrevBP = new Vec3d((double) prevBp.getX() + 0.5f,
-                (double) prevBp.getY() + 0.5f,
-                (double) prevBp.getZ() + 0.5f);
+            blockPosArray.sort(Comparator.comparingDouble((blockPos) -> blockPos.getSquaredDistance(targetBlock)));
 
-            Vec3d sub = pos.subtract(vecPrevBP);
-            Direction facing;
-            if (sub.getY() < -0.5f) {
-                facing = Direction.DOWN;
-            } else if (sub.getY() > 0.5f) {
-                facing = Direction.UP;
-            } else facing = Direction.getFacing(sub.getX(), 0, sub.getZ());
-
-            bp.set(prevBp.offset(facing));
+            bp.set(blockPosArray.getFirst());
         }
-
-        // Move down if shifting
-        if (mc.options.sneakKey.isPressed() && !mc.options.jumpKey.isPressed()) {
-            if (lastSneakingY - mc.player.getY() < 0.1) {
-                lastWasSneaking = false;
-                return;
-            }
-        } else {
-            lastWasSneaking = false;
-        }
-        if (!lastWasSneaking) lastSneakingY = mc.player.getY();
-
-        fastTower(false, null);
 
         if (airPlace.get()) {
             List<BlockPos> blocks = new ArrayList<>();
-            for (int x = (int) (mc.player.getX() - radius.get()); x < mc.player.getX() + radius.get(); x++) {
-                for (int z = (int) (mc.player.getZ() - radius.get()); z < mc.player.getZ() + radius.get(); z++) {
-                    blocks.add(BlockPos.ofFloored(x, mc.player.getY() - 0.5, z));
+            for (int x = (int) (bp.getX() - radius.get()); x <= bp.getX() + radius.get(); x++) {
+                for (int z = (int) (bp.getZ() - radius.get()); z <= bp.getZ() + radius.get(); z++) {
+                    BlockPos blockPos = BlockPos.ofFloored(x, bp.getY(), z);
+                    if (mc.player.getPos().distanceTo(Vec3d.ofCenter(blockPos)) <= radius.get() || (x == bp.getX() && z == bp.getZ())) {
+                        blocks.add(blockPos);
+                    }
                 }
             }
 
@@ -249,7 +252,6 @@ public class Scaffold extends Module {
                 int counter = 0;
                 for (BlockPos block : blocks) {
                     if (place(block)) {
-                        fastTower(true, block);
                         counter++;
                     }
 
@@ -259,15 +261,35 @@ public class Scaffold extends Module {
                 }
             }
         } else {
-            if (place(bp)) fastTower(true, bp);
-            if (!mc.world.getBlockState(bp).isAir()) {
-                prevBp.set(bp);
+            place(bp);
+        }
+
+        FindItemResult result = InvUtils.findInHotbar(itemStack -> validItem(itemStack, bp));
+        if (fastTower.get() && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed() && result.found() && (autoSwitch.get() || result.getHand() != null)) {
+            Vec3d velocity = mc.player.getVelocity();
+            Box playerBox = mc.player.getBoundingBox();
+            if (Streams.stream(mc.world.getBlockCollisions(mc.player, playerBox.offset(0, 1, 0))).toList().isEmpty()) {
+                // If there is no block above the player: move the player up, so he can place another block
+                if (whileMoving.get() || !PlayerUtils.isMoving()) {
+                    velocity = new Vec3d(velocity.x, towerSpeed.get(), velocity.z);
+                }
+                mc.player.setVelocity(velocity);
+            } else {
+                // If there is a block above the player: move the player down, so he's on top of the placed block
+                mc.player.setVelocity(velocity.x, Math.ceil(mc.player.getY()) - mc.player.getY(), velocity.z);
+                mc.player.setOnGround(true);
             }
         }
     }
 
     public boolean scaffolding() {
         return isActive() && (!onlyOnClick.get() || (onlyOnClick.get() && mc.options.useKey.isPressed()));
+    }
+
+    public boolean towering() {
+        FindItemResult result = InvUtils.findInHotbar(itemStack -> validItem(itemStack, bp));
+        return scaffolding() && fastTower.get() && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed() &&
+            (whileMoving.get() || !PlayerUtils.isMoving()) && result.found() && (autoSwitch.get() || result.getHand() != null);
     }
 
     private boolean validItem(ItemStack itemStack, BlockPos pos) {
@@ -295,22 +317,6 @@ public class Scaffold extends Module {
             return true;
         }
         return false;
-    }
-
-    private void fastTower(boolean down, BlockPos checkBlock) {
-        if (down) {
-            // Move player down so they are on top of the placed block ready to jump again
-            if (fastTower.get() && mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed() && !mc.player.isOnGround()) {
-                // The chunk hasn't updated yet so we check the block we were standing on
-                if (!mc.world.getBlockState(checkBlock.down()).isReplaceable())
-                    mc.player.setVelocity(0, -0.28f, 0);
-            }
-        } else {
-            if (mc.options.jumpKey.isPressed() && !mc.options.sneakKey.isPressed() && fastTower.get() && InvUtils.testInHotbar(stack -> validItem(stack, mc.player.getBlockPos()))) {
-                Vec3d vel = mc.player.getVelocity();
-                mc.player.setVelocity(cancelVelocity.get() ? 0 : vel.x, 0.42, cancelVelocity.get() ? 0 : vel.z);
-            }
-        }
     }
 
     public enum ListMode {

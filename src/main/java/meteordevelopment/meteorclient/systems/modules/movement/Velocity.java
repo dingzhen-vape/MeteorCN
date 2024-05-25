@@ -23,14 +23,14 @@ public class Velocity extends Module {
 
     public final Setting<Boolean> knockback = sgGeneral.add(new BoolSetting.Builder()
         .name("击退")
-        .description("修改你受到攻击的击退量。")
+        .description("修改你从攻击中受到的击退量。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Double> knockbackHorizontal = sgGeneral.add(new DoubleSetting.Builder()
-        .name("击退水平")
-        .description("你将受到的水平击退量。")
+        .name("水平击退")
+        .description("你将承受多少水平击退。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(knockback::get)
@@ -38,8 +38,8 @@ public class Velocity extends Module {
     );
 
     public final Setting<Double> knockbackVertical = sgGeneral.add(new DoubleSetting.Builder()
-        .name("击退垂直")
-        .description("你将受到的垂直击退量。")
+        .name("垂直击退")
+        .description("你将承受多少垂直击退。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(knockback::get)
@@ -48,14 +48,14 @@ public class Velocity extends Module {
 
     public final Setting<Boolean> explosions = sgGeneral.add(new BoolSetting.Builder()
         .name("爆炸")
-        .description("修改你受到爆炸的击退量。")
+        .description("修改你从爆炸中受到的击退。")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Double> explosionsHorizontal = sgGeneral.add(new DoubleSetting.Builder()
         .name("爆炸水平")
-        .description("你将受到的水平爆炸击退量。")
+        .description("你将从爆炸中水平承受多少速度。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(explosions::get)
@@ -64,7 +64,7 @@ public class Velocity extends Module {
 
     public final Setting<Double> explosionsVertical = sgGeneral.add(new DoubleSetting.Builder()
         .name("爆炸垂直")
-        .description("你将受到的垂直爆炸击退量。")
+        .description("你将从爆炸中垂直承受多少速度。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(explosions::get)
@@ -80,7 +80,7 @@ public class Velocity extends Module {
 
     public final Setting<Double> liquidsHorizontal = sgGeneral.add(new DoubleSetting.Builder()
         .name("液体水平")
-        .description("你将受到的水平液体击退量。")
+        .description("你将从液体中水平承受多少速度。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(liquids::get)
@@ -89,7 +89,7 @@ public class Velocity extends Module {
 
     public final Setting<Double> liquidsVertical = sgGeneral.add(new DoubleSetting.Builder()
         .name("液体垂直")
-        .description("你将受到的垂直液体击退量。")
+        .description("你将从液体中垂直承受多少速度。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(liquids::get)
@@ -105,7 +105,7 @@ public class Velocity extends Module {
 
     public final Setting<Double> entityPushAmount = sgGeneral.add(new DoubleSetting.Builder()
         .name("实体推动量")
-        .description("你将被推动的量。")
+        .description("你将被推动多少。")
         .defaultValue(0)
         .sliderMax(1)
         .visible(entityPush::get)
@@ -120,14 +120,21 @@ public class Velocity extends Module {
     );
 
     public final Setting<Boolean> sinking = sgGeneral.add(new BoolSetting.Builder()
-        .name("下沉")
-        .description("防止你在液体中下沉。")
+        .name("沉没")
+        .description("防止你在液体中沉没。")
+        .defaultValue(false)
+        .build()
+    );
+
+    public final Setting<Boolean> fishing = sgGeneral.add(new BoolSetting.Builder()
+        .name("钓鱼")
+        .description("防止你被钓鱼竿拉动。")
         .defaultValue(false)
         .build()
     );
 
     public Velocity() {
-        super(Categories.Movement, "防击退", "防止你被外部力量移动。");
+        super(Categories.Movement, "反击退", "防止你被外力移动。");
     }
 
     @EventHandler
@@ -143,7 +150,7 @@ public class Velocity extends Module {
     @EventHandler
     private void onPacketReceive(PacketEvent.Receive event) {
         if (knockback.get() && event.packet instanceof EntityVelocityUpdateS2CPacket packet
-            && ((EntityVelocityUpdateS2CPacket) event.packet).getId() == mc.player.getId()) {
+            && packet.getId() == mc.player.getId()) {
             double velX = (packet.getVelocityX() / 8000d - mc.player.getVelocity().x) * knockbackHorizontal.get();
             double velY = (packet.getVelocityY() / 8000d - mc.player.getVelocity().y) * knockbackVertical.get();
             double velZ = (packet.getVelocityZ() / 8000d - mc.player.getVelocity().z) * knockbackHorizontal.get();

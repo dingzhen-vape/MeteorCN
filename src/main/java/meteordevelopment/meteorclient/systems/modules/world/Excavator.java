@@ -28,7 +28,7 @@ public class Excavator extends Module {
     private final SettingGroup sgRendering = settings.createGroup("渲染");
 
     // Keybindings
-    private final Setting<Keybind> selectionKey = sgGeneral.add(new KeybindSetting.Builder()
+    private final Setting<Keybind> selectionBind = sgGeneral.add(new KeybindSetting.Builder()
         .name("选择键")
         .description("绘制选择区域的键。")
         .defaultValue(Keybind.fromButton(GLFW.GLFW_MOUSE_BUTTON_RIGHT))
@@ -94,7 +94,7 @@ public class Excavator extends Module {
 
     @EventHandler
     private void onMouseButton(MouseButtonEvent event) {
-        if (event.action != KeyAction.Press || event.button != selectionKey.get().getValue() || mc.currentScreen != null) {
+        if (event.action != KeyAction.Press || !selectionBind.get().isPressed() || mc.currentScreen != null) {
             return;
         }
         selectCorners();
@@ -102,7 +102,7 @@ public class Excavator extends Module {
 
     @EventHandler
     private void onKey(KeyEvent event) {
-        if (event.action != KeyAction.Press || event.key != selectionKey.get().getValue() || mc.currentScreen != null) {
+        if (event.action != KeyAction.Press || !selectionBind.get().isPressed() || mc.currentScreen != null) {
             return;
         }
         selectCorners();

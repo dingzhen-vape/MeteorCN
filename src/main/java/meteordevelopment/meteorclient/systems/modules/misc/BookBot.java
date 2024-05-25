@@ -20,15 +20,14 @@ import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.font.TextHandler;
-import net.minecraft.item.*;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.WritableBookContentComponent;
+import net.minecraft.component.type.WrittenBookContentComponent;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
 import net.minecraft.network.packet.c2s.play.BookUpdateC2SPacket;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
@@ -40,7 +39,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.PrimitiveIterator;
+import java.util.Random;
 import java.util.function.Predicate;
 
 public class BookBot extends Module {
@@ -48,7 +50,7 @@ public class BookBot extends Module {
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
         .name("模式")
-        .description("要写的文本的类型。")
+        .description("要写什么样的文本。")
         .defaultValue(Mode.Random)
         .build()
     );
@@ -64,8 +66,8 @@ public class BookBot extends Module {
     );
 
     private final Setting<Boolean> onlyAscii = sgGeneral.add(new BoolSetting.Builder()
-        .name("仅ASCII")
-        .description("只使用ASCII字符集中的字符。")
+        .name("仅限ASCII")
+        .description("仅使用ASCII字符集中的字符。")
         .defaultValue(false)
         .visible(() -> mode.get() == Mode.Random)
         .build()
@@ -82,7 +84,7 @@ public class BookBot extends Module {
 
     private final Setting<Boolean> sign = sgGeneral.add(new BoolSetting.Builder()
         .name("签名")
-        .description("是否要在书上签名。")
+        .description("是否签署书籍。")
         .defaultValue(true)
         .build()
     );
@@ -90,14 +92,14 @@ public class BookBot extends Module {
     private final Setting<String> name = sgGeneral.add(new StringSetting.Builder()
         .name("名称")
         .description("你想给你的书起的名字。")
-        .defaultValue("Meteor on Crack!")
+        .defaultValue("流星破裂！")
         .visible(sign::get)
         .build()
     );
 
     private final Setting<Boolean> count = sgGeneral.add(new BoolSetting.Builder()
         .name("附加计数")
-        .description("是否要在书名后面加上书的编号。")
+        .description("是否在标题中附加书籍的编号。")
         .defaultValue(true)
         .visible(sign::get)
         .build()
@@ -110,7 +112,7 @@ public class BookBot extends Module {
     private Random random;
 
     public BookBot() {
-        super(Categories.Misc, "书写机器人", "自动在书上写字。");
+        super(Categories.Misc, "书籍机器人", "自动在书中写字。");
 
         if (!file.exists()) {
             file = null;
@@ -153,7 +155,7 @@ public class BookBot extends Module {
     @Override
     public void onActivate() {
         if ((file == null || !file.exists()) && mode.get() == Mode.File) {
-            info("没有选择文件，请在图形界面中选择一个文件。");
+            info("没有选择文件，请在GUI中选择一个文件。");
             toggle();
             return;
         }
@@ -165,8 +167,10 @@ public class BookBot extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        Predicate<ItemStack> bookPredicate = i ->
-            i.getItem() == Items.WRITABLE_BOOK && (i.getNbt() == null || i.getNbt().get("页数") == null || ((NbtList) i.getNbt().get("页数")).isEmpty());
+        Predicate<ItemStack> bookPredicate = i -> {
+            WritableBookContentComponent component = i.get(DataComponentTypes.WRITABLE_BOOK_CONTENT);
+            return i.getItem() == Items.WRITABLE_BOOK && (component != null || component.pages().isEmpty());
+        };
 
         FindItemResult writableBook = InvUtils.find(bookPredicate);
 
@@ -206,7 +210,7 @@ public class BookBot extends Module {
         } else if (mode.get() == Mode.File) {
             // Ignore if somehow the file got deleted
             if ((file == null || !file.exists()) && mode.get() == Mode.File) {
-                info("没有选择文件，请在图形界面中选择一个文件。");
+                info("没有选择文件，请在GUI中选择一个文件。");
                 toggle();
                 return;
             }
@@ -214,11 +218,11 @@ public class BookBot extends Module {
             // Handle the file being empty
             if (file.length() == 0) {
                 MutableText message = Text.literal("");
-                message.append(Text.literal("书写机器人的文件是空的！").formatted(Formatting.RED));
-                message.append(Text.literal("点击这里编辑它。")
+                message.append(Text.literal("书籍机器人文件为空！ ").formatted(Formatting.RED));
+                message.append(Text.literal("点击这里进行编辑。")
                     .setStyle(Style.EMPTY
-                            .withFormatting(Formatting.UNDERLINE, Formatting.RED)
-                            .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath()))
+                        .withFormatting(Formatting.UNDERLINE, Formatting.RED)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath()))
                     )
                 );
                 info(message);
@@ -240,13 +244,14 @@ public class BookBot extends Module {
                 // Write the file string to a book
                 writeBook(file.toString().chars().iterator());
             } catch (IOException ignored) {
-                error("无法读取文件。");
+                error("读取文件失败。");
             }
         }
     }
 
     private void writeBook(PrimitiveIterator.OfInt chars) {
         ArrayList<String> pages = new ArrayList<>();
+        ArrayList<RawFilteredPair<Text>> filteredPages = new ArrayList<>();
         TextHandler.WidthRetriever widthRetriever = ((TextHandlerAccessor) mc.textRenderer.getTextHandler()).getWidthRetriever();
 
         int maxPages = mode.get() == Mode.File ? 100 : this.pages.get();
@@ -285,6 +290,7 @@ public class BookBot extends Module {
 
             // Reached end of page
             if (lineIndex == 14) {
+                filteredPages.add(RawFilteredPair.of(Text.of(page.toString())));
                 pages.add(page.toString());
                 page.setLength(0);
                 pageIndex++;
@@ -302,6 +308,7 @@ public class BookBot extends Module {
 
         // No more characters, end current page
         if (!page.isEmpty() && pageIndex != maxPages) {
+            filteredPages.add(RawFilteredPair.of(Text.of(page.toString())));
             pages.add(page.toString());
         }
 
@@ -310,13 +317,7 @@ public class BookBot extends Module {
         if (count.get() && bookCount != 0) title += " #" + bookCount;
 
         // Write data to book
-        mc.player.getMainHandStack().setSubNbt("标题", NbtString.of(title));
-        mc.player.getMainHandStack().setSubNbt("作者", NbtString.of(mc.player.getGameProfile().getName()));
-
-        // Write pages NBT
-        NbtList pageNbt = new NbtList();
-        pages.stream().map(NbtString::of).forEach(pageNbt::add);
-        if (!pages.isEmpty()) mc.player.getMainHandStack().setSubNbt("页数", pageNbt);
+        mc.player.getMainHandStack().set(DataComponentTypes.WRITTEN_BOOK_CONTENT, new WrittenBookContentComponent(RawFilteredPair.of(title), mc.player.getGameProfile().getName(), 0, filteredPages, true));
 
         // Send book update to server
         mc.player.networkHandler.sendPacket(new BookUpdateC2SPacket(mc.player.getInventory().selectedSlot, pages, sign.get() ? Optional.of(title) : Optional.empty()));

@@ -18,6 +18,9 @@ import java.util.*;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class NbtUtils {
+    private NbtUtils() {
+    }
+
     public static <T extends ISerializable<?>> NbtList listToTag(Iterable<T> list) {
         NbtList tag = new NbtList();
         for (T item : list) tag.add(item.toTag());
@@ -86,7 +89,7 @@ public class NbtUtils {
             byte[] data = Base64.getDecoder().decode(mc.keyboard.getClipboard().trim());
             ByteArrayInputStream bis = new ByteArrayInputStream(data);
 
-            NbtCompound pasted = NbtIo.readCompressed(new DataInputStream(bis), NbtTagSizeTracker.ofUnlimitedBytes());
+            NbtCompound pasted = NbtIo.readCompressed(new DataInputStream(bis), NbtSizeTracker.ofUnlimitedBytes());
             for (String key : schema.getKeys()) if (!pasted.getKeys().contains(key)) return null;
             if (!pasted.getString("name").equals(schema.getString("name"))) return null;
 

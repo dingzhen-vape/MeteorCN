@@ -26,7 +26,7 @@ public class Flight extends Module {
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
         .name("模式")
-        .description("飞行的模式.")
+        .description("飞行的模式。")
         .defaultValue(Mode.Abilities)
         .onChanged(mode -> {
             if (!isActive() || !Utils.canUpdate()) return;
@@ -37,7 +37,7 @@ public class Flight extends Module {
 
     private final Setting<Double> speed = sgGeneral.add(new DoubleSetting.Builder()
         .name("速度")
-        .description("飞行时的速度.")
+        .description("你飞行时的速度。")
         .defaultValue(0.1)
         .min(0.0)
         .build()
@@ -45,21 +45,29 @@ public class Flight extends Module {
 
     private final Setting<Boolean> verticalSpeedMatch = sgGeneral.add(new BoolSetting.Builder()
         .name("垂直速度匹配")
-        .description("将你的垂直速度匹配你的水平速度，否则使用原版比例.")
+        .description("将你的垂直速度匹配到你的水平速度，否则使用原版比例。")
         .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Boolean> noSneak = sgGeneral.add(new BoolSetting.Builder()
+        .name("无潜行")
+        .description("防止你在飞行时潜行。")
+        .defaultValue(false)
+        .visible(() -> mode.get() == Mode.Velocity)
         .build()
     );
 
     private final Setting<AntiKickMode> antiKickMode = sgAntiKick.add(new EnumSetting.Builder<AntiKickMode>()
         .name("模式")
-        .description("防踢的模式.")
+        .description("防踢的模式。")
         .defaultValue(AntiKickMode.Packet)
         .build()
     );
 
     private final Setting<Integer> delay = sgAntiKick.add(new IntSetting.Builder()
         .name("延迟")
-        .description("向下飞一点和返回原始位置之间的刻延迟")
+        .description("在稍微下降一点并返回原始位置之间的延迟时间，以滴答为单位。")
         .defaultValue(20)
         .min(1)
         .sliderMax(200)
@@ -69,7 +77,7 @@ public class Flight extends Module {
     // Anti Kick
     private final Setting<Integer> offTime = sgAntiKick.add(new IntSetting.Builder()
         .name("关闭时间")
-        .description("向下飞一点以重置浮动刻的毫秒延迟.")
+        .description("稍微下降一点以重置浮动tick的延迟时间，以毫秒为单位。")
         .defaultValue(1)
         .min(1)
         .sliderRange(1, 20)
@@ -83,7 +91,7 @@ public class Flight extends Module {
     private double lastPacketY = Double.MAX_VALUE;
 
     public Flight() {
-        super(Categories.Movement, "飞行", "飞吧! 建议和无摔落一起使用这个模块.");
+        super(Categories.Movement, "飞行", "飞吧！建议与此模块一起使用无坠落。");
     }
 
     @Override
@@ -146,15 +154,17 @@ public class Flight extends Module {
 
         switch (mode.get()) {
             case Velocity -> {
-                // TODO: deal with underwater movement, find a way to "欺骗" not being in water
-
                 mc.player.getAbilities().flying = false;
                 mc.player.setVelocity(0, 0, 0);
-                Vec3d initialVelocity = mc.player.getVelocity();
+                Vec3d playerVelocity = mc.player.getVelocity();
                 if (mc.options.jumpKey.isPressed())
-                    mc.player.setVelocity(initialVelocity.add(0, speed.get() * (verticalSpeedMatch.get() ? 10f : 5f), 0));
+                    playerVelocity = playerVelocity.add(0, speed.get() * (verticalSpeedMatch.get() ? 10f : 5f), 0);
                 if (mc.options.sneakKey.isPressed())
-                    mc.player.setVelocity(initialVelocity.subtract(0, speed.get() * (verticalSpeedMatch.get() ? 10f : 5f), 0));
+                    playerVelocity = playerVelocity.subtract(0, speed.get() * (verticalSpeedMatch.get() ? 10f : 5f), 0);
+                mc.player.setVelocity(playerVelocity);
+                if (noSneak.get()) {
+                    mc.player.setOnGround(false);
+                }
             }
             case Abilities -> {
                 if (mc.player.isSpectator()) return;
@@ -238,6 +248,10 @@ public class Flight extends Module {
 
         if (!isActive() || mode.get() != Mode.Velocity) return -1;
         return speed.get().floatValue() * (mc.player.isSprinting() ? 15f : 10f);
+    }
+
+    public boolean noSneak() {
+        return isActive() && mode.get() == Mode.Velocity && noSneak.get();
     }
 
     public enum Mode {

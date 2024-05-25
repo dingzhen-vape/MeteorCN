@@ -51,14 +51,14 @@ public class CityESP extends Module {
     private BlockPos target;
 
     public CityESP() {
-        super(Categories.Render, "城市(???-ESP", "显示可以被破坏来城市(???另一个玩家的方块。");
+        super(Categories.Render, "挖脚-ESP", "显示可以被破坏另一个玩家脚底的方块。");
     }
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        PlayerEntity targetEntity = TargetUtils.getPlayerTarget(mc.interactionManager.getReachDistance() + 2, SortPriority.LowestDistance);
+        PlayerEntity targetEntity = TargetUtils.getPlayerTarget(mc.player.getBlockInteractionRange() + 2, SortPriority.LowestDistance);
 
-        if (TargetUtils.isBadTarget(targetEntity, mc.interactionManager.getReachDistance() + 2)) {
+        if (TargetUtils.isBadTarget(targetEntity, mc.player.getBlockInteractionRange() + 2)) {
             target = null;
         } else {
             target = EntityUtils.getCityBlock(targetEntity);

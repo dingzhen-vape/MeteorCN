@@ -5,6 +5,7 @@
 
 package meteordevelopment.meteorclient.systems.modules.player;
 
+import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixin.ClientPlayerInteractionManagerAccessor;
 import meteordevelopment.meteorclient.settings.*;
@@ -14,6 +15,7 @@ import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
@@ -25,21 +27,21 @@ public class SpeedMine extends Module {
 
     public final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
         .name("模式")
-        .defaultValue(Mode.Normal)
+        .defaultValue(Mode.Damage)
         .onChanged(mode -> removeHaste())
         .build()
     );
 
     private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
         .name("方块")
-        .description("选择的方块。")
+        .description("选定的方块。")
         .filter(block -> block.getHardness() > 0)
         .visible(() -> mode.get() != Mode.Haste)
         .build()
     );
 
     private final Setting<ListMode> blocksFilter = sgGeneral.add(new EnumSetting.Builder<ListMode>()
-        .name("方块过滤")
+        .name("方块过滤器")
         .description("如何使用方块设置。")
         .defaultValue(ListMode.Blacklist)
         .visible(() -> mode.get() != Mode.Haste)
@@ -47,8 +49,8 @@ public class SpeedMine extends Module {
     );
 
     public final Setting<Double> modifier = sgGeneral.add(new DoubleSetting.Builder()
-        .name("修正")
-        .description("挖掘速度的修正。额外的0.2相当于一个急迫等级（1.2 = 急迫 1）。")
+        .name("修饰符")
+        .description("挖掘速度修饰符。额外值0.2相当于一个急迫等级（1.2 = 急迫1）。")
         .defaultValue(1.4)
         .visible(() -> mode.get() == Mode.Normal)
         .min(0)
@@ -57,7 +59,7 @@ public class SpeedMine extends Module {
 
     private final Setting<Integer> hasteAmplifier = sgGeneral.add(new IntSetting.Builder()
         .name("急迫放大器")
-        .description("给你的急迫值。不建议超过2。")
+        .description("给你的急迫值。不推荐超过2。")
         .defaultValue(2)
         .min(1)
         .visible(() -> mode.get() == Mode.Haste)
@@ -66,15 +68,23 @@ public class SpeedMine extends Module {
     );
 
     private final Setting<Boolean> instamine = sgGeneral.add(new BoolSetting.Builder()
-        .name("瞬挖")
-        .description("在某些条件下是否立即挖掘方块。")
+        .name("即时开采")
+        .description("在某些条件下是否立即开采方块。")
         .defaultValue(true)
         .visible(() -> mode.get() == Mode.Damage)
         .build()
     );
 
+    private final Setting<Boolean> grimBypass = sgGeneral.add(new BoolSetting.Builder()
+        .name("格林绕过")
+        .description("绕过格林的快速破坏检查，截至2.3.58版本有效")
+        .defaultValue(false)
+        .visible(() -> mode.get() == Mode.Damage)
+        .build()
+    );
+
     public SpeedMine() {
-        super(Categories.Player, "速挖", "让你快速挖掘方块。");
+        super(Categories.Player, "速度开采", "允许你快速开采方块。");
     }
 
     @Override
@@ -101,6 +111,16 @@ public class SpeedMine extends Module {
             if (pos == null || progress <= 0) return;
             if (progress + mc.world.getBlockState(pos).calcBlockBreakingDelta(mc.player, mc.world, pos) >= 0.7f)
                 im.setCurrentBreakingProgress(1f);
+        }
+    }
+
+    @EventHandler
+    private void onPacket(PacketEvent.Send event) {
+        if (!(mode.get() == Mode.Damage) || !grimBypass.get()) return;
+
+        // https://github.com/GrimAnticheat/Grim/issues/1296
+        if (event.packet instanceof PlayerActionC2SPacket packet && packet.getAction() == PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK) {
+            mc.getNetworkHandler().sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.ABORT_DESTROY_BLOCK, packet.getPos().up(), packet.getDirection()));
         }
     }
 
