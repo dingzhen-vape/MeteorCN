@@ -36,6 +36,7 @@ import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.Slot;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -140,7 +141,7 @@ public class InventoryTweaks extends Module {
     public final Setting<List<ScreenHandlerType<?>>> stealScreens = sgStealDump.add(new ScreenHandlerListSetting.Builder()
         .name("偷取界面")
         .description("选择要显示按钮和自动偷取的界面.")
-        .defaultValue(List.of(ScreenHandlerType.GENERIC_9X3, ScreenHandlerType.GENERIC_9X6))
+        .defaultValue(Arrays.asList(ScreenHandlerType.GENERIC_9X3, ScreenHandlerType.GENERIC_9X6))
         .build()
     );
 
@@ -262,7 +263,7 @@ public class InventoryTweaks extends Module {
     private void onKey(KeyEvent event) {
         if (event.action != KeyAction.Press) return;
 
-        if (sortingKey.get().matches(true, event.key, event.modifiers)) {
+        if (sortingKey.get().matches(true, event.key)) {
             if (sort()) event.cancel();
         }
     }
@@ -271,7 +272,7 @@ public class InventoryTweaks extends Module {
     private void onMouseButton(MouseButtonEvent event) {
         if (event.action != KeyAction.Press) return;
 
-        if (sortingKey.get().matches(false, event.button, 0)) {
+        if (sortingKey.get().matches(false, event.button)) {
             if (sort()) event.cancel();
         }
     }

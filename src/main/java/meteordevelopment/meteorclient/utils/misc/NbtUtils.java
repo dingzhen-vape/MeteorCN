@@ -8,7 +8,10 @@ package meteordevelopment.meteorclient.utils.misc;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.systems.System;
 import meteordevelopment.meteorclient.utils.render.prompts.OkPrompt;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtList;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 
 import java.io.ByteArrayInputStream;
@@ -18,9 +21,6 @@ import java.util.*;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class NbtUtils {
-    private NbtUtils() {
-    }
-
     public static <T extends ISerializable<?>> NbtList listToTag(Iterable<T> list) {
         NbtList tag = new NbtList();
         for (T item : list) tag.add(item.toTag());
@@ -89,7 +89,7 @@ public class NbtUtils {
             byte[] data = Base64.getDecoder().decode(mc.keyboard.getClipboard().trim());
             ByteArrayInputStream bis = new ByteArrayInputStream(data);
 
-            NbtCompound pasted = NbtIo.readCompressed(new DataInputStream(bis), NbtSizeTracker.ofUnlimitedBytes());
+            NbtCompound pasted = NbtIo.readCompressed(new DataInputStream(bis));
             for (String key : schema.getKeys()) if (!pasted.getKeys().contains(key)) return null;
             if (!pasted.getString("name").equals(schema.getString("name"))) return null;
 

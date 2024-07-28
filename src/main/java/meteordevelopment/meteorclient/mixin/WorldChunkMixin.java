@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WorldChunk.class)
-public abstract class WorldChunkMixin {
+public class WorldChunkMixin {
     @Shadow @Final World world;
 
     @Inject(method = "setBlockState", at = @At("TAIL"))

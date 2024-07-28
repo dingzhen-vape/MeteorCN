@@ -5,13 +5,12 @@
 
 package meteordevelopment.meteorclient.utils.player;
 
+import baritone.api.BaritoneAPI;
 import com.mojang.brigadier.StringReader;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.mixininterface.IChatHud;
-import meteordevelopment.meteorclient.pathing.BaritoneUtils;
 import meteordevelopment.meteorclient.systems.config.Config;
 import meteordevelopment.meteorclient.utils.PostInit;
-import meteordevelopment.meteorclient.utils.misc.text.MeteorClickEvent;
 import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Pair;
@@ -30,9 +29,6 @@ public class ChatUtils {
 
     private static Text PREFIX;
 
-    private ChatUtils() {
-    }
-
     @PostInit
     public static void init() {
         PREFIX = Text.empty()
@@ -46,9 +42,7 @@ public class ChatUtils {
         return PREFIX;
     }
 
-    /**
-     * Registers a custom prefix to be used when calling from a class in the specified package. When null is returned from the supplier the default Meteor prefix is used.
-     */
+    /** Registers a custom prefix to be used when calling from a class in the specified package. When null is returned from the supplier the default Meteor prefix is used. */
     public static void registerCustomPrefix(String packageName, Supplier<Text> supplier) {
         for (Pair<String, Supplier<Text>> pair : customPrefixes) {
             if (pair.getLeft().equals(packageName)) {
@@ -60,9 +54,7 @@ public class ChatUtils {
         customPrefixes.add(new Pair<>(packageName, supplier));
     }
 
-    /**
-     * The package name must match exactly to the one provided through {@link #registerCustomPrefix(String, Supplier)}.
-     */
+    /** The package name must match exactly to the one provided through {@link #registerCustomPrefix(String, Supplier)}. */
     public static void unregisterCustomPrefix(String packageName) {
         customPrefixes.removeIf(pair -> pair.getLeft().equals(packageName));
     }
@@ -73,9 +65,7 @@ public class ChatUtils {
 
     // Player
 
-    /**
-     * Sends the message as if the user typed it into chat.
-     */
+    /** Sends the message as if the user typed it into chat. */
     public static void sendPlayerMsg(String message) {
         mc.inGameHud.getChatHud().addToMessageHistory(message);
 
@@ -181,7 +171,8 @@ public class ChatUtils {
         if (forcedPrefixClassName != null) {
             className = forcedPrefixClassName;
             forcedPrefixClassName = null;
-        } else {
+        }
+        else {
             for (StackTraceElement element : Thread.currentThread().getStackTrace()) {
                 if (foundChatUtils) {
                     if (!element.getClassName().equals(ChatUtils.class.getName())) {
@@ -236,10 +227,6 @@ public class ChatUtils {
                             style = style.withFormatting(Formatting.UNDERLINE);
                             result.setLength(0);
                         }
-                        case "(bold)" -> {
-                            style = style.withFormatting(Formatting.BOLD);
-                            result.setLength(0);
-                        }
                     }
                     formatting = false;
                 }
@@ -254,21 +241,17 @@ public class ChatUtils {
     public static MutableText formatCoords(Vec3d pos) {
         String coordsString = String.format("(highlight)(underline)%.0f, %.0f, %.0f(default)", pos.x, pos.y, pos.z);
         MutableText coordsText = formatMsg(coordsString, Formatting.GRAY);
-
-        if (BaritoneUtils.IS_AVAILABLE) {
-            Style style = coordsText.getStyle().withFormatting(Formatting.BOLD)
-                .withHoverEvent(new HoverEvent(
-                    HoverEvent.Action.SHOW_TEXT,
-                    Text.literal("Set as Baritone goal")
+        coordsText.setStyle(coordsText.getStyle()
+                .withFormatting(Formatting.BOLD)
+                .withClickEvent(new ClickEvent(
+                        ClickEvent.Action.RUN_COMMAND,
+                        String.format("%sgoto %d %d %d", BaritoneAPI.getSettings().prefix.value, (int) pos.x, (int) pos.y, (int) pos.z)
                 ))
-                .withClickEvent(new MeteorClickEvent(
-                    ClickEvent.Action.RUN_COMMAND,
-                    String.format("%sgoto %d %d %d", BaritoneUtils.getPrefix(), (int) pos.x, (int) pos.y, (int) pos.z)
-                ));
-
-            coordsText.setStyle(style);
-        }
-
+                .withHoverEvent(new HoverEvent(
+                        HoverEvent.Action.SHOW_TEXT,
+                        Text.literal("Set as Baritone goal")
+                ))
+        );
         return coordsText;
     }
 }

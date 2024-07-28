@@ -144,9 +144,7 @@ public class LongJump extends Module {
 
     @EventHandler
     private void onPlayerMove(PlayerMoveEvent event) {
-        if (timer.get() != Timer.OFF) {
-            Modules.get().get(Timer.class).setOverride(PlayerUtils.isMoving() ? timer.get() : Timer.OFF);
-        }
+        Modules.get().get(Timer.class).setOverride(PlayerUtils.isMoving() ? timer.get() : Timer.OFF);
         switch (jumpMode.get()) {
             case Vanilla -> {
                 if (PlayerUtils.isMoving() && mc.options.jumpKey.isPressed()) {

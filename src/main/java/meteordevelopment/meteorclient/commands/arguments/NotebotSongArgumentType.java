@@ -21,13 +21,9 @@ import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 public class NotebotSongArgumentType implements ArgumentType<Path> {
-    private static final NotebotSongArgumentType INSTANCE = new NotebotSongArgumentType();
-
     public static NotebotSongArgumentType create() {
-        return INSTANCE;
+        return new NotebotSongArgumentType();
     }
-
-    private NotebotSongArgumentType() {}
 
     @Override
     public Path parse(StringReader reader) throws CommandSyntaxException {

@@ -5,8 +5,10 @@
 
 package meteordevelopment.meteorclient.systems.modules.render;
 
+import baritone.api.BaritoneAPI;
+import baritone.api.IBaritone;
+import baritone.api.pathing.goals.GoalGetToBlock;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
-import meteordevelopment.meteorclient.events.render.Render2DEvent;
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
 import meteordevelopment.meteorclient.gui.screens.EditSystemScreen;
@@ -16,8 +18,6 @@ import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WCheckbox;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WMinus;
-import meteordevelopment.meteorclient.pathing.PathManagers;
-import meteordevelopment.meteorclient.renderer.text.TextRenderer;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
@@ -25,7 +25,6 @@ import meteordevelopment.meteorclient.systems.waypoints.Waypoint;
 import meteordevelopment.meteorclient.systems.waypoints.Waypoints;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
-import meteordevelopment.meteorclient.utils.render.NametagUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.gui.screen.DeathScreen;
@@ -33,7 +32,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Vector3d;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -43,14 +41,13 @@ import static meteordevelopment.meteorclient.utils.player.ChatUtils.formatCoords
 
 public class WaypointsModule extends Module {
     private static final Color GRAY = new Color(200, 200, 200);
-    private static final Color TEXT = new Color(255, 255, 255);
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgDeathPosition = settings.createGroup("死亡位置");
 
     public final Setting<Integer> textRenderDistance = sgGeneral.add(new IntSetting.Builder()
-        .name("文本渲染距离")
-        .description("文本渲染的最大距离，以屏幕中心为基准。")
+        .name("文字渲染距离")
+        .description("文本渲染的最大距离从屏幕中心开始.")
         .defaultValue(100)
         .min(0)
         .sliderMax(200)
@@ -59,7 +56,7 @@ public class WaypointsModule extends Module {
 
     private final Setting<Integer> maxDeathPositions = sgDeathPosition.add(new IntSetting.Builder()
         .name("最大死亡位置")
-        .description("保存的死亡位置的数量，0为禁用。")
+        .description("保存的死亡位置数量, 0为禁用")
         .defaultValue(0)
         .min(0)
         .sliderMax(20)
@@ -69,74 +66,16 @@ public class WaypointsModule extends Module {
 
     private final Setting<Boolean> dpChat = sgDeathPosition.add(new BoolSetting.Builder()
         .name("聊天")
-        .description("死亡时发送一条带有你位置的聊天信息。")
+        .description("死亡时发送一个包含你位置的聊天信息")
         .defaultValue(false)
         .build()
     );
 
     public WaypointsModule() {
-        super(Categories.Render, "路径点", "允许你创建路径点。");
+        super(Categories.Render, "路标", "允许你创建路标.");
     }
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-
-    @EventHandler
-    private void onRender2D(Render2DEvent event) {
-        TextRenderer text = TextRenderer.get();
-        Vector3d center = new Vector3d(mc.getWindow().getFramebufferWidth() / 2.0, mc.getWindow().getFramebufferHeight() / 2.0, 0);
-        int textRenderDist = textRenderDistance.get();
-
-        for (Waypoint waypoint : Waypoints.get()) {
-            // Continue if this waypoint should not be rendered
-            if (!waypoint.visible.get() || !Waypoints.checkDimension(waypoint)) continue;
-
-            // Calculate distance
-            BlockPos blockPos = waypoint.getPos();
-            Vector3d pos = new Vector3d(blockPos.getX() + 0.5, blockPos.getY(), blockPos.getZ() + 0.5);
-            double dist = PlayerUtils.distanceToCamera(pos.x, pos.y, pos.z);
-
-            // Continue if this waypoint should not be rendered
-            if (dist > waypoint.maxVisible.get()) continue;
-            if (!NametagUtils.to2D(pos, 1)) continue;
-
-            // Calculate alpha and distance to center of the screen
-            double distToCenter = pos.distance(center);
-            double a = 1;
-
-            if (dist < 20) {
-                a = (dist - 10) / 10;
-                if (a < 0.01) continue;
-            }
-
-            // Render
-            NametagUtils.scale = waypoint.scale.get() - 0.2;
-            NametagUtils.begin(pos);
-
-            // Render icon
-            waypoint.renderIcon(-16, -16, a, 32);
-
-            // Render text if cursor is close enough
-            if (distToCenter <= textRenderDist) {
-                // Setup text rendering
-                int preTextA = TEXT.a;
-                TEXT.a *= a;
-                text.begin();
-
-                // Render name
-                text.render(waypoint.name.get(), -text.getWidth(waypoint.name.get()) / 2, -16 - text.getHeight(), TEXT, true);
-
-                // Render distance
-                String distText = String.format("%d 方块", (int) Math.round(dist));
-                text.render(distText, -text.getWidth(distText) / 2, 16, TEXT, true);
-
-                // End text rendering
-                text.end();
-                TEXT.a = preTextA;
-            }
-
-            NametagUtils.end();
-        }
-    }
 
     @EventHandler
     private void onOpenScreen(OpenScreenEvent event) {
@@ -150,7 +89,7 @@ public class WaypointsModule extends Module {
         if (dpChat.get()) {
             MutableText text = Text.literal("死于 ");
             text.append(formatCoords(deathPos));
-            text.append(String.format(" 在 %s。", time));
+            text.append(String.format(" 于 %s.", time));
             info(text);
         }
 
@@ -185,7 +124,7 @@ public class WaypointsModule extends Module {
 
     @Override
     public WWidget getWidget(GuiTheme theme) {
-        if (!Utils.canUpdate()) return theme.label("你需要在一个世界里。");
+        if (!Utils.canUpdate()) return theme.label("你需要在一个世界中.");
 
         WTable table = theme.table();
         initTable(theme, table);
@@ -216,10 +155,9 @@ public class WaypointsModule extends Module {
             if (validDim) {
                 WButton gotoB = table.add(theme.button("前往")).widget();
                 gotoB.action = () -> {
-                    if (PathManagers.get().isPathing())
-                        PathManagers.get().stop();
-
-                    PathManagers.get().moveTo(waypoint.getPos());
+                    IBaritone baritone = BaritoneAPI.getProvider().getPrimaryBaritone();
+                    if (baritone.getPathingBehavior().isPathing()) baritone.getPathingBehavior().cancelEverything();
+                    baritone.getCustomGoalProcess().setGoalAndPath(new GoalGetToBlock(waypoint.getPos()));
                 };
             }
 

@@ -17,14 +17,13 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.CloseHandledScreenC2SPacket;
 
 public class ChestSwap extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Chestplate> chestplate = sgGeneral.add(new EnumSetting.Builder<Chestplate>()
         .name("胸甲")
-        .description("要切换到哪种类型的胸甲。")
+        .description("要切换到的胸甲类型。")
         .defaultValue(Chestplate.PreferNetherite)
         .build()
     );
@@ -32,13 +31,6 @@ public class ChestSwap extends Module {
     private final Setting<Boolean> stayOn = sgGeneral.add(new BoolSetting.Builder()
         .name("保持开启")
         .description("保持开启并在你关闭时激活。")
-        .defaultValue(false)
-        .build()
-    );
-
-    private final Setting<Boolean> closeInventory = sgGeneral.add(new BoolSetting.Builder()
-        .name("关闭库存")
-        .description("在切换后发送库存关闭。")
         .defaultValue(false)
         .build()
     );
@@ -128,16 +120,12 @@ public class ChestSwap extends Module {
 
     private void equip(int slot) {
         InvUtils.move().from(slot).toArmor(2);
-        if (closeInventory.get()) {
-            // Notchian clients send a Close Window packet with Window ID 0 to close their inventory even though there is never an Open Screen packet for the inventory.
-            mc.getNetworkHandler().sendPacket(new CloseHandledScreenC2SPacket(0));
-        }
     }
 
     @Override
     public void sendToggledMsg() {
         if (stayOn.get()) super.sendToggledMsg();
-        else if (Config.get().chatFeedback.get() && chatFeedback) info("触发 (高亮)%s(默认)。", title);
+        else if (Config.get().chatFeedback.get() && chatFeedback) info("触发 (highlight)%s(default).", title);
     }
 
     public enum Chestplate {

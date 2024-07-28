@@ -12,7 +12,6 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.Utils;
-import meteordevelopment.meteorclient.utils.entity.DamageUtils;
 import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.entity.SortPriority;
 import meteordevelopment.meteorclient.utils.entity.TargetUtils;
@@ -259,8 +258,8 @@ public class BedAura extends Module {
 
                 BlockPos centerPos = target.getBlockPos().up(i);
 
-                float headSelfDamage = DamageUtils.bedDamage(mc.player, Utils.vec3d(centerPos));
-                float offsetSelfDamage = DamageUtils.bedDamage(mc.player, Utils.vec3d(centerPos.offset(dir.toDirection())));
+                double headSelfDamage = DamageUtils.bedDamage(mc.player, Utils.vec3d(centerPos));
+                double offsetSelfDamage = DamageUtils.bedDamage(mc.player, Utils.vec3d(centerPos.offset(dir.toDirection())));
 
                 if (mc.world.getBlockState(centerPos).isReplaceable()
                     && BlockUtils.canPlace(centerPos.offset(dir.toDirection()))

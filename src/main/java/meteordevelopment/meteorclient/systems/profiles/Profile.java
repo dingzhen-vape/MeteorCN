@@ -30,6 +30,7 @@ public class Profile implements ISerializable<Profile> {
     public Setting<String> name = sgGeneral.add(new StringSetting.Builder()
         .name("name")
         .description("The name of the profile.")
+        .defaultValue("")
         .filter(Utils::nameFilter)
         .build()
     );

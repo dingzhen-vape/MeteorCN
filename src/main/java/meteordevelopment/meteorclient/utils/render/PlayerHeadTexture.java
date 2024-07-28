@@ -8,12 +8,10 @@ import meteordevelopment.meteorclient.utils.network.Http;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 
@@ -67,8 +65,8 @@ public class PlayerHeadTexture extends Texture {
     }
 
     public PlayerHeadTexture() {
-        try (InputStream inputStream = mc.getResourceManager().getResource(new MeteorIdentifier("textures/steve.png")).get().getInputStream()) {
-            ByteBuffer data = TextureUtil.readResource(inputStream);
+        try {
+            ByteBuffer data = TextureUtil.readResource(mc.getResourceManager().getResource(new MeteorIdentifier("textures/steve.png")).get().getInputStream());
             data.rewind();
 
             try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -80,7 +78,6 @@ public class PlayerHeadTexture extends Texture {
                 upload(image);
                 STBImage.stbi_image_free(image);
             }
-            MemoryUtil.memFree(data);
         }
         catch (IOException e) {
             e.printStackTrace();

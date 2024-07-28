@@ -20,9 +20,6 @@ import java.util.stream.Collectors;
 public class ReflectInit {
     private static final List<Reflections> reflections = new ArrayList<>();
 
-    private ReflectInit() {
-    }
-
     public static void registerPackages() {
         add(MeteorClient.ADDON);
 
@@ -49,7 +46,7 @@ public class ReflectInit {
             Map<Class<?>, List<Method>> byClass = initTasks.stream().collect(Collectors.groupingBy(Method::getDeclaringClass));
             Set<Method> left = new HashSet<>(initTasks);
 
-            for (Method m; (m = left.stream().findAny().orElse(null)) != null; ) {
+            for (Method m; (m = left.stream().findAny().orElse(null)) != null;) {
                 reflectInit(m, annotation, left, byClass);
             }
         }
@@ -69,7 +66,7 @@ public class ReflectInit {
         try {
             task.invoke(null);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalStateException("Error running @%s task '%s.%s'".formatted(annotation.getSimpleName(), task.getDeclaringClass().getSimpleName(), task.getName()), e);
+            e.printStackTrace();
         } catch (NullPointerException e) {
             throw new RuntimeException("Method \"%s\" using Init annotations from non-static context".formatted(task.getName()), e);
         }
@@ -78,10 +75,13 @@ public class ReflectInit {
     private static <T extends Annotation> Class<?>[] getDependencies(Method task, Class<T> annotation) {
         T init = task.getAnnotation(annotation);
 
-        return switch (init) {
-            case PreInit pre -> pre.dependencies();
-            case PostInit post -> post.dependencies();
-            default -> new Class<?>[]{};
-        };
+        if (init instanceof PreInit pre) {
+            return pre.dependencies();
+        }
+        else if (init instanceof PostInit post) {
+            return post.dependencies();
+        }
+
+        return new Class<?>[]{};
     }
 }

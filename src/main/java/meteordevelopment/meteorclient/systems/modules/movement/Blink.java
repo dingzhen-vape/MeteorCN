@@ -28,15 +28,14 @@ public class Blink extends Module {
 
     private final Setting<Boolean> renderOriginal = sgGeneral.add(new BoolSetting.Builder()
         .name("渲染原始")
-        .description("在原始位置渲染你的玩家模型。")
+        .description("在原始位置渲染你的玩家模型.")
         .defaultValue(true)
         .build()
     );
 
-    @SuppressWarnings("未使用")
     private final Setting<Keybind> cancelBlink = sgGeneral.add(new KeybindSetting.Builder()
         .name("取消闪烁")
-        .description("取消发送数据包并将你送回原始位置。")
+        .description("取消发送数据包并将你返回到原始位置.")
         .defaultValue(Keybind.none())
         .action(() -> {
             cancelled = true;
@@ -53,7 +52,7 @@ public class Blink extends Module {
     private int timer = 0;
 
     public Blink() {
-        super(Categories.Movement, "闪烁", "允许你在暂停运动更新的同时基本上进行传送。");
+        super(Categories.Movement, "闪烁", "让你在暂停运动更新的同时实质上传送.");
     }
 
     @Override
@@ -85,7 +84,7 @@ public class Blink extends Module {
         if (!(event.packet instanceof PlayerMoveC2SPacket p)) return;
         event.cancel();
 
-        PlayerMoveC2SPacket prev = packets.isEmpty() ? null : packets.getLast();
+        PlayerMoveC2SPacket prev = packets.size() == 0 ? null : packets.get(packets.size() - 1);
 
         if (prev != null &&
                 p.isOnGround() == prev.isOnGround() &&

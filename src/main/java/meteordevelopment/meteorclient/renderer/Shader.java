@@ -61,7 +61,8 @@ public class Shader {
         try {
             return IOUtils.toString(mc.getResourceManager().getResource(new MeteorIdentifier("shaders/" + path)).get().getInputStream(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new IllegalStateException("Could not read shader '" + path + "'", e);
+            e.printStackTrace();
+            return "";
         }
     }
 
@@ -104,6 +105,6 @@ public class Shader {
 
     public void setDefaults() {
         set("u_Proj", RenderSystem.getProjectionMatrix());
-        set("u_ModelView", RenderSystem.getModelViewStack());
+        set("u_ModelView", RenderSystem.getModelViewStack().peek().getPositionMatrix());
     }
 }

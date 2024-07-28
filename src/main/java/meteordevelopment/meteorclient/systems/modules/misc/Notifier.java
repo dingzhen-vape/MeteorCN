@@ -154,7 +154,7 @@ public class Notifier extends Module {
         if (!event.entity.getUuid().equals(mc.player.getUuid()) && entities.get().contains(event.entity.getType()) && visualRange.get() && this.event.get() != Event.Despawn) {
             if (event.entity instanceof PlayerEntity) {
                 if ((!visualRangeIgnoreFriends.get() || !Friends.get().isFriend(((PlayerEntity) event.entity))) && (!visualRangeIgnoreFakes.get() || !(event.entity instanceof FakePlayerEntity))) {
-                    ChatUtils.sendMsg(event.entity.getId() + 100, Formatting.GRAY, "(高亮)%s(默认)进入了你的视觉范围！", event.entity.getName().getString());
+                    ChatUtils.sendMsg(event.entity.getId() + 100, Formatting.GRAY, "(高亮)%s(默认)进入了你的视觉范围！", event.entity.getEntityName());
 
                     if (visualMakeSound.get())
                         mc.world.playSoundFromEntity(mc.player, mc.player, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 3.0F, 1.0F);
@@ -180,7 +180,7 @@ public class Notifier extends Module {
         if (!event.entity.getUuid().equals(mc.player.getUuid()) && entities.get().contains(event.entity.getType()) && visualRange.get() && this.event.get() != Event.Spawn) {
             if (event.entity instanceof PlayerEntity) {
                 if ((!visualRangeIgnoreFriends.get() || !Friends.get().isFriend(((PlayerEntity) event.entity))) && (!visualRangeIgnoreFakes.get() || !(event.entity instanceof FakePlayerEntity))) {
-                    ChatUtils.sendMsg(event.entity.getId() + 100, Formatting.GRAY, "(高亮)%s(默认)离开了你的视觉范围！", event.entity.getName().getString());
+                    ChatUtils.sendMsg(event.entity.getId() + 100, Formatting.GRAY, "(高亮)%s(默认)离开了你的视觉范围！", event.entity.getEntityName());
 
                     if (visualMakeSound.get())
                         mc.world.playSoundFromEntity(mc.player, mc.player, SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.AMBIENT, 3.0F, 1.0F);
@@ -202,7 +202,7 @@ public class Notifier extends Module {
                 if (pearl.getOwner() != null && pearl.getOwner() instanceof PlayerEntity p) {
                     double d = pearlStartPosMap.get(i).distanceTo(e.getPos());
                     if ((!Friends.get().isFriend(p) || !pearlIgnoreFriends.get()) && (!p.equals(mc.player) || !pearlIgnoreOwn.get())) {
-                        info("(高亮)%s的(默认)珍珠落在了 %d, %d, %d (高亮)(%.1fm 远, 旅行了 %.1fm)(默认)。", pearl.getOwner().getName().getString(), pearl.getBlockPos().getX(), pearl.getBlockPos().getY(), pearl.getBlockPos().getZ(), pearl.distanceTo(mc.player), d);
+                        info("(高亮)%s的(默认)珍珠落在了 %d, %d, %d (高亮)(%.1fm 远, 旅行了 %.1fm)(默认)。", pearl.getOwner().getEntityName(), pearl.getBlockPos().getX(), pearl.getBlockPos().getY(), pearl.getBlockPos().getZ(), pearl.distanceTo(mc.player), d);
                     }
                 }
                 pearlStartPosMap.remove(i);
@@ -246,7 +246,7 @@ public class Notifier extends Module {
             int pops = totemPopMap.getOrDefault(entity.getUuid(), 0);
             totemPopMap.put(entity.getUuid(), ++pops);
 
-            ChatUtils.sendMsg(getChatId(entity), Formatting.GRAY, "(高亮)%s (默认)爆炸了 (高亮)%d (默认)%s。", entity.getName().getString(), pops, pops == 1 ? "图腾" : "图腾");
+            ChatUtils.sendMsg(getChatId(entity), Formatting.GRAY, "(高亮)%s (默认)爆炸了 (高亮)%d (默认)%s。", entity.getEntityName(), pops, pops == 1 ? "图腾" : "图腾");
         }
     }
 
@@ -260,7 +260,7 @@ public class Notifier extends Module {
                 if (player.deathTime > 0 || player.getHealth() <= 0) {
                     int pops = totemPopMap.removeInt(player.getUuid());
 
-                    ChatUtils.sendMsg(getChatId(player), Formatting.GRAY, "(高亮)%s (默认)在爆炸了 (高亮)%d (默认)%s后死亡。", player.getName().getString(), pops, pops == 1 ? "图腾" : "图腾");
+                    ChatUtils.sendMsg(getChatId(player), Formatting.GRAY, "(高亮)%s (默认)在爆炸了 (高亮)%d (默认)%s后死亡。", player.getEntityName(), pops, pops == 1 ? "图腾" : "图腾");
                     chatIdMap.removeInt(player.getUuid());
                 }
             }

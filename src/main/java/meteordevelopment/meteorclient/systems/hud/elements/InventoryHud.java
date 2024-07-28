@@ -12,6 +12,7 @@ import meteordevelopment.meteorclient.systems.hud.HudElementInfo;
 import meteordevelopment.meteorclient.systems.hud.HudRenderer;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.misc.MeteorIdentifier;
+import meteordevelopment.meteorclient.utils.render.RenderUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.item.ItemStack;
@@ -41,7 +42,6 @@ public class InventoryHud extends HudElement {
         .defaultValue(2)
         .min(1)
         .sliderRange(1, 5)
-        .onChanged(aDouble -> calculateSize())
         .build()
     );
 
@@ -49,7 +49,6 @@ public class InventoryHud extends HudElement {
         .name("background")
         .description("Background of inventory viewer.")
         .defaultValue(Background.Texture)
-        .onChanged(bg -> calculateSize())
         .build()
     );
 
@@ -65,12 +64,12 @@ public class InventoryHud extends HudElement {
 
     private InventoryHud() {
         super(INFO);
-
-        calculateSize();
     }
 
     @Override
     public void render(HudRenderer renderer) {
+        setSize(background.get().width * scale.get(), background.get().height * scale.get());
+
         double x = this.x, y = this.y;
 
         ItemStack container = getContainer();
@@ -98,10 +97,6 @@ public class InventoryHud extends HudElement {
                 }
             }
         });
-    }
-
-    private void calculateSize() {
-        setSize(background.get().width * scale.get(), background.get().height * scale.get());
     }
 
     private void drawBackground(HudRenderer renderer, int x, int y, Color color) {

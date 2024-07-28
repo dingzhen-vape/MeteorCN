@@ -23,7 +23,7 @@ import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,7 +33,6 @@ import net.minecraft.item.Items;
 import net.minecraft.item.SwordItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.math.MathHelper;
-import org.joml.Matrix4fStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,7 +57,6 @@ public class CombatHud extends HudElement {
         .defaultValue(2)
         .min(1)
         .sliderRange(1, 5)
-        .onChanged(aDouble -> calculateSize())
         .build()
     );
 
@@ -179,11 +177,10 @@ public class CombatHud extends HudElement {
 
     public CombatHud() {
         super(INFO);
-
-        calculateSize();
     }
 
-    private void calculateSize() {
+    @Override
+    public void tick(HudRenderer renderer) {
         setSize(175 * scale.get(), 95 * scale.get());
     }
 
@@ -205,29 +202,18 @@ public class CombatHud extends HudElement {
             // Background
             Renderer2D.COLOR.begin();
             Renderer2D.COLOR.quad(x, y, getWidth(), getHeight(), backgroundColor.get());
-
-            if (playerEntity == null) {
-                if (isInEditor()) {
-                    renderer.line(x, y, x + getWidth(), y + getHeight(), Color.GRAY);
-                    renderer.line(x + getWidth(), y, x, y + getHeight(), Color.GRAY);
-                    Renderer2D.COLOR.render(null); // i know, ill fix it soon
-                }
-                return;
-            }
             Renderer2D.COLOR.render(null);
+
+            if (playerEntity == null) return;
 
             // Player Model
             InventoryScreen.drawEntity(
                 renderer.drawContext,
-                (int) x,
-                (int) y,
                 (int) (x + (25 * scale.get())),
                 (int) (y + (66 * scale.get())),
                 (int) (30 * scale.get()),
-                0,
                 -MathHelper.wrapDegrees(playerEntity.prevYaw + (playerEntity.getYaw() - playerEntity.prevYaw) * mc.getTickDelta()),
-                -playerEntity.getPitch(),
-                playerEntity
+                -playerEntity.getPitch(), playerEntity
             );
 
             // Moving pos to past player model
@@ -238,7 +224,7 @@ public class CombatHud extends HudElement {
             String breakText = " | ";
 
             // Name
-            String nameText = playerEntity.getName().getString();
+            String nameText = playerEntity.getEntityName();
             Color nameColor = PlayerUtils.getPlayerColor(playerEntity, primaryColor);
 
             // Ping
@@ -268,7 +254,8 @@ public class CombatHud extends HudElement {
             if (Friends.get().isFriend(playerEntity)) {
                 friendText = "Friend";
                 friendColor = Config.get().friendColor.get();
-            } else {
+            }
+            else {
                 boolean naked = true;
 
                 for (int position = 3; position >= 0; position--) {
@@ -280,7 +267,8 @@ public class CombatHud extends HudElement {
                 if (naked) {
                     friendText = "Naked";
                     friendColor = GREEN;
-                } else {
+                }
+                else {
                     boolean threat = false;
 
                     for (int position = 5; position >= 0; position--) {
@@ -334,9 +322,9 @@ public class CombatHud extends HudElement {
             int slot = 5;
 
             // Drawing armor
-            Matrix4fStack matrices = RenderSystem.getModelViewStack();
+            MatrixStack matrices = RenderSystem.getModelViewStack();
 
-            matrices.pushMatrix();
+            matrices.push();
             matrices.scale(scale.get().floatValue(), scale.get().floatValue(), 1);
 
             x /= scale.get();
@@ -354,12 +342,12 @@ public class CombatHud extends HudElement {
 
                 armorY += 18;
 
-                ItemEnchantmentsComponent enchantments = EnchantmentHelper.getEnchantments(itemStack);
+                Map<Enchantment, Integer> enchantments = EnchantmentHelper.get(itemStack);
                 Map<Enchantment, Integer> enchantmentsToShow = new HashMap<>();
 
                 for (Enchantment enchantment : displayedEnchantments.get()) {
-                    if (enchantments.getEnchantments().contains(Registries.ENCHANTMENT.getEntry(enchantment))) {
-                        enchantmentsToShow.put(enchantment, enchantments.getLevel(enchantment));
+                    if (enchantments.containsKey(enchantment)) {
+                        enchantmentsToShow.put(enchantment, enchantments.get(enchantment));
                     }
                 }
 
@@ -415,7 +403,7 @@ public class CombatHud extends HudElement {
             Renderer2D.COLOR.quad(x + healthWidth, y, absorbWidth, 7, healthColor2.get(), healthColor3.get(), healthColor3.get(), healthColor2.get());
             Renderer2D.COLOR.render(null);
 
-            matrices.popMatrix();
+            matrices.pop();
         });
     }
 

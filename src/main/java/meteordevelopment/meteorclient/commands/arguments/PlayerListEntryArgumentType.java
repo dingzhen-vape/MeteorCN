@@ -23,20 +23,17 @@ import java.util.concurrent.CompletableFuture;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class PlayerListEntryArgumentType implements ArgumentType<PlayerListEntry> {
-    private static final PlayerListEntryArgumentType INSTANCE = new PlayerListEntryArgumentType();
     private static final DynamicCommandExceptionType NO_SUCH_PLAYER = new DynamicCommandExceptionType(name -> Text.literal("Player list entry with name " + name + " doesn't exist."));
 
     private static final Collection<String> EXAMPLES = List.of("seasnail8169", "MineGame159");
 
     public static PlayerListEntryArgumentType create() {
-        return INSTANCE;
+        return new PlayerListEntryArgumentType();
     }
 
     public static PlayerListEntry get(CommandContext<?> context) {
         return context.getArgument("player", PlayerListEntry.class);
     }
-
-    private PlayerListEntryArgumentType() {}
 
     @Override
     public PlayerListEntry parse(StringReader reader) throws CommandSyntaxException {

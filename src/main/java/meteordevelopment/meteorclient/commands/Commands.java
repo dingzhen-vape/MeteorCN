@@ -8,8 +8,8 @@ package meteordevelopment.meteorclient.commands;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import meteordevelopment.meteorclient.commands.commands.*;
-import meteordevelopment.meteorclient.pathing.PathManagers;
 import meteordevelopment.meteorclient.utils.PostInit;
+import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.command.CommandSource;
 
 import java.util.ArrayList;
@@ -20,14 +20,14 @@ import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Commands {
     public static final CommandDispatcher<CommandSource> DISPATCHER = new CommandDispatcher<>();
+    public static final CommandSource COMMAND_SOURCE = new ClientCommandSource(null, mc);
     public static final List<Command> COMMANDS = new ArrayList<>();
 
-    @PostInit(dependencies = PathManagers.class)
+    @PostInit
     public static void init() {
         add(new VClipCommand());
         add(new HClipCommand());
         add(new DismountCommand());
-        add(new DisconnectCommand());
         add(new DamageCommand());
         add(new DropCommand());
         add(new EnchantCommand());
@@ -35,6 +35,7 @@ public class Commands {
         add(new FriendsCommand());
         add(new CommandsCommand());
         add(new InventoryCommand());
+        add(new LocateCommand());
         add(new NbtCommand());
         add(new NotebotCommand());
         add(new PeekCommand());
@@ -60,7 +61,6 @@ public class Commands {
         add(new RotationCommand());
         add(new WaypointCommand());
         add(new InputCommand());
-        add(new LocateCommand());
 
         COMMANDS.sort(Comparator.comparing(Command::getName));
     }
@@ -72,7 +72,7 @@ public class Commands {
     }
 
     public static void dispatch(String message) throws CommandSyntaxException {
-        DISPATCHER.execute(message, mc.getNetworkHandler().getCommandSource());
+        DISPATCHER.execute(message, COMMAND_SOURCE);
     }
 
     public static Command get(String name) {

@@ -11,7 +11,6 @@ import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.entity.DamageUtils;
 import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.entity.SortPriority;
 import meteordevelopment.meteorclient.utils.entity.TargetUtils;
@@ -21,13 +20,13 @@ import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.item.Items;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import org.jetbrains.annotations.Nullable;
 
 public class AnchorAura extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -226,7 +225,6 @@ public class AnchorAura extends Module {
     private int placeDelayLeft;
     private int breakDelayLeft;
     private PlayerEntity target;
-    private final BlockPos.Mutable mutable = new BlockPos.Mutable();
 
     public AnchorAura() {
         super(Categories.Combat, "锚光环", "自动放置和破坏重生锚来伤害实体.");
@@ -266,8 +264,7 @@ public class AnchorAura extends Module {
                 breakDelayLeft = 0;
 
                 if (rotationMode.get() == RotationMode.Both || rotationMode.get() == RotationMode.Break) {
-                    BlockPos immutableBreakPos = breakPos.toImmutable();
-                    Rotations.rotate(Rotations.getYaw(breakPos), Rotations.getPitch(breakPos), 50, () -> breakAnchor(immutableBreakPos, anchor, glowStone));
+                    Rotations.rotate(Rotations.getYaw(breakPos), Rotations.getPitch(breakPos), 50, () -> breakAnchor(breakPos, anchor, glowStone));
                 } else breakAnchor(breakPos, anchor, glowStone);
             }
         }
@@ -277,7 +274,7 @@ public class AnchorAura extends Module {
 
             if (placePos != null) {
                 placeDelayLeft = 0;
-                BlockUtils.place(placePos.toImmutable(), anchor, (rotationMode.get() == RotationMode.Place || rotationMode.get() == RotationMode.Both), 50);
+                BlockUtils.place(placePos, anchor, (rotationMode.get() == RotationMode.Place || rotationMode.get() == RotationMode.Both), 50);
             }
         }
 
@@ -304,50 +301,48 @@ public class AnchorAura extends Module {
         }
     }
 
-    @Nullable
     private BlockPos findPlacePos(BlockPos targetPlacePos) {
         switch (placePositions.get()) {
-            case All -> {
-                if (isValidPlace(targetPlacePos, 0, -1, 0)) return mutable;
-                else if (isValidPlace(targetPlacePos, 0, 2, 0)) return mutable;
-                else if (isValidPlace(targetPlacePos, 1, 0, 0)) return mutable;
-                else if (isValidPlace(targetPlacePos, -1, 0, 0)) return mutable;
-                else if (isValidPlace(targetPlacePos, 0, 0, 1)) return mutable;
-                else if (isValidPlace(targetPlacePos, 0, 0, -1)) return mutable;
-                else if (isValidPlace(targetPlacePos, 1, 1, 0)) return mutable;
-                else if (isValidPlace(targetPlacePos, -1, -1, 0)) return mutable;
-                else if (isValidPlace(targetPlacePos, 0, 1, 1)) return mutable;
-                else if (isValidPlace(targetPlacePos, 0, 0, -1)) return mutable;
-            }
-            case Above -> {
-                if (isValidPlace(targetPlacePos, 0, 2, 0)) return mutable;
-            }
-            case AboveAndBelow -> {
-                if (isValidPlace(targetPlacePos, 0, -1, 0)) return mutable;
-                else if (isValidPlace(targetPlacePos, 0, 2, 0)) return mutable;
-            }
-            case Around -> {
-                if (isValidPlace(targetPlacePos, 0, 0, -1)) return mutable;
-                else if (isValidPlace(targetPlacePos, 1, 0, 0)) return mutable;
-                else if (isValidPlace(targetPlacePos, -1, 0, 0)) return mutable;
-                else if (isValidPlace(targetPlacePos, 0, 0, 1)) return mutable;
-            }
+            case All:
+                if (isValidPlace(targetPlacePos.down())) return targetPlacePos.down();
+                else if (isValidPlace(targetPlacePos.up(2))) return targetPlacePos.up(2);
+                else if (isValidPlace(targetPlacePos.add(1, 0, 0))) return targetPlacePos.add(1, 0, 0);
+                else if (isValidPlace(targetPlacePos.add(-1, 0, 0))) return targetPlacePos.add(-1, 0, 0);
+                else if (isValidPlace(targetPlacePos.add(0, 0, 1))) return targetPlacePos.add(0, 0, 1);
+                else if (isValidPlace(targetPlacePos.add(0, 0, -1))) return targetPlacePos.add(0, 0, -1);
+                else if (isValidPlace(targetPlacePos.add(1, 1, 0))) return targetPlacePos.add(1, 1, 0);
+                else if (isValidPlace(targetPlacePos.add(-1, -1, 0))) return targetPlacePos.add(-1, -1, 0);
+                else if (isValidPlace(targetPlacePos.add(0, 1, 1))) return targetPlacePos.add(0, 1, 1);
+                else if (isValidPlace(targetPlacePos.add(0, 0, -1))) return targetPlacePos.add(0, 0, -1);
+                break;
+            case Above:
+                if (isValidPlace(targetPlacePos.up(2))) return targetPlacePos.up(2);
+                break;
+            case AboveAndBelow:
+                if (isValidPlace(targetPlacePos.down())) return targetPlacePos.down();
+                else if (isValidPlace(targetPlacePos.up(2))) return targetPlacePos.up(2);
+                break;
+            case Around:
+                if (isValidPlace(targetPlacePos.north())) return targetPlacePos.north();
+                else if (isValidPlace(targetPlacePos.east())) return targetPlacePos.east();
+                else if (isValidPlace(targetPlacePos.west())) return targetPlacePos.west();
+                else if (isValidPlace(targetPlacePos.south())) return targetPlacePos.south();
+                break;
         }
         return null;
     }
 
-    @Nullable
     private BlockPos findBreakPos(BlockPos targetPos) {
-        if (isValidBreak(targetPos, 0, -1, 0)) return mutable;
-        else if (isValidBreak(targetPos, 0, 2, 0)) return mutable;
-        else if (isValidBreak(targetPos, 1, 0, 0)) return mutable;
-        else if (isValidBreak(targetPos, -1, 0, 0)) return mutable;
-        else if (isValidBreak(targetPos, 0, 0, 1)) return mutable;
-        else if (isValidBreak(targetPos, 0, 0, -1)) return mutable;
-        else if (isValidBreak(targetPos, 1, 1, 0)) return mutable;
-        else if (isValidBreak(targetPos, -1, -1, 0)) return mutable;
-        else if (isValidBreak(targetPos, 0, 1, 1)) return mutable;
-        else if (isValidBreak(targetPos, 0, 0, -1)) return mutable;
+        if (isValidBreak(targetPos.down())) return targetPos.down();
+        else if (isValidBreak(targetPos.up(2))) return targetPos.up(2);
+        else if (isValidBreak(targetPos.add(1, 0, 0))) return targetPos.add(1, 0, 0);
+        else if (isValidBreak(targetPos.add(-1, 0, 0))) return targetPos.add(-1, 0, 0);
+        else if (isValidBreak(targetPos.add(0, 0, 1))) return targetPos.add(0, 0, 1);
+        else if (isValidBreak(targetPos.add(0, 0, -1))) return targetPos.add(0, 0, -1);
+        else if (isValidBreak(targetPos.add(1, 1, 0))) return targetPos.add(1, 1, 0);
+        else if (isValidBreak(targetPos.add(-1, -1, 0))) return targetPos.add(-1, -1, 0);
+        else if (isValidBreak(targetPos.add(0, 1, 1))) return targetPos.add(0, 1, 1);
+        else if (isValidBreak(targetPos.add(0, 0, -1))) return targetPos.add(0, 0, -1);
         return null;
     }
 
@@ -359,14 +354,12 @@ public class AnchorAura extends Module {
         return breakMode.get() == Safety.Suicide || DamageUtils.anchorDamage(mc.player, pos.toCenterPos()) <= maxDamage.get();
     }
 
-    private boolean isValidPlace(BlockPos origin, int xOffset, int yOffset, int zOffset) {
-    	BlockUtils.mutateAround(mutable, origin, xOffset, yOffset, zOffset);
-        return Math.sqrt(mc.player.getBlockPos().getSquaredDistance(mutable)) <= placeRange.get() && getDamagePlace(mutable) && BlockUtils.canPlace(mutable);
+    private boolean isValidPlace(BlockPos pos) {
+        return Math.sqrt(mc.player.getBlockPos().getSquaredDistance(pos)) <= placeRange.get() && getDamagePlace(pos) && BlockUtils.canPlace(pos, true);
     }
 
-    private boolean isValidBreak(BlockPos origin, int xOffset, int yOffset, int zOffset) {
-    	BlockUtils.mutateAround(mutable, origin, xOffset, yOffset, zOffset);
-        return mc.world.getBlockState(mutable).getBlock() == Blocks.RESPAWN_ANCHOR && Math.sqrt(mc.player.getBlockPos().getSquaredDistance(mutable)) <= breakRange.get() && getDamageBreak(mutable);
+    private boolean isValidBreak(BlockPos pos) {
+        return mc.world.getBlockState(pos).getBlock() == Blocks.RESPAWN_ANCHOR && Math.sqrt(mc.player.getBlockPos().getSquaredDistance(pos)) <= breakRange.get() && getDamageBreak(pos);
     }
 
     private void breakAnchor(BlockPos pos, FindItemResult anchor, FindItemResult glowStone) {

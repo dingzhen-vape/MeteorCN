@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(BakedQuad.class)
-public abstract class BakedQuadMixin implements IBakedQuad {
+public class BakedQuadMixin implements IBakedQuad {
     @Shadow @Final protected int[] vertexData;
 
     @Override

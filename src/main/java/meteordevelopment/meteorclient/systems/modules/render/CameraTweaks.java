@@ -13,7 +13,6 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.client.option.Perspective;
-import org.lwjgl.glfw.GLFW;
 
 public class CameraTweaks extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -46,20 +45,20 @@ public class CameraTweaks extends Module {
         .build()
     );
 
-    private final Setting<Keybind> scrollKeybind = sgScrolling.add(new KeybindSetting.Builder()
+    private final Setting<Double> scrollSensitivity = sgScrolling.add(new DoubleSetting.Builder()
         .name("滚动灵敏度")
         .description("改变相机距离时的滚动灵敏度。0为禁用。")
         .visible(scrollingEnabled::get)
-        .defaultValue(Keybind.fromKey(GLFW.GLFW_KEY_LEFT_ALT))
+        .defaultValue(1)
+        .min(0)
         .build()
     );
 
-    private final Setting<Double> scrollSensitivity = sgScrolling.add(new DoubleSetting.Builder()
+    private final Setting<Keybind> scrollKeybind = sgScrolling.add(new KeybindSetting.Builder()
         .name("滚动按键绑定")
         .description("需要按下一个按键才能使滚动生效。")
         .visible(scrollingEnabled::get)
-        .defaultValue(1)
-        .min(0.01)
+        .defaultValue(Keybind.none())
         .build()
     );
 
@@ -81,7 +80,7 @@ public class CameraTweaks extends Module {
 
     @EventHandler
     private void onMouseScroll(MouseScrollEvent event) {
-        if (mc.options.getPerspective() == Perspective.FIRST_PERSON || mc.currentScreen != null || !scrollingEnabled.get() || (scrollKeybind.get().isSet() && !scrollKeybind.get().isPressed())) return;
+        if (mc.options.getPerspective() == Perspective.FIRST_PERSON || mc.currentScreen != null || !scrollingEnabled.get() || (scrollKeybind.get().isValid() && !scrollKeybind.get().isPressed())) return;
 
         if (scrollSensitivity.get() > 0) {
             distance -= event.value * 0.25 * (scrollSensitivity.get() * distance);

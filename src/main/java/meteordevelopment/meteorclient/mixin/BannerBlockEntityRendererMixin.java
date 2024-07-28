@@ -22,13 +22,12 @@ import net.minecraft.util.math.RotationAxis;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BannerBlockEntityRenderer.class)
-public abstract class BannerBlockEntityRendererMixin {
+public class BannerBlockEntityRendererMixin {
 
     @Final
     @Shadow private ModelPart pillar;
@@ -57,12 +56,11 @@ public abstract class BannerBlockEntityRendererMixin {
         }
     }
 
-    @Unique
     private void renderPillar(BannerBlockEntity bannerBlockEntity, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j) {
         matrixStack.push();
         BlockState blockState = bannerBlockEntity.getCachedState();
         matrixStack.translate(0.5D, 0.5D, 0.5D);
-        float h = (-(Integer)blockState.get(BannerBlock.ROTATION) * 360) / 16.0F;
+        float h = (float)(-(Integer)blockState.get(BannerBlock.ROTATION) * 360) / 16.0F;
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(h));
         matrixStack.push();
         matrixStack.scale(0.6666667F, -0.6666667F, -0.6666667F);
@@ -72,7 +70,6 @@ public abstract class BannerBlockEntityRendererMixin {
         matrixStack.pop();
     }
 
-    @Unique
     private void renderCrossbar(BannerBlockEntity bannerBlockEntity, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j) {
         matrixStack.push();
         BlockState blockState = bannerBlockEntity.getCachedState();

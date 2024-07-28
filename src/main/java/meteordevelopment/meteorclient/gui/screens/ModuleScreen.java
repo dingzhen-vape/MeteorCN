@@ -47,7 +47,7 @@ public class ModuleScreen extends WindowScreen {
         add(theme.label(module.description, getWindowWidth() / 2.0));
 
         // Settings
-        if (!module.settings.groups.isEmpty()) {
+        if (module.settings.groups.size() > 0) {
             settingsContainer = add(theme.verticalList()).expandX().widget();
             settingsContainer.add(theme.settings(module.settings)).expandX();
         }
@@ -62,12 +62,12 @@ public class ModuleScreen extends WindowScreen {
         }
 
         // Bind
-        WSection section = add(theme.section("绑定", true)).expandX().widget();
+        WSection section = add(theme.section("Bind", true)).expandX().widget();
 
         // Keybind
         WHorizontalList bind = section.add(theme.horizontalList()).expandX().widget();
 
-        bind.add(theme.label("按键: "));
+        bind.add(theme.label("Bind: "));
         keybind = bind.add(theme.keybind(module.keybind)).expandX().widget();
         keybind.actionOnSet = () -> Modules.get().setModuleToBind(module);
 
@@ -77,14 +77,14 @@ public class ModuleScreen extends WindowScreen {
         // Toggle on bind release
         WHorizontalList tobr = section.add(theme.horizontalList()).widget();
 
-        tobr.add(theme.label("是否为按下触发: "));
+        tobr.add(theme.label("Toggle on bind release: "));
         WCheckbox tobrC = tobr.add(theme.checkbox(module.toggleOnBindRelease)).widget();
         tobrC.action = () -> module.toggleOnBindRelease = tobrC.checked;
 
         // Chat feedback
         WHorizontalList cf = section.add(theme.horizontalList()).widget();
 
-        cf.add(theme.label("聊天栏返回信息: "));
+        cf.add(theme.label("Chat Feedback: "));
         WCheckbox cfC = cf.add(theme.checkbox(module.chatFeedback)).widget();
         cfC.action = () -> module.chatFeedback = cfC.checked;
 

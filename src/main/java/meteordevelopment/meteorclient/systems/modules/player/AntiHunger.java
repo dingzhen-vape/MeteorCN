@@ -5,8 +5,8 @@
 
 package meteordevelopment.meteorclient.systems.modules.player;
 
-import meteordevelopment.meteorclient.events.entity.player.SendMovementPacketsEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
+import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixin.PlayerMoveC2SPacketAccessor;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -22,51 +22,70 @@ public class AntiHunger extends Module {
 
     private final Setting<Boolean> sprint = sgGeneral.add(new BoolSetting.Builder()
         .name("冲刺")
-        .description("伪装冲刺数据包。")
+        .description("伪造冲刺包。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> onGround = sgGeneral.add(new BoolSetting.Builder()
-        .name("在地面上")
-        .description("伪装onGround标志。")
+        .name("在地面")
+        .description("伪造onGround标志。")
         .defaultValue(true)
         .build()
     );
 
-    private boolean lastOnGround, ignorePacket;
+    private final Setting<Boolean> waterCheck = sgGeneral.add(new BoolSetting.Builder()
+        .name("水检测")
+        .description("如果你在水中，暂停模块。")
+        .defaultValue(true)
+        .build()
+    );
+
+    private boolean lastOnGround;
+    private boolean sendOnGroundTruePacket;
+    private boolean ignorePacket;
 
     public AntiHunger() {
-        super(Categories.Player, "反饥饿", "减少（不是移除）饥饿消耗。");
+        super(Categories.Player, "防饿", "减少（不是移除）饥饿消耗。");
     }
 
     @Override
     public void onActivate() {
         lastOnGround = mc.player.isOnGround();
+        sendOnGroundTruePacket = true;
     }
 
     @EventHandler
     private void onSendPacket(PacketEvent.Send event) {
-        if (ignorePacket && event.packet instanceof PlayerMoveC2SPacket) {
-            ignorePacket = false;
-            return;
+        if (ignorePacket) return;
+
+        if (event.packet instanceof ClientCommandC2SPacket && sprint.get()) {
+            ClientCommandC2SPacket.Mode mode = ((ClientCommandC2SPacket) event.packet).getMode();
+
+            if (mode == ClientCommandC2SPacket.Mode.START_SPRINTING) {
+                event.cancel();
+            }
         }
 
-        if (mc.player.hasVehicle() || mc.player.isTouchingWater() || mc.player.isSubmergedInWater()) return;
-
-        if (event.packet instanceof ClientCommandC2SPacket packet && sprint.get()) {
-            if (packet.getMode() == ClientCommandC2SPacket.Mode.START_SPRINTING) event.cancel();
-        }
-
-        if (event.packet instanceof PlayerMoveC2SPacket packet && onGround.get() && mc.player.isOnGround() && mc.player.fallDistance <= 0.0 && !mc.interactionManager.isBreakingBlock()) {
-            ((PlayerMoveC2SPacketAccessor) packet).setOnGround(false);
+        if (event.packet instanceof PlayerMoveC2SPacket && onGround.get() && mc.player.isOnGround() && mc.player.fallDistance <= 0.0 && !mc.interactionManager.isBreakingBlock()) {
+            ((PlayerMoveC2SPacketAccessor) event.packet).setOnGround(false);
         }
     }
 
     @EventHandler
-    private void onTick(SendMovementPacketsEvent.Pre event) {
-        if (mc.player.isOnGround() && !lastOnGround && onGround.get()) {
-            ignorePacket = true; // prevents you from not taking fall damage
+    private void onTick(TickEvent.Post event) {
+        if (waterCheck.get() && mc.player.isTouchingWater()) {
+            ignorePacket = true;
+            return;
+        }
+        if (mc.player.isOnGround() && !lastOnGround && !sendOnGroundTruePacket) sendOnGroundTruePacket = true;
+
+        if (mc.player.isOnGround() && sendOnGroundTruePacket && onGround.get()) {
+            ignorePacket = true;
+            mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.OnGroundOnly(true));
+            ignorePacket = false;
+
+            sendOnGroundTruePacket = false;
         }
 
         lastOnGround = mc.player.isOnGround();

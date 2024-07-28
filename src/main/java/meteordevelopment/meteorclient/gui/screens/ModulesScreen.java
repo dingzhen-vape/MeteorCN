@@ -32,7 +32,7 @@ public class ModulesScreen extends TabScreen {
     private WCategoryController controller;
 
     public ModulesScreen(GuiTheme theme) {
-        super(theme, Tabs.get().getFirst());
+        super(theme, Tabs.get().get(0));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class ModulesScreen extends TabScreen {
             // Titles
             Set<Module> modules = Modules.get().searchTitles(text);
 
-            if (!modules.isEmpty()) {
+            if (modules.size() > 0) {
                 WSection section = w.add(theme.section("Modules")).expandX().widget();
                 section.spacing = 0;
 
@@ -97,7 +97,7 @@ public class ModulesScreen extends TabScreen {
             // Settings
             modules = Modules.get().searchSettingTitles(text);
 
-            if (!modules.isEmpty()) {
+            if (modules.size() > 0) {
                 WSection section = w.add(theme.section("Settings")).expandX().widget();
                 section.spacing = 0;
 
@@ -164,21 +164,16 @@ public class ModulesScreen extends TabScreen {
     }
 
     protected boolean createFavoritesW(WWindow w) {
-        List<Module> modules = new ArrayList<>();
+        boolean hasFavorites = false;
 
         for (Module module : Modules.get().getAll()) {
             if (module.favorite) {
-                modules.add(module);
+                w.add(theme.module(module)).expandX();
+                hasFavorites = true;
             }
         }
 
-        modules.sort((o1, o2) -> String.CASE_INSENSITIVE_ORDER.compare(o1.name, o2.name));
-
-        for (Module module : modules) {
-            w.add(theme.module(module)).expandX();
-        }
-
-        return !modules.isEmpty();
+        return hasFavorites;
     }
 
     @Override

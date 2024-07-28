@@ -5,26 +5,22 @@
 
 package meteordevelopment.meteorclient.utils.misc;
 
-import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.game.ResourcePacksReloadedEvent;
 import meteordevelopment.meteorclient.utils.PreInit;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.sound.WeightedSoundSet;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleEffect;
 import net.minecraft.particle.ParticleType;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringHelper;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.WordUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,16 +28,13 @@ import java.util.Map;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class Names {
-    private static final Map<StatusEffect, String> statusEffectNames = new Reference2ObjectOpenHashMap<>(16);
-    private static final Map<Item, String> itemNames = new Reference2ObjectOpenHashMap<>(128);
-    private static final Map<Block, String> blockNames = new Reference2ObjectOpenHashMap<>(128);
-    private static final Map<Enchantment, String> enchantmentNames = new Reference2ObjectOpenHashMap<>(16);
-    private static final Map<EntityType<?>, String> entityTypeNames = new Reference2ObjectOpenHashMap<>(64);
-    private static final Map<ParticleType<?>, String> particleTypesNames = new Reference2ObjectOpenHashMap<>(64);
+    private static final Map<StatusEffect, String> statusEffectNames = new HashMap<>(16);
+    private static final Map<Item, String> itemNames = new HashMap<>(128);
+    private static final Map<Block, String> blockNames = new HashMap<>(128);
+    private static final Map<Enchantment, String> enchantmentNames = new HashMap<>(16);
+    private static final Map<EntityType<?>, String> entityTypeNames = new HashMap<>(64);
+    private static final Map<ParticleType<?>, String> particleTypesNames = new HashMap<>(64);
     private static final Map<Identifier, String> soundNames = new HashMap<>(64);
-
-    private Names() {
-    }
 
     @PreInit
     public static void init() {
@@ -60,28 +53,28 @@ public class Names {
     }
 
     public static String get(StatusEffect effect) {
-        return statusEffectNames.computeIfAbsent(effect, effect1 -> StringHelper.stripTextFormat(I18n.translate(effect1.getTranslationKey())));
+        return statusEffectNames.computeIfAbsent(effect, effect1 -> StringHelper.stripTextFormat(effect1.getName().getString()));
     }
 
     public static String get(Item item) {
-        return itemNames.computeIfAbsent(item, item1 -> StringHelper.stripTextFormat(I18n.translate(item1.getTranslationKey())));
+        return itemNames.computeIfAbsent(item, item1 -> StringHelper.stripTextFormat(item1.getName().getString()));
     }
 
     public static String get(Block block) {
-        return blockNames.computeIfAbsent(block, block1 -> StringHelper.stripTextFormat(I18n.translate(block1.getTranslationKey())));
+        return blockNames.computeIfAbsent(block, block1 -> StringHelper.stripTextFormat(block1.getName().getString()));
     }
 
     public static String get(Enchantment enchantment) {
-        return enchantmentNames.computeIfAbsent(enchantment, enchantment1 -> StringHelper.stripTextFormat(I18n.translate(enchantment1.getTranslationKey())));
+        return enchantmentNames.computeIfAbsent(enchantment, enchantment1 -> StringHelper.stripTextFormat(Text.translatable(enchantment1.getTranslationKey()).getString()));
     }
 
     public static String get(EntityType<?> entityType) {
-        return entityTypeNames.computeIfAbsent(entityType, entityType1 -> StringHelper.stripTextFormat(I18n.translate(entityType1.getTranslationKey())));
+        return entityTypeNames.computeIfAbsent(entityType, entityType1 -> StringHelper.stripTextFormat(entityType1.getName().getString()));
     }
 
     public static String get(ParticleType<?> type) {
         if (!(type instanceof ParticleEffect)) return "";
-        return particleTypesNames.computeIfAbsent(type, effect1 -> StringUtils.capitalize(Registries.PARTICLE_TYPE.getId(type).getPath().replace("_", " ")));
+        return particleTypesNames.computeIfAbsent(type, effect1 -> WordUtils.capitalize(((ParticleEffect) effect1).asString().substring(10).replace("_", " ")));
     }
 
     public static String getSoundName(Identifier id) {
@@ -94,9 +87,5 @@ public class Names {
 
             return StringHelper.stripTextFormat(text.getString());
         });
-    }
-
-    public static String get(ItemStack stack) {
-        return stack.getName().getString(); // pretty sure this is the same as it was
     }
 }

@@ -22,14 +22,10 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.entity.DamageUtils;
 import meteordevelopment.meteorclient.utils.entity.EntityUtils;
 import meteordevelopment.meteorclient.utils.entity.Target;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
-import meteordevelopment.meteorclient.utils.player.FindItemResult;
-import meteordevelopment.meteorclient.utils.player.InvUtils;
-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
-import meteordevelopment.meteorclient.utils.player.Rotations;
+import meteordevelopment.meteorclient.utils.player.*;
 import meteordevelopment.meteorclient.utils.render.NametagUtils;
 import meteordevelopment.meteorclient.utils.render.RenderUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
@@ -41,8 +37,6 @@ import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.decoration.EndCrystalEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -58,7 +52,6 @@ import org.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -89,17 +82,25 @@ public class CrystalAura extends Module {
         .build()
     );
 
-    private final Setting<Double> minDamage = sgGeneral.add(new DoubleSetting.Builder()
+    private final Setting<Boolean> ignoreTerrain = sgGeneral.add(new BoolSetting.Builder()
         .name("忽略地形")
         .description("如果地形可以被末影水晶炸毁，就完全忽略它。")
+        .defaultValue(true)
+        .build()
+    );
+
+
+    private final Setting<Double> minDamage = sgGeneral.add(new DoubleSetting.Builder()
+        .name("最小伤害")
+        .description("水晶对目标造成的最小伤害。")
         .defaultValue(6)
         .min(0)
         .build()
     );
 
     private final Setting<Double> maxDamage = sgGeneral.add(new DoubleSetting.Builder()
-        .name("最小伤害")
-        .description("水晶对目标造成的最小伤害。")
+        .name("最大伤害")
+        .description("水晶对自己造成的最大伤害。")
         .defaultValue(6)
         .range(0, 36)
         .sliderMax(36)
@@ -107,48 +108,40 @@ public class CrystalAura extends Module {
     );
 
     private final Setting<Boolean> antiSuicide = sgGeneral.add(new BoolSetting.Builder()
-        .name("最大伤害")
-        .description("水晶对自己造成的最大伤害。")
+        .name("防自杀")
+        .description("如果水晶会杀死你，就不会放置和破坏水晶。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> ignoreNakeds = sgGeneral.add(new BoolSetting.Builder()
-        .name("防自杀")
-        .description("如果水晶会杀死你，就不会放置和破坏水晶。")
+        .name("忽略裸体")
+        .description("忽略没有物品的玩家。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> rotate = sgGeneral.add(new BoolSetting.Builder()
-        .name("忽略裸体")
-        .description("忽略没有物品的玩家。")
+        .name("旋转")
+        .description("服务器端旋转到被击中/放置的水晶的方向。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<YawStepMode> yawStepMode = sgGeneral.add(new EnumSetting.Builder<YawStepMode>()
-        .name("旋转")
-        .description("服务器端旋转到被击中/放置的水晶的方向。")
+        .name("偏航步骤模式")
+        .description("何时运行偏航步骤检查。")
         .defaultValue(YawStepMode.Break)
         .visible(rotate::get)
         .build()
     );
 
     private final Setting<Double> yawSteps = sgGeneral.add(new DoubleSetting.Builder()
-        .name("偏航步骤模式")
-        .description("何时运行偏航步骤检查。")
+        .name("偏航步骤")
+        .description("每个刻度允许旋转的最大角度。")
         .defaultValue(180)
         .range(1, 180)
         .visible(rotate::get)
-        .build()
-    );
-
-    private final Setting<Set<EntityType<?>>> entities = sgGeneral.add(new EntityTypeListSetting.Builder()
-        .name("偏航步骤")
-        .description("每个刻度允许旋转的最大角度。")
-        .onlyAttackable()
-        .defaultValue(EntityType.PLAYER, EntityType.WARDEN, EntityType.WITHER)
         .build()
     );
 
@@ -555,7 +548,7 @@ public class CrystalAura extends Module {
     private Item mainItem, offItem;
 
     private int breakTimer, placeTimer, switchTimer, ticksPassed;
-    private final List<LivingEntity> targets = new ArrayList<>();
+    private final List<PlayerEntity> targets = new ArrayList<>();
 
     private final Vec3d vec3d = new Vec3d(0, 0, 0);
     private final Vec3d playerEyePos = new Vec3d(0, 0, 0);
@@ -579,7 +572,7 @@ public class CrystalAura extends Module {
 
     private double serverYaw;
 
-    private LivingEntity bestTarget;
+    private PlayerEntity bestTarget;
     private double bestTargetDamage;
     private int bestTargetTimer;
 
@@ -699,7 +692,7 @@ public class CrystalAura extends Module {
         // Find targets, break and place
         findTargets();
 
-        if (!targets.isEmpty()) {
+        if (targets.size() > 0) {
             if (!didRotateThisTick) doBreak();
             if (!didRotateThisTick) doPlace();
         }
@@ -724,7 +717,7 @@ public class CrystalAura extends Module {
         }
 
         if (fastBreak.get() && !didRotateThisTick && attacks < attackFrequency.get()) {
-            float damage = getBreakDamage(event.entity, true);
+            double damage = getBreakDamage(event.entity, true);
             if (damage > minDamage.get()) doBreak(event.entity);
         }
     }
@@ -757,12 +750,12 @@ public class CrystalAura extends Module {
         if (!doBreak.get() || breakTimer > 0 || switchTimer > 0 || attacks >= attackFrequency.get()) return;
         if (shouldPause(PauseMode.Break)) return;
 
-        float bestDamage = 0;
+        double bestDamage = 0;
         Entity crystal = null;
 
         // Find best crystal to break
         for (Entity entity : mc.world.getEntities()) {
-            float damage = getBreakDamage(entity, true);
+            double damage = getBreakDamage(entity, true);
 
             if (damage > bestDamage) {
                 bestDamage = damage;
@@ -774,7 +767,7 @@ public class CrystalAura extends Module {
         if (crystal != null) doBreak(crystal);
     }
 
-    private float getBreakDamage(Entity entity, boolean checkCrystalAge) {
+    private double getBreakDamage(Entity entity, boolean checkCrystalAge) {
         if (!(entity instanceof EndCrystalEntity)) return 0;
 
         // Check only break own
@@ -794,15 +787,15 @@ public class CrystalAura extends Module {
 
         // Check damage to self and anti suicide
         blockPos.set(entity.getBlockPos()).move(0, -1, 0);
-        float selfDamage = DamageUtils.crystalDamage(mc.player, entity.getPos(), predictMovement.get(), blockPos);
+        double selfDamage = DamageUtils.crystalDamage(mc.player, entity.getPos(), predictMovement.get(), blockPos, ignoreTerrain.get());
         if (selfDamage > maxDamage.get() || (antiSuicide.get() && selfDamage >= EntityUtils.getTotalHealth(mc.player))) return 0;
 
         // Check damage to targets and face place
-        float damage = getDamageToTargets(entity.getPos(), blockPos, true, false);
+        double damage = getDamageToTargets(entity.getPos(), blockPos, true, false);
         boolean shouldFacePlace = shouldFacePlace();
-        double minimumDamage = shouldFacePlace ? Math.min(minDamage.get(), 1.5d) : minDamage.get();
+        double minimumDamage = Math.min(minDamage.get(), shouldFacePlace ? 1.5 : minDamage.get());
 
-        if (damage < minimumDamage) return 0f;
+        if (damage < minimumDamage) return 0;
 
         return damage;
     }
@@ -938,11 +931,11 @@ public class CrystalAura extends Module {
             if (isOutOfRange(vec3d, blockPos, true)) return;
 
             // Check damage to self and anti suicide
-            float selfDamage = DamageUtils.crystalDamage(mc.player, vec3d, predictMovement.get(), bp);
+            double selfDamage = DamageUtils.crystalDamage(mc.player, vec3d, predictMovement.get(), bp, ignoreTerrain.get());
             if (selfDamage > maxDamage.get() || (antiSuicide.get() && selfDamage >= EntityUtils.getTotalHealth(mc.player))) return;
 
             // Check damage to targets and face place
-            float damage = getDamageToTargets(vec3d, bp, false, !hasBlock && support.get() == SupportMode.Fast);
+            double damage = getDamageToTargets(vec3d, bp, false, !hasBlock && support.get() == SupportMode.Fast);
 
             boolean shouldFacePlace = shouldFacePlace();
             double minimumDamage = Math.min(minDamage.get(), shouldFacePlace ? 1.5 : minDamage.get());
@@ -1119,7 +1112,7 @@ public class CrystalAura extends Module {
         if (forceFacePlace.get().isPressed()) return true;
 
         // Checks if the provided crystal position should face place to any target
-        for (LivingEntity target : targets) {
+        for (PlayerEntity target : targets) {
             if (EntityUtils.getTotalHealth(target) <= facePlaceHealth.get()) return true;
 
             for (ItemStack itemStack : target.getArmorItems()) {
@@ -1158,11 +1151,11 @@ public class CrystalAura extends Module {
         return !PlayerUtils.isWithin(vec3d, (place ? placeRange : breakRange).get());
     }
 
-    private LivingEntity getNearestTarget() {
-        LivingEntity nearestTarget = null;
+    private PlayerEntity getNearestTarget() {
+        PlayerEntity nearestTarget = null;
         double nearestDistance = Double.MAX_VALUE;
 
-        for (LivingEntity target : targets) {
+        for (PlayerEntity target : targets) {
             double distance = PlayerUtils.squaredDistanceTo(target);
 
             if (distance < nearestDistance) {
@@ -1174,18 +1167,18 @@ public class CrystalAura extends Module {
         return nearestTarget;
     }
 
-    private float getDamageToTargets(Vec3d vec3d, BlockPos obsidianPos, boolean breaking, boolean fast) {
-        float damage = 0;
+    private double getDamageToTargets(Vec3d vec3d, BlockPos obsidianPos, boolean breaking, boolean fast) {
+        double damage = 0;
 
         if (fast) {
-            LivingEntity target = getNearestTarget();
-            if (!(smartDelay.get() && breaking && target.hurtTime > 0)) damage = DamageUtils.crystalDamage(target, vec3d, predictMovement.get(), obsidianPos);
+            PlayerEntity target = getNearestTarget();
+            if (!(smartDelay.get() && breaking && target.hurtTime > 0)) damage = DamageUtils.crystalDamage(target, vec3d, predictMovement.get(), obsidianPos, ignoreTerrain.get());
         }
         else {
-            for (LivingEntity target : targets) {
+            for (PlayerEntity target : targets) {
                 if (smartDelay.get() && breaking && target.hurtTime > 0) continue;
 
-                float dmg = DamageUtils.crystalDamage(target, vec3d, predictMovement.get(), obsidianPos);
+                double dmg = DamageUtils.crystalDamage(target, vec3d, predictMovement.get(), obsidianPos, ignoreTerrain.get());
 
                 // Update best target
                 if (dmg > bestTargetDamage) {
@@ -1203,40 +1196,29 @@ public class CrystalAura extends Module {
 
     @Override
     public String getInfoString() {
-        return bestTarget != null && bestTargetTimer > 0 ? EntityUtils.getName(bestTarget) : null;
+        return bestTarget != null && bestTargetTimer > 0 ? bestTarget.getGameProfile().getName() : null;
     }
 
     private void findTargets() {
         targets.clear();
 
-        // Living Entities
-        for (Entity entity : mc.world.getEntities()) {
-            // Ignore non-living
-            if (!(entity instanceof LivingEntity livingEntity)) continue;
+        // Players
+        for (PlayerEntity player : mc.world.getPlayers()) {
+            if (player.getAbilities().creativeMode || player == mc.player) continue;
+            if (!player.isAlive() || !Friends.get().shouldAttack(player)) continue;
+            if (player.distanceTo(mc.player) > targetRange.get()) continue;
 
-            // Player
-            if (livingEntity instanceof PlayerEntity player) {
-                if (player.getAbilities().creativeMode || livingEntity == mc.player) continue;
-                if (!player.isAlive() || !Friends.get().shouldAttack(player)) continue;
-
-                if (ignoreNakeds.get()) {
-                    if (player.getOffHandStack().isEmpty()
-                        && player.getMainHandStack().isEmpty()
-                        && player.getInventory().armor.get(0).isEmpty()
-                        && player.getInventory().armor.get(1).isEmpty()
-                        && player.getInventory().armor.get(2).isEmpty()
-                        && player.getInventory().armor.get(3).isEmpty()
-                    ) continue;
-                }
+            if (ignoreNakeds.get()) {
+                if (player.getOffHandStack().isEmpty()
+                    && player.getMainHandStack().isEmpty()
+                    && player.getInventory().armor.get(0).isEmpty()
+                    && player.getInventory().armor.get(1).isEmpty()
+                    && player.getInventory().armor.get(2).isEmpty()
+                    && player.getInventory().armor.get(3).isEmpty()
+                ) continue;
             }
 
-            // Animals, water animals, monsters, bats, misc
-            if (!(entities.get().contains(livingEntity.getType()))) continue;
-
-            // Close enough to damage
-            if (livingEntity.squaredDistanceTo(mc.player) > targetRange.get() * targetRange.get()) continue;
-
-            targets.add(livingEntity);
+            targets.add(player);
         }
     }
 

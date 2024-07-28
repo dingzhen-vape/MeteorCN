@@ -12,9 +12,6 @@ public class PostProcessShaders {
 
     public static boolean rendering;
 
-    private PostProcessShaders() {
-    }
-
     @PreInit
     public static void init() {
         CHAMS = new ChamsShader();

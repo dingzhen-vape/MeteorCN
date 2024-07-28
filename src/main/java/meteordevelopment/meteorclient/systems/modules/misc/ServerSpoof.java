@@ -5,16 +5,17 @@
 
 package meteordevelopment.meteorclient.systems.modules.misc;
 
+import io.netty.buffer.Unpooled;
+import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
+import meteordevelopment.meteorclient.mixin.CustomPayloadC2SPacketAccessor;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import meteordevelopment.meteorclient.utils.misc.text.RunnableClickEvent;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.BrandCustomPayload;
-import net.minecraft.network.packet.c2s.common.CustomPayloadC2SPacket;
-import net.minecraft.network.packet.c2s.common.ResourcePackStatusC2SPacket;
-import net.minecraft.network.packet.s2c.common.ResourcePackSendS2CPacket;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
+import net.minecraft.network.packet.s2c.play.ResourcePackSendS2CPacket;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
@@ -37,7 +38,7 @@ public class ServerSpoof extends Module {
 
     private final Setting<String> brand = sgGeneral.add(new StringSetting.Builder()
         .name("品牌")
-        .description("指定将发送到服务器的品牌。")
+        .description("指定要发送给服务器的品牌。")
         .defaultValue("原版")
         .visible(spoofBrand::get)
         .build()
@@ -51,82 +52,67 @@ public class ServerSpoof extends Module {
     );
 
     private final Setting<Boolean> blockChannels = sgGeneral.add(new BoolSetting.Builder()
-        .name("阻止频道")
-        .description("是否阻止一些频道。")
+        .name("屏蔽频道")
+        .description("是否屏蔽一些频道。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<List<String>> channels = sgGeneral.add(new StringListSetting.Builder()
         .name("频道")
-        .description("如果频道包含关键词，这个传出频道将被阻止。")
-        .defaultValue("fabric", "minecraft:register")
+        .description("如果频道包含关键字，这个输出频道将被屏蔽。")
+        .defaultValue("minecraft:register")
         .visible(blockChannels::get)
         .build()
     );
 
     public ServerSpoof() {
-        super(Categories.Misc, "服务器伪装", "伪装客户端品牌、资源包和频道。");
+        super(Categories.Misc, "服务器伪装", "伪装客户端品牌，资源包和频道。");
 
-        runInMainMenu = true;
+        MeteorClient.EVENT_BUS.subscribe(new Listener());
     }
 
-    @EventHandler
-    private void onPacketSend(PacketEvent.Send event) {
-        if (!isActive() || !(event.packet instanceof CustomPayloadC2SPacket)) return;
-        Identifier id = ((CustomPayloadC2SPacket) event.packet).payload().getId().id();
+    private class Listener {
+        @EventHandler
+        private void onPacketSend(PacketEvent.Send event) {
+            if (!isActive()) return;
+            if (!(event.packet instanceof CustomPayloadC2SPacket)) return;
+            CustomPayloadC2SPacketAccessor packet = (CustomPayloadC2SPacketAccessor) event.packet;
+            Identifier id = packet.getChannel();
 
-        if (blockChannels.get()) {
-            for (String channel : channels.get()) {
-                if (StringUtils.containsIgnoreCase(id.toString(), channel)) {
-                    event.cancel();
-                    return;
+            if (spoofBrand.get() && id.equals(CustomPayloadC2SPacket.BRAND))
+                packet.setData(new PacketByteBuf(Unpooled.buffer()).writeString(brand.get()));
+
+            if (blockChannels.get()) {
+                for (String channel : channels.get()) {
+                    if (StringUtils.containsIgnoreCase(channel, id.toString())) {
+                        event.cancel();
+                        return;
+                    }
                 }
             }
         }
 
-        if (spoofBrand.get() && id.equals(BrandCustomPayload.ID.id())) {
-            CustomPayloadC2SPacket spoofedPacket = new CustomPayloadC2SPacket(new BrandCustomPayload(brand.get()));
+        @EventHandler
+        private void onPacketRecieve(PacketEvent.Receive event) {
+            if (!isActive()) return;
 
-            // PacketEvent.Send doesn't trigger if we send the packet like this
-            event.connection.send(spoofedPacket, null, true);
-            event.cancel();
-        }
-    }
-
-    @EventHandler
-    private void onPacketReceive(PacketEvent.Receive event) {
-        if (!isActive()) return;
-
-        if (resourcePack.get()) {
-            if (!(event.packet instanceof ResourcePackSendS2CPacket packet)) return;
-            event.cancel();
-
-            MutableText msg = Text.literal("这个服务器有 ");
-            msg.append(packet.required() ? "一个必需的 " : "一个可选的 ").append("资源包。 ");
-
-            MutableText link = Text.literal("[下载]");
-            link.setStyle(link.getStyle()
-                .withColor(Formatting.BLUE)
-                .withUnderline(true)
-                .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, packet.url()))
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击下载")))
-            );
-
-            MutableText acceptance = Text.literal("[伪装接受]");
-            acceptance.setStyle(acceptance.getStyle()
-                .withColor(Formatting.DARK_GREEN)
-                .withUnderline(true)
-                .withClickEvent(new RunnableClickEvent(() -> {
-                    event.connection.send(new ResourcePackStatusC2SPacket(packet.id(), ResourcePackStatusC2SPacket.Status.ACCEPTED));
-                    event.connection.send(new ResourcePackStatusC2SPacket(packet.id(), ResourcePackStatusC2SPacket.Status.SUCCESSFULLY_LOADED));
-                }))
-                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击伪装接受资源包。")))
-            );
-
-            msg.append(link).append(" ");
-            msg.append(acceptance).append(".");
-            info(msg);
+            if (resourcePack.get()) {
+                if (!(event.packet instanceof ResourcePackSendS2CPacket packet)) return;
+                event.cancel();
+                MutableText msg = Text.literal("这个服务器有 ");
+                msg.append(packet.isRequired() ? "一个必须的 " : "一个可选的 ");
+                MutableText link = Text.literal("资源包");
+                link.setStyle(link.getStyle()
+                    .withColor(Formatting.BLUE)
+                    .withUnderline(true)
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, packet.getURL()))
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击下载")))
+                );
+                msg.append(link);
+                msg.append("。");
+                info(msg);
+            }
         }
     }
 }

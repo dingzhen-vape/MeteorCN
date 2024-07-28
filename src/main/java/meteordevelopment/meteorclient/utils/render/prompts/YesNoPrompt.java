@@ -26,7 +26,6 @@ public class YesNoPrompt {
 
     private String title = "";
     private final List<String> messages = new ArrayList<>();
-    private boolean dontShowAgainCheckboxVisible = true;
     private String id = null;
 
     private Runnable onYes = () -> {};
@@ -64,11 +63,6 @@ public class YesNoPrompt {
         return this;
     }
 
-    public YesNoPrompt dontShowAgainCheckboxVisible(boolean visible) {
-        this.dontShowAgainCheckboxVisible = visible;
-        return this;
-    }
-
     public YesNoPrompt id(String from) {
         this.id = from;
         return this;
@@ -84,9 +78,9 @@ public class YesNoPrompt {
         return this;
     }
 
-    public boolean show() {
+    public void show() {
         if (id == null) this.id(this.title);
-        if (Config.get().dontShowAgainPrompts.contains(id)) return false;
+        if (Config.get().dontShowAgainPrompts.contains(id)) return;
 
         if (!RenderSystem.isOnRenderThread()) {
             RenderSystem.recordRenderCall(() -> mc.setScreen(new PromptScreen(theme)));
@@ -94,8 +88,6 @@ public class YesNoPrompt {
         else {
             mc.setScreen(new PromptScreen(theme));
         }
-        
-        return true;
     }
 
     private class PromptScreen extends WindowScreen {
@@ -110,26 +102,22 @@ public class YesNoPrompt {
             for (String line : messages) add(theme.label(line)).expandX();
             add(theme.horizontalSeparator()).expandX();
 
-            WCheckbox dontShowAgainCheckbox;
-
-            if (dontShowAgainCheckboxVisible) {
-                WHorizontalList checkboxContainer = add(theme.horizontalList()).expandX().widget();
-                dontShowAgainCheckbox = checkboxContainer.add(theme.checkbox(false)).widget();
-                checkboxContainer.add(theme.label("Don't show this again.")).expandX();
-            } else dontShowAgainCheckbox = null;
+            WHorizontalList checkboxContainer = add(theme.horizontalList()).expandX().widget();
+            WCheckbox dontShowAgainCheckbox = checkboxContainer.add(theme.checkbox(false)).widget();
+            checkboxContainer.add(theme.label("Don't show this again.")).expandX();
 
             WHorizontalList list = add(theme.horizontalList()).expandX().widget();
 
             WButton yesButton = list.add(theme.button("Yes")).expandX().widget();
             yesButton.action = () -> {
-                if (dontShowAgainCheckbox != null && dontShowAgainCheckbox.checked) Config.get().dontShowAgainPrompts.add(id);
+                if (dontShowAgainCheckbox.checked) Config.get().dontShowAgainPrompts.add(id);
                 onYes.run();
                 close();
             };
 
             WButton noButton = list.add(theme.button("No")).expandX().widget();
             noButton.action = () -> {
-                if (dontShowAgainCheckbox != null && dontShowAgainCheckbox.checked) Config.get().dontShowAgainPrompts.add(id);
+                if (dontShowAgainCheckbox.checked) Config.get().dontShowAgainPrompts.add(id);
                 onNo.run();
                 close();
             };

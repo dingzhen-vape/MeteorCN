@@ -7,7 +7,6 @@ package meteordevelopment.meteorclient.systems.modules.movement;
 
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.meteor.KeyEvent;
-import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.gui.WidgetScreen;
 import meteordevelopment.meteorclient.mixin.CreativeInventoryScreenAccessor;
@@ -87,7 +86,7 @@ public class GUIMove extends Module {
         .min(0)
         .build()
     );
-    
+
     public GUIMove() {
         super(Categories.Movement, "界面移动", "在界面中允许你执行各种动作.");
     }
@@ -102,13 +101,6 @@ public class GUIMove extends Module {
         if (jump.get()) set(mc.options.jumpKey, false);
         if (sneak.get()) set(mc.options.sneakKey, false);
         if (sprint.get()) set(mc.options.sprintKey, false);
-    }
-
-    public boolean disableSpace() {
-        return isActive() && jump.get() && mc.options.jumpKey.isDefault();
-    }
-    public boolean disableArrows() {
-        return isActive() && arrowsRotate.get();
     }
 
     @EventHandler
@@ -126,25 +118,16 @@ public class GUIMove extends Module {
         if (sneak.get()) set(mc.options.sneakKey, Input.isPressed(mc.options.sneakKey));
         if (sprint.get()) set(mc.options.sprintKey, Input.isPressed(mc.options.sprintKey));
 
-    }
-
-    @EventHandler
-    private void onRender3D(Render3DEvent event) {
-        if (skip()) return;
-        if (screens.get() == Screens.GUI && !(mc.currentScreen instanceof WidgetScreen)) return;
-        if (screens.get() == Screens.Inventory && mc.currentScreen instanceof WidgetScreen) return;
-
-        float rotationDelta = Math.min((float) (rotateSpeed.get() * event.frameTime * 20f), 100);
-
         if (arrowsRotate.get()) {
             float yaw = mc.player.getYaw();
             float pitch = mc.player.getPitch();
 
-            if (Input.isKeyPressed(GLFW_KEY_LEFT)) yaw -= rotationDelta;
-            if (Input.isKeyPressed(GLFW_KEY_RIGHT)) yaw += rotationDelta;
-            if (Input.isKeyPressed(GLFW_KEY_UP)) pitch -= rotationDelta;
-            if (Input.isKeyPressed(GLFW_KEY_DOWN)) pitch += rotationDelta;
-
+            for (int i = 0; i < (rotateSpeed.get() * 2); i++) {
+                if (Input.isKeyPressed(GLFW_KEY_LEFT)) yaw -= 0.5;
+                if (Input.isKeyPressed(GLFW_KEY_RIGHT)) yaw += 0.5;
+                if (Input.isKeyPressed(GLFW_KEY_UP)) pitch -= 0.5;
+                if (Input.isKeyPressed(GLFW_KEY_DOWN)) pitch += 0.5;
+            }
 
             pitch = MathHelper.clamp(pitch, -90, 90);
 

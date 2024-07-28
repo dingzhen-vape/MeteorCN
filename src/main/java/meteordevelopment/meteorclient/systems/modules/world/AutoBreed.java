@@ -50,10 +50,10 @@ public class AutoBreed extends Module {
         .build()
     );
 
-    private final Setting<EntityAge> mobAgeFilter = sgGeneral.add(new EnumSetting.Builder<EntityAge>()
+    private final Setting<Boolean> ignoreBabies = sgGeneral.add(new BoolSetting.Builder()
         .name("忽略幼崽")
         .description("是否忽略指定实体的幼崽变种。")
-        .defaultValue(EntityAge.Adult)
+        .defaultValue(true)
         .build()
     );
 
@@ -71,18 +71,16 @@ public class AutoBreed extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         for (Entity entity : mc.world.getEntities()) {
-            if (!(entity instanceof AnimalEntity animal)) continue;
+            AnimalEntity animal;
+
+            if (!(entity instanceof AnimalEntity)) continue;
+            else animal = (AnimalEntity) entity;
 
             if (!entities.get().contains(animal.getType())
-                || !switch (mobAgeFilter.get()) {
-                case Baby -> animal.isBaby();
-                case Adult -> !animal.isBaby();
-                case Both -> true;
-            }
-                || animalsFed.contains(animal)
-                || !PlayerUtils.isWithin(animal, range.get())
-                || !animal.isBreedingItem(hand.get() == Hand.MAIN_HAND ? mc.player.getMainHandStack() : mc.player.getOffHandStack()))
-                continue;
+                    || (animal.isBaby() && !ignoreBabies.get())
+                    || animalsFed.contains(animal)
+                    || !PlayerUtils.isWithin(animal, range.get())
+                    || !animal.isBreedingItem(hand.get() == Hand.MAIN_HAND ? mc.player.getMainHandStack() : mc.player.getOffHandStack())) continue;
 
             Rotations.rotate(Rotations.getYaw(entity), Rotations.getPitch(entity), -100, () -> {
                 mc.interactionManager.interactEntity(mc.player, animal, hand.get());
@@ -92,11 +90,5 @@ public class AutoBreed extends Module {
 
             return;
         }
-    }
-
-    public enum EntityAge {
-        Baby,
-        Adult,
-        Both
     }
 }

@@ -131,6 +131,7 @@ public abstract class Module implements ISerializable<Module>, Comparable<Module
         tag.putBoolean("chatFeedback", chatFeedback);
         tag.putBoolean("favorite", favorite);
         tag.put("settings", settings.toTag());
+
         tag.putBoolean("active", active);
 
         return tag;
@@ -139,7 +140,9 @@ public abstract class Module implements ISerializable<Module>, Comparable<Module
     @Override
     public Module fromTag(NbtCompound tag) {
         // General
-        keybind.fromTag(tag.getCompound("keybind"));
+        if (tag.contains("key")) keybind.set(true, tag.getInt("key"));
+        else keybind.fromTag(tag.getCompound("keybind"));
+
         toggleOnBindRelease = tag.getBoolean("toggleOnKeyRelease");
         chatFeedback = !tag.contains("chatFeedback") || tag.getBoolean("chatFeedback");
         favorite = tag.getBoolean("favorite");

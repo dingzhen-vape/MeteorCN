@@ -5,8 +5,8 @@
 
 package meteordevelopment.meteorclient.systems.modules.combat;
 
+import baritone.api.BaritoneAPI;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
-import meteordevelopment.meteorclient.pathing.PathManagers;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Categories;
@@ -34,7 +34,7 @@ public class BowAimbot extends Module {
 
     private final Setting<Double> range = sgGeneral.add(new DoubleSetting.Builder()
         .name("范围")
-        .description("实体可以被瞄准的最大范围.")
+        .description("目标实体的最大范围.")
         .defaultValue(20)
         .range(0, 100)
         .sliderMax(100)
@@ -43,14 +43,14 @@ public class BowAimbot extends Module {
 
     private final Setting<Set<EntityType<?>>> entities = sgGeneral.add(new EntityTypeListSetting.Builder()
         .name("实体")
-        .description("要攻击的实体.")
+        .description("攻击的实体.")
         .onlyAttackable()
         .build()
     );
 
     private final Setting<SortPriority> priority = sgGeneral.add(new EnumSetting.Builder<SortPriority>()
         .name("优先级")
-        .description("要目标的实体类型.")
+        .description("目标实体的类型.")
         .defaultValue(SortPriority.LowestHealth)
         .build()
     );
@@ -63,16 +63,16 @@ public class BowAimbot extends Module {
     );
 
     private final Setting<Boolean> nametagged = sgGeneral.add(new BoolSetting.Builder()
-        .name("命名")
-        .description("是否攻击有命名牌的生物.")
+        .name("命名标签")
+        .description("是否攻击有命名标签的生物.")
         .defaultValue(false)
         .build()
     );
 
 
     private final Setting<Boolean> pauseOnCombat = sgGeneral.add(new BoolSetting.Builder()
-        .name("战斗时暂停")
-        .description("暂时冻结Baritone，直到你释放弓.")
+        .name("战斗暂停")
+        .description("在释放弓之前暂时冻结Baritone.")
         .defaultValue(false)
         .build()
     );
@@ -81,7 +81,7 @@ public class BowAimbot extends Module {
     private Entity target;
 
     public BowAimbot() {
-        super(Categories.Combat, "弓箭自瞄", "自动为你瞄准弓箭.");
+        super(Categories.Combat, "弓自动瞄准", "自动帮你瞄准.");
     }
 
     @Override
@@ -93,7 +93,7 @@ public class BowAimbot extends Module {
     @EventHandler
     private void onRender(Render3DEvent event) {
         if (!PlayerUtils.isAlive() || !itemInHand()) return;
-        if (!mc.player.getAbilities().creativeMode && !InvUtils.find(itemStack -> itemStack.getItem() instanceof ArrowItem).found()) return;
+        if (!InvUtils.find(itemStack -> itemStack.getItem() instanceof ArrowItem).found()) return;
 
         target = TargetUtils.get(entity -> {
             if (entity == mc.player || entity == mc.cameraEntity) return false;
@@ -111,15 +111,15 @@ public class BowAimbot extends Module {
 
         if (target == null) {
             if (wasPathing) {
-                PathManagers.get().resume();
+                BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("恢复");
                 wasPathing = false;
             }
             return;
         }
 
         if (mc.options.useKey.isPressed() && itemInHand()) {
-            if (pauseOnCombat.get() && PathManagers.get().isPathing() && !wasPathing) {
-                PathManagers.get().pause();
+            if (pauseOnCombat.get() && BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().isPathing() && !wasPathing) {
+                BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("暂停");
                 wasPathing = true;
             }
             aim(event.tickDelta);

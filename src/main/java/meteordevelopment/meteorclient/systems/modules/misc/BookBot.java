@@ -19,15 +19,15 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.font.TextHandler;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.WritableBookContentComponent;
-import net.minecraft.component.type.WrittenBookContentComponent;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.network.packet.c2s.play.BookUpdateC2SPacket;
-import net.minecraft.text.*;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
@@ -43,21 +43,27 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.PrimitiveIterator;
 import java.util.Random;
-import java.util.function.Predicate;
 
 public class BookBot extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
         .name("模式")
-        .description("要写什么样的文本。")
+        .description("要写的文本的种类。")
         .defaultValue(Mode.Random)
+        .build()
+    );
+
+    private final Setting<String> name = sgGeneral.add(new StringSetting.Builder()
+        .name("名称")
+        .description("要给你的书本的名称。")
+        .defaultValue("Meteor on Crack!")
         .build()
     );
 
     private final Setting<Integer> pages = sgGeneral.add(new IntSetting.Builder()
         .name("页数")
-        .description("每本书要写的页数。")
+        .description("每本书写的页数。")
         .defaultValue(50)
         .range(1, 100)
         .sliderRange(1, 100)
@@ -66,42 +72,26 @@ public class BookBot extends Module {
     );
 
     private final Setting<Boolean> onlyAscii = sgGeneral.add(new BoolSetting.Builder()
-        .name("仅限ASCII")
-        .description("仅使用ASCII字符集中的字符。")
+        .name("仅ASCII")
+        .description("只使用ASCII字符集中的字符。")
         .defaultValue(false)
         .visible(() -> mode.get() == Mode.Random)
         .build()
     );
 
+    private final Setting<Boolean> count = sgGeneral.add(new BoolSetting.Builder()
+        .name("附加计数")
+        .description("是否在标题后附加书本的编号。")
+        .defaultValue(true)
+        .build()
+    );
+
     private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
         .name("延迟")
-        .description("写书之间的延迟时间。")
+        .description("写书之间的延迟。")
         .defaultValue(20)
         .min(1)
         .sliderRange(1, 200)
-        .build()
-    );
-
-    private final Setting<Boolean> sign = sgGeneral.add(new BoolSetting.Builder()
-        .name("签名")
-        .description("是否签署书籍。")
-        .defaultValue(true)
-        .build()
-    );
-
-    private final Setting<String> name = sgGeneral.add(new StringSetting.Builder()
-        .name("名称")
-        .description("你想给你的书起的名字。")
-        .defaultValue("流星破裂！")
-        .visible(sign::get)
-        .build()
-    );
-
-    private final Setting<Boolean> count = sgGeneral.add(new BoolSetting.Builder()
-        .name("附加计数")
-        .description("是否在标题中附加书籍的编号。")
-        .defaultValue(true)
-        .visible(sign::get)
         .build()
     );
 
@@ -112,7 +102,7 @@ public class BookBot extends Module {
     private Random random;
 
     public BookBot() {
-        super(Categories.Misc, "书籍机器人", "自动在书中写字。");
+        super(Categories.Misc, "书本机器人", "自动在书本中写字。");
 
         if (!file.exists()) {
             file = null;
@@ -167,12 +157,7 @@ public class BookBot extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        Predicate<ItemStack> bookPredicate = i -> {
-            WritableBookContentComponent component = i.get(DataComponentTypes.WRITABLE_BOOK_CONTENT);
-            return i.getItem() == Items.WRITABLE_BOOK && (component != null || component.pages().isEmpty());
-        };
-
-        FindItemResult writableBook = InvUtils.find(bookPredicate);
+        FindItemResult writableBook = InvUtils.find(Items.WRITABLE_BOOK);
 
         // Check if there is a book to write
         if (!writableBook.found()) {
@@ -181,7 +166,7 @@ public class BookBot extends Module {
         }
 
         // Move the book into hand
-        if (!InvUtils.testInMainHand(bookPredicate)) {
+        if (!InvUtils.testInMainHand(Items.WRITABLE_BOOK)) {
             InvUtils.move().from(writableBook.slot()).toHotbar(mc.player.getInventory().selectedSlot);
             return;
         }
@@ -218,11 +203,11 @@ public class BookBot extends Module {
             // Handle the file being empty
             if (file.length() == 0) {
                 MutableText message = Text.literal("");
-                message.append(Text.literal("书籍机器人文件为空！ ").formatted(Formatting.RED));
-                message.append(Text.literal("点击这里进行编辑。")
+                message.append(Text.literal("书本机器人的文件是空的！").formatted(Formatting.RED));
+                message.append(Text.literal("点击这里编辑它。")
                     .setStyle(Style.EMPTY
-                        .withFormatting(Formatting.UNDERLINE, Formatting.RED)
-                        .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath()))
+                            .withFormatting(Formatting.UNDERLINE, Formatting.RED)
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, file.getAbsolutePath()))
                     )
                 );
                 info(message);
@@ -251,64 +236,44 @@ public class BookBot extends Module {
 
     private void writeBook(PrimitiveIterator.OfInt chars) {
         ArrayList<String> pages = new ArrayList<>();
-        ArrayList<RawFilteredPair<Text>> filteredPages = new ArrayList<>();
-        TextHandler.WidthRetriever widthRetriever = ((TextHandlerAccessor) mc.textRenderer.getTextHandler()).getWidthRetriever();
 
-        int maxPages = mode.get() == Mode.File ? 100 : this.pages.get();
+        for (int pageI = 0; pageI < (mode.get() == Mode.File ? 100 : this.pages.get()); pageI++) {
+            // Check if the stream is empty before creating a new page
+            if (!chars.hasNext()) break;
 
-        int pageIndex = 0;
-        int lineIndex = 0;
+            StringBuilder page = new StringBuilder();
 
-        final StringBuilder page = new StringBuilder();
+            for (int lineI = 0; lineI < 13; lineI++) {
+                // Check if the stream is empty before creating a new line
+                if (!chars.hasNext()) break;
 
-        float lineWidth = 0;
+                double lineWidth = 0;
+                StringBuilder line = new StringBuilder();
 
-        while (chars.hasNext()) {
-            int c = chars.nextInt();
+                while (true) {
+                    // Check if the stream is empty
+                    if (!chars.hasNext()) break;
 
-            if (c == '\r' || c == '\n') {
-                page.append('\n');
-                lineWidth = 0;
-                lineIndex++;
-            } else {
-                float charWidth = widthRetriever.getWidth(c, Style.EMPTY);
+                    // Get the next character
+                    int nextChar = chars.nextInt();
 
-                // Reached end of line
-                if (lineWidth + charWidth > 114f) {
-                    page.append('\n');
-                    lineWidth = charWidth;
-                    lineIndex++;
-                    // Wrap to next line, unless wrapping to next page
-                    if (lineIndex != 14) page.appendCodePoint(c);
-                } else if (lineWidth == 0f && c == ' ') {
-                    continue; // Prevent leading space from text wrapping
-                } else {
+                    // Ignore newline chars when writing lines, should already be organised
+                    if (nextChar == '\r' || nextChar == '\n') break;
+
+                    // Make sure the character will fit on the line
+                    double charWidth = ((TextHandlerAccessor) mc.textRenderer.getTextHandler()).getWidthRetriever().getWidth(nextChar, Style.EMPTY);
+                    if (lineWidth + charWidth > 114) break;
+
+                    // Append it to the line
+                    line.appendCodePoint(nextChar);
                     lineWidth += charWidth;
-                    page.appendCodePoint(c);
                 }
+
+                // Append the line to the page
+                page.append(line).append('\n');
             }
 
-            // Reached end of page
-            if (lineIndex == 14) {
-                filteredPages.add(RawFilteredPair.of(Text.of(page.toString())));
-                pages.add(page.toString());
-                page.setLength(0);
-                pageIndex++;
-                lineIndex = 0;
-
-                // No more pages
-                if (pageIndex == maxPages) break;
-
-                // Wrap to next page
-                if (c != '\r' && c != '\n') {
-                    page.appendCodePoint(c);
-                }
-            }
-        }
-
-        // No more characters, end current page
-        if (!page.isEmpty() && pageIndex != maxPages) {
-            filteredPages.add(RawFilteredPair.of(Text.of(page.toString())));
+            // Append page to the page list
             pages.add(page.toString());
         }
 
@@ -317,10 +282,16 @@ public class BookBot extends Module {
         if (count.get() && bookCount != 0) title += " #" + bookCount;
 
         // Write data to book
-        mc.player.getMainHandStack().set(DataComponentTypes.WRITTEN_BOOK_CONTENT, new WrittenBookContentComponent(RawFilteredPair.of(title), mc.player.getGameProfile().getName(), 0, filteredPages, true));
+        mc.player.getMainHandStack().setSubNbt("标题", NbtString.of(title));
+        mc.player.getMainHandStack().setSubNbt("作者", NbtString.of(mc.player.getGameProfile().getName()));
+
+        // Write pages NBT
+        NbtList pageNbt = new NbtList();
+        pages.stream().map(NbtString::of).forEach(pageNbt::add);
+        if (!pages.isEmpty()) mc.player.getMainHandStack().setSubNbt("页数", pageNbt);
 
         // Send book update to server
-        mc.player.networkHandler.sendPacket(new BookUpdateC2SPacket(mc.player.getInventory().selectedSlot, pages, sign.get() ? Optional.of(title) : Optional.empty()));
+        mc.player.networkHandler.sendPacket(new BookUpdateC2SPacket(mc.player.getInventory().selectedSlot, pages, Optional.of(title)));
 
         bookCount++;
     }

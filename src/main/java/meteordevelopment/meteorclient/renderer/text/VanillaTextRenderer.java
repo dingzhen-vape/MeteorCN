@@ -13,7 +13,6 @@ import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
@@ -99,17 +98,17 @@ public class VanillaTextRenderer implements TextRenderer {
     public void end(MatrixStack matrices) {
         if (!building) throw new RuntimeException("VanillaTextRenderer.end() called without calling begin()");
 
-        Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
+        MatrixStack matrixStack = RenderSystem.getModelViewStack();
 
         RenderSystem.disableDepthTest();
-        matrixStack.pushMatrix();
-        if (matrices != null) matrixStack.mul(matrices.peek().getPositionMatrix());
+        matrixStack.push();
+        if (matrices != null) matrixStack.multiplyPositionMatrix(matrices.peek().getPositionMatrix());
         if (!scaleIndividually) matrixStack.scale((float) scale, (float) scale, 1);
         RenderSystem.applyModelViewMatrix();
 
         immediate.draw();
 
-        matrixStack.popMatrix();
+        matrixStack.pop();
         RenderSystem.enableDepthTest();
         RenderSystem.applyModelViewMatrix();
 

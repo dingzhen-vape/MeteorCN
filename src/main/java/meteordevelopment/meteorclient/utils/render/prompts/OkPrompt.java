@@ -26,7 +26,6 @@ public class OkPrompt {
 
     private String title = "";
     private final List<String> messages = new ArrayList<>();
-    private boolean dontShowAgainCheckboxVisible = true;
     private String id = null;
 
     private Runnable onOk = () -> {};
@@ -63,11 +62,6 @@ public class OkPrompt {
         return this;
     }
 
-    public OkPrompt dontShowAgainCheckboxVisible(boolean visible) {
-        this.dontShowAgainCheckboxVisible = visible;
-        return this;
-    }
-
     public OkPrompt id(String from) {
         this.id = from;
         return this;
@@ -78,9 +72,9 @@ public class OkPrompt {
         return this;
     }
 
-    public boolean show() {
+    public void show() {
         if (id == null) this.id(this.title);
-        if (Config.get().dontShowAgainPrompts.contains(id)) return false;
+        if (Config.get().dontShowAgainPrompts.contains(id)) return;
 
         if (!RenderSystem.isOnRenderThread()) {
             RenderSystem.recordRenderCall(() -> mc.setScreen(new PromptScreen(theme)));
@@ -88,8 +82,6 @@ public class OkPrompt {
         else {
             mc.setScreen(new PromptScreen(theme));
         }
-        
-        return true;
     }
 
     private class PromptScreen extends WindowScreen {
@@ -104,18 +96,14 @@ public class OkPrompt {
             for (String line : messages) add(theme.label(line)).expandX();
             add(theme.horizontalSeparator()).expandX();
 
-            WCheckbox dontShowAgainCheckbox;
-            
-            if (dontShowAgainCheckboxVisible) {
-                WHorizontalList checkboxContainer = add(theme.horizontalList()).expandX().widget();
-                dontShowAgainCheckbox = checkboxContainer.add(theme.checkbox(false)).widget();
-                checkboxContainer.add(theme.label("Don't show this again.")).expandX();
-            } else dontShowAgainCheckbox = null;
+            WHorizontalList checkboxContainer = add(theme.horizontalList()).expandX().widget();
+            WCheckbox dontShowAgainCheckbox = checkboxContainer.add(theme.checkbox(false)).widget();
+            checkboxContainer.add(theme.label("Don't show this again.")).expandX();
 
             WHorizontalList list = add(theme.horizontalList()).expandX().widget();
             WButton okButton = list.add(theme.button("Ok")).expandX().widget();
             okButton.action = () -> {
-                if (dontShowAgainCheckbox != null && dontShowAgainCheckbox.checked) Config.get().dontShowAgainPrompts.add(id);
+                if (dontShowAgainCheckbox.checked) Config.get().dontShowAgainPrompts.add(id);
                 onOk.run();
                 close();
             };

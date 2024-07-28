@@ -21,16 +21,8 @@ public class ColorListSetting extends Setting<List<SettingColor>> {
 
     @Override
     protected List<SettingColor> parseImpl(String str) {
-        List<SettingColor> colors = new ArrayList<>();
-        try {
-            String[] colorsStr = str.replaceAll("\\s+", "").split(";");
-            for (String colorStr : colorsStr) {
-                String[] strs = colorStr.split(",");
-                colors.add(new SettingColor(Integer.parseInt(strs[0]), Integer.parseInt(strs[1]), Integer.parseInt(strs[2]), Integer.parseInt(strs[3])));
-            }
-        } catch (IndexOutOfBoundsException | NumberFormatException ignored) {
-        }
-        return colors;
+        // TODO: I cba to write a text parser for this
+        return new ArrayList<>();
     }
 
     @Override

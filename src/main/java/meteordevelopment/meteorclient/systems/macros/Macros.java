@@ -15,7 +15,6 @@ import meteordevelopment.meteorclient.utils.misc.input.KeyAction;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.nbt.NbtCompound;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -62,7 +61,7 @@ public class Macros extends System<Macros> implements Iterable<Macro> {
         if (event.action == KeyAction.Release) return;
 
         for (Macro macro : macros) {
-            if (macro.onAction(true, event.key, event.modifiers)) return;
+            if (macro.onAction(true, event.key)) return;
         }
     }
 
@@ -71,7 +70,7 @@ public class Macros extends System<Macros> implements Iterable<Macro> {
         if (event.action == KeyAction.Release) return;
 
         for (Macro macro : macros) {
-            if (macro.onAction(false, event.button, 0)) return;
+            if (macro.onAction(false, event.button)) return;
         }
     }
 
@@ -80,7 +79,7 @@ public class Macros extends System<Macros> implements Iterable<Macro> {
     }
 
     @Override
-    public @NotNull Iterator<Macro> iterator() {
+    public Iterator<Macro> iterator() {
         return macros.iterator();
     }
 

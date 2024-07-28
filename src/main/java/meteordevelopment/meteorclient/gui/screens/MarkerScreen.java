@@ -25,7 +25,7 @@ public class MarkerScreen extends WindowScreen {
     @Override
     public void initWidgets() {
         // Settings
-        if (!marker.settings.groups.isEmpty()) {
+        if (marker.settings.groups.size() > 0) {
             settingsContainer = add(theme.verticalList()).expandX().widget();
             settingsContainer.add(theme.settings(marker.settings)).expandX();
         }

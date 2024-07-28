@@ -18,14 +18,12 @@ import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.NameProtect;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.entity.EntityUtils;
-import meteordevelopment.meteorclient.utils.misc.Names;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.render.NametagUtils;
 import meteordevelopment.meteorclient.utils.render.RenderUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -33,7 +31,6 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
@@ -149,13 +146,6 @@ public class Nametags extends Module {
         .build()
     );
 
-    private final Setting<Durability> itemDurability = sgPlayers.add(new EnumSetting.Builder<Durability>()
-        .name("耐久度")
-        .description("用百分比等显示物品耐久度")
-        .defaultValue(Durability.None)
-        .visible(displayItems::get)
-        .build()
-    );
     private final Setting<Double> itemSpacing = sgPlayers.add(new DoubleSetting.Builder()
         .name("物品间距")
         .description("物品之间的间距。")
@@ -401,8 +391,8 @@ public class Nametags extends Module {
         String name;
         Color nameColor = PlayerUtils.getPlayerColor(player, this.nameColor.get());
 
-        if (player == mc.player) name = Modules.get().get(NameProtect.class).getName(player.getName().getString());
-        else name = player.getName().getString();
+        if (player == mc.player) name = Modules.get().get(NameProtect.class).getName(player.getEntityName());
+        else name = player.getEntityName();
 
         // Health
         float absorption = player.getAbsorptionAmount();
@@ -480,12 +470,12 @@ public class Nametags extends Module {
                 if (!itemStack.isEmpty()) hasItems = true;
 
                 if (displayEnchants.get()) {
-                    ItemEnchantmentsComponent enchantments = EnchantmentHelper.getEnchantments(itemStack);
+                    Map<Enchantment, Integer> enchantments = EnchantmentHelper.get(itemStack);
 
                     int size = 0;
-                    for (RegistryEntry<Enchantment> enchantment : enchantments.getEnchantments()) {
-                        if (!shownEnchantments.get().contains(enchantment.value())) continue;
-                        String enchantName = Utils.getEnchantSimpleName(enchantment.value(), enchantLength.get()) + " " + enchantments.getLevel(enchantment.value());
+                    for (var enchantment : enchantments.keySet()) {
+                        if (!shownEnchantments.get().contains(enchantment)) continue;
+                        String enchantName = Utils.getEnchantSimpleName(enchantment, enchantLength.get()) + " " + enchantments.get(enchantment);
                         itemWidths[i] = Math.max(itemWidths[i], (text.getWidth(enchantName, shadow) / 2));
                         size++;
                     }
@@ -508,29 +498,15 @@ public class Nametags extends Module {
 
                 RenderUtils.drawItem(event.drawContext, stack, (int) x, (int) y, 2, true);
 
-                if (stack.isDamageable() && itemDurability.get() != Durability.None) {
-                    text.begin(0.75, false, true);
-
-                    String damageText = switch (itemDurability.get()) {
-                        case Percentage -> String.format("%.0f%%", ((stack.getMaxDamage() - stack.getDamage()) * 100f) / (float) stack.getMaxDamage());
-                        case Total -> Integer.toString(stack.getMaxDamage() - stack.getDamage());
-                        default -> "err";
-                    };
-                    Color damageColor = new Color(stack.getItemBarColor());
-
-                    text.render(damageText, (int) x, (int) y, damageColor.a(255), true);
-                    text.end();
-                }
-
                 if (maxEnchantCount > 0 && displayEnchants.get()) {
                     text.begin(0.5 * enchantTextScale.get(), false, true);
 
-                    ItemEnchantmentsComponent enchantments = EnchantmentHelper.getEnchantments(stack);
+                    Map<Enchantment, Integer> enchantments = EnchantmentHelper.get(stack);
                     Map<Enchantment, Integer> enchantmentsToShow = new HashMap<>();
 
-                    for (RegistryEntry<Enchantment> enchantment : enchantments.getEnchantments()) {
-                        if (shownEnchantments.get().contains(enchantment.value())) {
-                            enchantmentsToShow.put(enchantment.value(), enchantments.getLevel(enchantment.value()));
+                    for (Enchantment enchantment : enchantments.keySet()) {
+                        if (shownEnchantments.get().contains(enchantment)) {
+                            enchantmentsToShow.put(enchantment, enchantments.get(enchantment));
                         }
                     }
 
@@ -574,7 +550,7 @@ public class Nametags extends Module {
         TextRenderer text = TextRenderer.get();
         NametagUtils.begin(pos);
 
-        String name = Names.get(stack);
+        String name = stack.getName().getString();
         String count = " x" + stack.getCount();
 
         double nameWidth = text.getWidth(name, shadow);
@@ -684,15 +660,9 @@ public class Nametags extends Module {
         OnTop
     }
 
-    public enum Durability {
-        None,
-        Total,
-        Percentage
-    }
-
     public enum DistanceColorMode {
         Gradient,
-        Flat
+        Flat;
     }
 
     public boolean excludeBots() {

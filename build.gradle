@@ -1,14 +1,14 @@
 plugins {
-    id "fabric-loom" version "1.6-SNAPSHOT"
+    id "fabric-loom" version "1.2-SNAPSHOT"
     id "maven-publish"
-    id "com.github.johnrengelman.shadow" version "8.1.1"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
-base {
-    archivesBaseName = project.archives_base_name
-    version = project.mod_version + (project.hasProperty("devbuild") ? ("-" + project.findProperty("devbuild")) : "")
-    group = project.maven_group
-}
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version + (project.hasProperty("devbuild") ? ("-" + project.findProperty("devbuild")) : "")
+group = project.maven_group
 
 repositories {
     maven {
@@ -60,7 +60,7 @@ dependencies {
     modCompileOnly("maven.modrinth:indium:${project.indium_version}") { transitive = false }
 
     // Baritone (https://github.com/MeteorDevelopment/baritone)
-    modCompileOnly "meteordevelopment:baritone:${project.baritone_version}-SNAPSHOT"
+    modInclude "baritone:fabric:${project.minecraft_version}-SNAPSHOT"
 
     // Libraries
     library "meteordevelopment:orbit:${project.orbit_version}"
@@ -69,7 +69,8 @@ dependencies {
     library "org.reflections:reflections:${project.reflections_version}"
     library("io.netty:netty-handler-proxy:${project.netty_version}") { transitive = false }
     library("io.netty:netty-codec-socks:${project.netty_version}") { transitive = false }
-    library "de.florianmichael:WaybackAuthLib:1.0.0"
+    library "com.github.LlamaLad7.MixinExtras:mixinextras-fabric:${project.mixin_extras_version}"
+    annotationProcessor "com.github.LlamaLad7.MixinExtras:mixinextras-fabric:${project.mixin_extras_version}"
 
     // Launch sub project
     shadow project(":launch")
@@ -85,82 +86,69 @@ afterEvaluate {
     }
 }
 
-tasks {
-    processResources {
-        def propertyMap = [
-            "version"          : project.version,
-            "devbuild"         : project.findProperty("devbuild") ?: "",
-            "commit"           : project.findProperty("commit") ?: "",
-            "minecraft_version": project.minecraft_version,
-            "loader_version"   : project.loader_version
-        ]
+shadowJar {
+    configurations = [project.configurations.shadow]
 
-        inputs.properties(propertyMap)
-        filesMatching("fabric.mod.json") {
-            expand(propertyMap)
+    dependencies {
+        exclude {
+            it.moduleGroup == "org.slf4j"
         }
-    }
-
-    jar {
-        from("LICENSE") {
-            rename { "${it}_${project.base.archivesBaseName}" }
-        }
-
-        manifest {
-            attributes("Main-Class": "meteordevelopment.meteorclient.Main")
-        }
-    }
-
-    java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
-
-        withSourcesJar()
-        withJavadocJar()
-    }
-
-    shadowJar {
-        configurations = [project.configurations.shadow]
-
-        from("LICENSE") {
-            rename { "${it}_${project.base.archivesBaseName}" }
-        }
-
-        dependencies {
-            exclude {
-                it.moduleGroup == "org.slf4j"
-            }
-        }
-    }
-
-    remapJar {
-        dependsOn shadowJar
-        inputFile.set(shadowJar.archiveFile)
-    }
-
-    javadoc {
-        options.addStringOption("Xdoclint:none", "-quiet")
-        options.encoding = "UTF-8"
-    }
-
-    build {
-        dependsOn javadocJar
     }
 }
-tasks.withType(Javadoc) {
-    failOnError false
-    options.addStringOption('Xdoclint:none', '-quiet')
-    options.addStringOption('encoding', 'UTF-8')
-    options.addStringOption('charSet', 'UTF-8')
+
+processResources {
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version,
+            "devbuild": project.findProperty("devbuild") ?: "",
+            "commit": project.findProperty("commit") ?: ""
+    }
+}
+
+jar {
+    from "LICENSE"
+
+    manifest {
+        attributes("Main-Class": "meteordevelopment.meteorclient.Main")
+    }
+}
+
+remapJar {
+    dependsOn shadowJar
+    inputFile.set(shadowJar.archiveFile)
+}
+
+javadoc {
+    options.addStringOption("Xdoclint:none", "-quiet")
+    options.encoding = "UTF-8"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    archiveClassifier.set("sources")
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    archiveClassifier.set("javadoc")
+    from javadoc
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        java(MavenPublication) {
             artifactId = "meteor-client"
             version = project.hasProperty("devbuild") ? (project.mod_version + "-SNAPSHOT") : project.mod_version
 
-            from components.java
+            artifact(remapJar) {
+                builtBy remapJar
+            }
+
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+
+            artifact(javadocJar) {
+                builtBy javadocJar
+            }
         }
     }
 

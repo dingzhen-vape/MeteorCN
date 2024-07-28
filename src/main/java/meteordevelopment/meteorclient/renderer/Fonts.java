@@ -32,9 +32,6 @@ public class Fonts {
     public static final List<FontFamily> FONT_FAMILIES = new ArrayList<>();
     public static CustomTextRenderer RENDERER;
 
-    private Fonts() {
-    }
-
     @PreInit(dependencies = Shaders.class)
     public static void refresh() {
         FONT_FAMILIES.clear();
@@ -59,10 +56,7 @@ public class Fonts {
     }
 
     public static void load(FontFace fontFace) {
-        if (RENDERER != null) {
-            if (RENDERER.fontFace.equals(fontFace)) return;
-            else RENDERER.destroy();
-        }
+        if (RENDERER != null && RENDERER.fontFace.equals(fontFace)) return;
 
         try {
             RENDERER = new CustomTextRenderer(fontFace);

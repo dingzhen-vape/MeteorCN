@@ -5,6 +5,7 @@
 
 package meteordevelopment.meteorclient.utils.tooltip;
 
+import net.minecraft.block.entity.BannerBlockEntity;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -16,7 +17,6 @@ import net.minecraft.client.render.block.entity.BannerBlockEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.model.ModelLoader;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.BannerItem;
 import net.minecraft.item.ItemStack;
 
@@ -71,8 +71,10 @@ public class BannerTooltipComponent implements MeteorTooltipData, TooltipCompone
             bannerField,
             ModelLoader.BANNER_BASE,
             true,
-            ((BannerItem) banner.getItem()).getColor(),
-            banner.get(DataComponentTypes.BANNER_PATTERNS)
+            BannerBlockEntity.getPatternsFromNbt(
+                ((BannerItem) banner.getItem()).getColor(),
+                BannerBlockEntity.getPatternListNbt(banner)
+            )
         );
         matrices.pop();
         matrices.pop();

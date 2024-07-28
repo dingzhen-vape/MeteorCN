@@ -5,9 +5,9 @@
 
 package meteordevelopment.meteorclient.systems.modules.player;
 
+import baritone.api.BaritoneAPI;
 import meteordevelopment.meteorclient.events.entity.player.ItemUseCrosshairTargetEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.pathing.PathManagers;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.IntSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -28,7 +28,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.registry.entry.RegistryEntry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,34 +38,34 @@ public class AutoGap extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgPotions = settings.createGroup("药水");
-    private final SettingGroup sgHealth = settings.createGroup("生命值");
+    private final SettingGroup sgHealth = settings.createGroup("健康");
 
     // General
 
     private final Setting<Boolean> allowEgap = sgGeneral.add(new BoolSetting.Builder()
-        .name("允许金苹果")
-        .description("如果找到了，优先吃附魔金苹果而不是普通金苹果。")
+        .name("允许-E-Gaps")
+        .description("如果找到，允许吃E-Gaps而不是Gaps.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> always = sgGeneral.add(new BoolSetting.Builder()
-        .name("始终")
-        .description("是否应该始终吃东西。")
+        .name("总是")
+        .description("是否总是吃.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pauseAuras = sgGeneral.add(new BoolSetting.Builder()
         .name("暂停光环")
-        .description("吃东西时暂停所有光环。")
+        .description("进食时暂停所有光环.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> pauseBaritone = sgGeneral.add(new BoolSetting.Builder()
-        .name("暂停巴里通")
-        .description("吃东西时暂停巴里通。")
+        .name("暂停Baritone")
+        .description("进食时暂停Baritone.")
         .defaultValue(true)
         .build()
     );
@@ -75,14 +74,14 @@ public class AutoGap extends Module {
 
     private final Setting<Boolean> potionsRegeneration = sgPotions.add(new BoolSetting.Builder()
         .name("药水-再生")
-        .description("如果再生效果消失，是否应该吃东西。")
+        .description("如果再生效果结束是否应该吃.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> potionsFireResistance = sgPotions.add(new BoolSetting.Builder()
-        .name("药水-抗火")
-        .description("如果抗火效果消失，是否应该吃东西。需要附魔金苹果。")
+        .name("药水-火焰抗性")
+        .description("如果火焰抗性结束是否应该吃. 需要E-Gaps.")
         .defaultValue(true)
         .visible(allowEgap::get)
         .build()
@@ -90,7 +89,7 @@ public class AutoGap extends Module {
 
     private final Setting<Boolean> potionsResistance = sgPotions.add(new BoolSetting.Builder()
         .name("药水-吸收")
-        .description("如果抗性效果消失，是否应该吃东西。需要附魔金苹果。")
+        .description("如果抗性结束是否应该吃. 需要E-Gaps.")
         .defaultValue(false)
         .visible(allowEgap::get)
         .build()
@@ -99,15 +98,15 @@ public class AutoGap extends Module {
     // Health
 
     private final Setting<Boolean> healthEnabled = sgHealth.add(new BoolSetting.Builder()
-        .name("生命值-启用")
-        .description("如果生命值低于阈值，是否应该吃东西。")
+        .name("健康启用")
+        .description("如果健康下降到阈值以下是否应该吃.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Integer> healthThreshold = sgHealth.add(new IntSetting.Builder()
-        .name("生命值-阈值")
-        .description("吃东西的生命值阈值。包括吸收。")
+        .name("健康阈值")
+        .description("吃的健康阈值. 包括吸收.")
         .defaultValue(20)
         .min(0)
         .sliderMax(40)
@@ -123,7 +122,7 @@ public class AutoGap extends Module {
     private boolean wasBaritone;
 
     public AutoGap() {
-        super(Categories.Player, "自动金苹果", "自动吃金苹果或附魔金苹果。");
+        super(Categories.Player, "自动吃Gap", "自动吃Gaps或E-Gaps.");
     }
 
     @Override
@@ -196,9 +195,9 @@ public class AutoGap extends Module {
 
         // Pause baritone
         wasBaritone = false;
-        if (pauseBaritone.get() && PathManagers.get().isPathing()) {
+        if (pauseBaritone.get() && BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().isPathing()) {
             wasBaritone = true;
-            PathManagers.get().pause();
+            BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("暂停");
         }
     }
 
@@ -229,7 +228,7 @@ public class AutoGap extends Module {
 
         // Resume baritone
         if (pauseBaritone.get() && wasBaritone) {
-            PathManagers.get().resume();
+            BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("恢复");
         }
     }
 
@@ -251,7 +250,7 @@ public class AutoGap extends Module {
     }
 
     private boolean shouldEatPotions() {
-        Map<RegistryEntry<StatusEffect>, StatusEffectInstance> effects = mc.player.getActiveStatusEffects();
+        Map<StatusEffect, StatusEffectInstance> effects = mc.player.getActiveStatusEffects();
 
         // Regeneration
         if (potionsRegeneration.get() && !effects.containsKey(StatusEffects.REGENERATION)) return true;

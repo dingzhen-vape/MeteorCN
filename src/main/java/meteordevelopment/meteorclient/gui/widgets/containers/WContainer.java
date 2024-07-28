@@ -34,7 +34,7 @@ public abstract class WContainer extends WWidget {
     }
 
     public void clear() {
-        if (!cells.isEmpty()) {
+        if (cells.size() > 0) {
             cells.clear();
             invalidate();
         }

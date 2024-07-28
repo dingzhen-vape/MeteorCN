@@ -85,7 +85,7 @@ public class AutoSmelter extends Module {
     }
 
     private void insertItems(AbstractFurnaceScreenHandler c) {
-        ItemStack inputItemStack = c.slots.getFirst().getStack();
+        ItemStack inputItemStack = c.slots.get(0).getStack();
         if (!inputItemStack.isEmpty()) return;
 
         int slot = -1;

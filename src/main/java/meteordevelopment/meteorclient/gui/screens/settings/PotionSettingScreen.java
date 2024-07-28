@@ -11,7 +11,6 @@ import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.settings.PotionSetting;
 import meteordevelopment.meteorclient.utils.misc.MyPotion;
-import net.minecraft.client.resource.language.I18n;
 
 public class PotionSettingScreen extends WindowScreen {
     private final PotionSetting setting;
@@ -27,7 +26,7 @@ public class PotionSettingScreen extends WindowScreen {
         WTable table = add(theme.table()).expandX().widget();
 
         for (MyPotion potion : MyPotion.values()) {
-            table.add(theme.itemWithLabel(potion.potion, I18n.translate(potion.potion.getTranslationKey())));
+            table.add(theme.itemWithLabel(potion.potion, potion.potion.getName().getString()));
 
             WButton select = table.add(theme.button("Select")).widget();
             select.action = () -> {

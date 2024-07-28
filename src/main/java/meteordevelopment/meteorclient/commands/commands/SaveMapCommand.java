@@ -12,14 +12,11 @@ import meteordevelopment.meteorclient.commands.Command;
 import meteordevelopment.meteorclient.mixin.MapRendererAccessor;
 import net.minecraft.client.render.MapRenderer;
 import net.minecraft.command.CommandSource;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.map.MapState;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryUtil;
@@ -82,11 +79,11 @@ public class SaveMapCommand extends Command {
         }));
     }
 
-    private void saveMap(@NotNull ItemStack map, MapState state, String path, int scale) {
+    private void saveMap(ItemStack map, MapState state, String path, int scale) {
         //this is horrible code but it somehow works
 
         MapRenderer mapRenderer = mc.gameRenderer.getMapRenderer();
-        MapRenderer.MapTexture texture = ((MapRendererAccessor) mapRenderer).invokeGetMapTexture(map.get(DataComponentTypes.MAP_ID), state);
+        MapRenderer.MapTexture texture = ((MapRendererAccessor) mapRenderer).invokeGetMapTexture(FilledMapItem.getMapId(map), state);
 
         int[] data = texture.texture.getImage().makePixelArray();
         BufferedImage image = new BufferedImage(128, 128, 2);
@@ -107,14 +104,17 @@ public class SaveMapCommand extends Command {
         }
     }
 
-    private @Nullable MapState getMapState() {
+    private MapState getMapState() {
         ItemStack map = getMap();
         if (map == null) return null;
 
-        return FilledMapItem.getMapState(map.get(DataComponentTypes.MAP_ID), mc.world);
+        MapState state = FilledMapItem.getMapState(FilledMapItem.getMapId(map), mc.world);
+        if (state == null) return null;
+
+        return state;
     }
 
-    private @Nullable String getPath() {
+    private String getPath() {
         String path = TinyFileDialogs.tinyfd_saveFileDialog("Save image", null, filters, null);
         if (path == null) return null;
         if (!path.endsWith(".png")) path += ".png";
@@ -122,7 +122,7 @@ public class SaveMapCommand extends Command {
         return path;
     }
 
-    private @Nullable ItemStack getMap() {
+    private ItemStack getMap() {
         ItemStack itemStack = mc.player.getMainHandStack();
         if (itemStack.getItem() == Items.FILLED_MAP) return itemStack;
 

@@ -22,9 +22,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class MicrosoftLogin {
-    private MicrosoftLogin() {
-    }
-
     public static class LoginData {
         public String mcToken;
         public String newRefreshToken;

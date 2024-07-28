@@ -151,12 +151,12 @@ public abstract class WidgetScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
         if (locked) return false;
 
-        root.mouseScrolled(verticalAmount);
+        root.mouseScrolled(amount);
 
-        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+        return super.mouseScrolled(mouseX, mouseY, amount);
     }
 
     @Override
@@ -197,7 +197,8 @@ public abstract class WidgetScreen extends Screen {
                     textBox.setCursorMax();
 
                     done.set(true);
-                } else {
+                }
+                else {
                     if (textBox.isFocused()) {
                         textBox.setFocused(false);
                         foundFocused.set(true);
@@ -219,7 +220,8 @@ public abstract class WidgetScreen extends Screen {
 
         if (control && keyCode == GLFW_KEY_C && toClipboard()) {
             return true;
-        } else if (control && keyCode == GLFW_KEY_V && fromClipboard()) {
+        }
+        else if (control && keyCode == GLFW_KEY_V && fromClipboard()) {
             reload();
             if (parent instanceof WidgetScreen wScreen) {
                 wScreen.reload();
@@ -245,7 +247,7 @@ public abstract class WidgetScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        if (!Utils.canUpdate()) renderBackground(context, mouseX, mouseY, delta);
+        if (!Utils.canUpdate()) renderBackground(context);
 
         double s = mc.getWindow().getScaleFactor();
         mouseX *= s;

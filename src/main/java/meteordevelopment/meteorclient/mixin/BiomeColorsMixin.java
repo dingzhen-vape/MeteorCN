@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BiomeColors.class)
-public abstract class BiomeColorsMixin {
+public class BiomeColorsMixin {
     /**
      * @author Walaryne
      */

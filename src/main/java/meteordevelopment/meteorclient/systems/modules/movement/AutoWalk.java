@@ -5,15 +5,15 @@
 
 package meteordevelopment.meteorclient.systems.modules.movement;
 
+import baritone.api.BaritoneAPI;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.pathing.NopPathManager;
-import meteordevelopment.meteorclient.pathing.PathManagers;
 import meteordevelopment.meteorclient.settings.EnumSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.input.Input;
+import meteordevelopment.meteorclient.utils.world.GoalDirection;
 import meteordevelopment.orbit.EventHandler;
 import meteordevelopment.orbit.EventPriority;
 import net.minecraft.client.option.KeyBinding;
@@ -28,8 +28,10 @@ public class AutoWalk extends Module {
         .onChanged(mode1 -> {
             if (isActive()) {
                 if (mode1 == Mode.Simple) {
-                    PathManagers.get().stop();
+                    BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().cancelEverything();
+                    goal = null;
                 } else {
+                    timer = 0;
                     createGoal();
                 }
 
@@ -41,7 +43,7 @@ public class AutoWalk extends Module {
 
     private final Setting<Direction> direction = sgGeneral.add(new EnumSetting.Builder<Direction>()
         .name("简单方向")
-        .description("简单模式中行走的方向.")
+        .description("简单模式下行走的方向.")
         .defaultValue(Direction.Forwards)
         .onChanged(direction1 -> {
             if (isActive()) unpress();
@@ -49,6 +51,9 @@ public class AutoWalk extends Module {
         .visible(() -> mode.get() == Mode.Simple)
         .build()
     );
+
+    private int timer = 0;
+    private GoalDirection goal;
 
     public AutoWalk() {
         super(Categories.Movement, "自动行走", "自动向前行走.");
@@ -62,7 +67,9 @@ public class AutoWalk extends Module {
     @Override
     public void onDeactivate() {
         if (mode.get() == Mode.Simple) unpress();
-        else PathManagers.get().stop();
+        else BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().cancelEverything();
+
+        goal = null;
     }
 
     @EventHandler(priority = EventPriority.HIGH)
@@ -75,10 +82,12 @@ public class AutoWalk extends Module {
                 case Right -> setPressed(mc.options.rightKey, true);
             }
         } else {
-            if (PathManagers.get() instanceof NopPathManager) {
-                info("智能模式需要Baritone");
-                toggle();
+            if (timer > 20) {
+                timer = 0;
+                goal.recalculate(mc.player.getPos());
             }
+
+            timer++;
         }
     }
 
@@ -95,7 +104,9 @@ public class AutoWalk extends Module {
     }
 
     private void createGoal() {
-        PathManagers.get().moveInDirection(mc.player.getYaw());
+        timer = 0;
+        goal = new GoalDirection(mc.player.getPos(), mc.player.getYaw());
+        BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(goal);
     }
 
     public enum Mode {

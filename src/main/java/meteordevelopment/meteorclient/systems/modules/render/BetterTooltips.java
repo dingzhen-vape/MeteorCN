@@ -5,9 +5,11 @@
 
 package meteordevelopment.meteorclient.systems.modules.render;
 
+import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import meteordevelopment.meteorclient.events.game.ItemStackTooltipEvent;
+import meteordevelopment.meteorclient.events.game.SectionVisibleEvent;
 import meteordevelopment.meteorclient.events.render.TooltipDataEvent;
 import meteordevelopment.meteorclient.mixin.EntityAccessor;
 import meteordevelopment.meteorclient.mixin.EntityBucketItemAccessor;
@@ -21,26 +23,28 @@ import meteordevelopment.meteorclient.utils.player.EChestMemory;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.tooltip.*;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.*;
-import net.minecraft.component.type.BannerPatternsComponent.Layer;
-import net.minecraft.component.type.SuspiciousStewEffectsComponent.StewEffect;
+import net.minecraft.block.entity.BannerPattern;
+import net.minecraft.block.entity.BannerPatterns;
 import net.minecraft.entity.Bucketable;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.inventory.Inventories;
 import net.minecraft.item.*;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.RawFilteredPair;
 import net.minecraft.text.Text;
+import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.collection.DefaultedList;
 
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -49,30 +53,30 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT;
 public class BetterTooltips extends Module {
     public static final Color ECHEST_COLOR = new Color(0, 50, 50);
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgPreviews = settings.createGroup("Previews");
-    private final SettingGroup sgOther = settings.createGroup("Other");
-    private final SettingGroup sgHideFlags = settings.createGroup("Hide Flags");
+    private final SettingGroup sgPreviews = settings.createGroup("预览");
+    private final SettingGroup sgOther = settings.createGroup("其他");
+    private final SettingGroup sgHideFlags = settings.createGroup("隐藏标志");
 
     // General
 
     private final Setting<DisplayWhen> displayWhen = sgGeneral.add(new EnumSetting.Builder<DisplayWhen>()
-        .name("display-when")
-        .description("When to display previews.")
+        .name("显示时间")
+        .description("何时显示预览.")
         .defaultValue(DisplayWhen.Keybind)
         .build()
     );
 
     private final Setting<Keybind> keybind = sgGeneral.add(new KeybindSetting.Builder()
-        .name("keybind")
-        .description("The bind for keybind mode.")
+        .name("键绑定")
+        .description("键绑定模式的绑定.")
         .defaultValue(Keybind.fromKey(GLFW_KEY_LEFT_ALT))
         .visible(() -> displayWhen.get() == DisplayWhen.Keybind)
         .build()
     );
 
     private final Setting<Boolean> middleClickOpen = sgGeneral.add(new BoolSetting.Builder()
-        .name("middle-click-open")
-        .description("Opens a GUI window with the inventory of the storage block or book when you middle click the item.")
+        .name("中键点击打开")
+        .description("中键点击物品时打开一个包含储存方块物品的GUI窗口.")
         .defaultValue(true)
         .build()
     );
@@ -80,37 +84,37 @@ public class BetterTooltips extends Module {
     // Previews
 
     private final Setting<Boolean> shulkers = sgPreviews.add(new BoolSetting.Builder()
-        .name("containers")
-        .description("Shows a preview of a containers when hovering over it in an inventory.")
+        .name("容器")
+        .description("在库存中悬停时显示容器的预览.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> shulkerCompactTooltip = sgPreviews.add(new BoolSetting.Builder()
-        .name("compact-shulker-tooltip")
-        .description("Compacts the lines of the shulker tooltip.")
+        .name("紧凑潜影盒提示")
+        .description("压缩潜影盒提示的行数.")
         .defaultValue(true)
         .visible(shulkers::get)
         .build()
     );
 
     public final Setting<Boolean> echest = sgPreviews.add(new BoolSetting.Builder()
-        .name("echests")
-        .description("Shows a preview of your echest when hovering over it in an inventory.")
+        .name("末影箱")
+        .description("在库存中悬停时显示末影箱的预览.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> maps = sgPreviews.add(new BoolSetting.Builder()
-        .name("maps")
-        .description("Shows a preview of a map when hovering over it in an inventory.")
+        .name("地图")
+        .description("在库存中悬停时显示地图的预览.")
         .defaultValue(true)
         .build()
     );
 
     public final Setting<Double> mapsScale = sgPreviews.add(new DoubleSetting.Builder()
-        .name("map-scale")
-        .description("The scale of the map preview.")
+        .name("地图比例")
+        .description("地图预览的比例.")
         .defaultValue(1)
         .min(0.001)
         .sliderMax(1)
@@ -119,22 +123,22 @@ public class BetterTooltips extends Module {
     );
 
     private final Setting<Boolean> books = sgPreviews.add(new BoolSetting.Builder()
-        .name("books")
-        .description("Shows contents of a book when hovering over it in an inventory.")
+        .name("书籍")
+        .description("在库存中悬停时显示书的内容.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> banners = sgPreviews.add(new BoolSetting.Builder()
-        .name("banners")
-        .description("Shows banners' patterns when hovering over it in an inventory. Also works with shields.")
+        .name("旗帜")
+        .description("在库存中悬停时显示旗帜的图案. 也适用于盾牌.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> entitiesInBuckets = sgPreviews.add(new BoolSetting.Builder()
-        .name("entities-in-buckets")
-        .description("Shows entities in buckets when hovering over it in an inventory.")
+        .name("桶中的实体")
+        .description("在库存中悬停时显示桶中的实体.")
         .defaultValue(true)
         .build()
     );
@@ -142,93 +146,79 @@ public class BetterTooltips extends Module {
     // Extras
 
     public final Setting<Boolean> byteSize = sgOther.add(new BoolSetting.Builder()
-        .name("byte-size")
-        .description("Displays an item's size in bytes in the tooltip.")
+        .name("字节大小")
+        .description("在工具提示中显示物品的字节大小.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> statusEffects = sgOther.add(new BoolSetting.Builder()
-        .name("status-effects")
-        .description("Adds list of status effects to tooltips of food items.")
+        .name("状态效果")
+        .description("为食物物品的工具提示添加状态效果列表.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> beehive = sgOther.add(new BoolSetting.Builder()
-        .name("beehive")
-        .description("Displays information about a beehive or bee nest.")
+        .name("蜂巢")
+        .description("显示蜂巢或蜜蜂巢的信息.")
         .defaultValue(true)
         .build()
     );
 
     //Hide flags
 
-    public final Setting<Boolean> tooltip = sgHideFlags.add(new BoolSetting.Builder()
-        .name("tooltip")
-        .description("Show the tooltip when it's hidden.")
+    private final Setting<Boolean> enchantments = sgHideFlags.add(new BoolSetting.Builder()
+        .name("附魔")
+        .description("隐藏时显示附魔.")
         .defaultValue(false)
         .build()
     );
 
-    public final Setting<Boolean> enchantments = sgHideFlags.add(new BoolSetting.Builder()
-        .name("enchantments")
-        .description("Show enchantments when it's hidden.")
+    private final Setting<Boolean> modifiers = sgHideFlags.add(new BoolSetting.Builder()
+        .name("修饰符")
+        .description("隐藏时显示物品修饰符.")
         .defaultValue(false)
         .build()
     );
 
-    public final Setting<Boolean> modifiers = sgHideFlags.add(new BoolSetting.Builder()
-        .name("modifiers")
-        .description("Show item modifiers when it's hidden.")
+    private final Setting<Boolean> unbreakable = sgHideFlags.add(new BoolSetting.Builder()
+        .name("坚不可摧")
+        .description("显示\"Unbreakable\" 标签隐藏时.")
         .defaultValue(false)
         .build()
     );
 
-    public final Setting<Boolean> unbreakable = sgHideFlags.add(new BoolSetting.Builder()
-        .name("unbreakable")
-        .description("Show \"Unbreakable\" tag when it's hidden.")
+    private final Setting<Boolean> canDestroy = sgHideFlags.add(new BoolSetting.Builder()
+        .name("可破坏")
+        .description("显示\"CanDestroy\" 标签隐藏时.")
         .defaultValue(false)
         .build()
     );
 
-    public final Setting<Boolean> canDestroy = sgHideFlags.add(new BoolSetting.Builder()
-        .name("can-destroy")
-        .description("Show \"CanDestroy\" tag when it's hidden.")
+    private final Setting<Boolean> canPlaceOn = sgHideFlags.add(new BoolSetting.Builder()
+        .name("可放置在")
+        .description("显示\"CanPlaceOn\" 标签隐藏时.")
         .defaultValue(false)
         .build()
     );
 
-    public final Setting<Boolean> canPlaceOn = sgHideFlags.add(new BoolSetting.Builder()
-        .name("can-place-on")
-        .description("Show \"CanPlaceOn\" tag when it's hidden.")
+    private final Setting<Boolean> additional = sgHideFlags.add(new BoolSetting.Builder()
+        .name("额外")
+        .description("隐藏时显示药水效果, 烟花状态, 书的作者等.")
         .defaultValue(false)
         .build()
     );
 
-    public final Setting<Boolean> additional = sgHideFlags.add(new BoolSetting.Builder()
-        .name("additional")
-        .description("Show potion effects, firework status, book author, etc when it's hidden.")
-        .defaultValue(false)
-        .build()
-    );
-
-    public final Setting<Boolean> dye = sgHideFlags.add(new BoolSetting.Builder()
-        .name("dye")
-        .description("Show dyed item tags when it's hidden.")
-        .defaultValue(false)
-        .build()
-    );
-
-    public final Setting<Boolean> upgrades = sgHideFlags.add(new BoolSetting.Builder()
-        .name("armor-trim")
-        .description("Show armor trims when it's hidden.")
+    private final Setting<Boolean> dye = sgHideFlags.add(new BoolSetting.Builder()
+        .name("染料")
+        .description("隐藏时显示染色物品标签.")
         .defaultValue(false)
         .build()
     );
 
     public BetterTooltips() {
-        super(Categories.Render, "better-tooltips", "Displays more useful tooltips for certain items.");
+        super(Categories.Render, "更好的工具提示", "为某些物品显示更有用的工具提示.");
     }
 
     @EventHandler
@@ -236,17 +226,34 @@ public class BetterTooltips extends Module {
         // Status effects
         if (statusEffects.get()) {
             if (event.itemStack.getItem() == Items.SUSPICIOUS_STEW) {
-                SuspiciousStewEffectsComponent stewEffectsComponent = event.itemStack.get(DataComponentTypes.SUSPICIOUS_STEW_EFFECTS);
-                if (stewEffectsComponent != null) {
-                    for (StewEffect effectTag : stewEffectsComponent.effects()) {
-                        StatusEffectInstance effect = new StatusEffectInstance(effectTag.effect(), effectTag.duration(), 0);
-                        event.list.add(1, getStatusText(effect));
+                NbtCompound tag = event.itemStack.getNbt();
+
+                if (tag != null) {
+                    NbtList effects = tag.getList("效果", 10);
+
+                    if (effects != null) {
+                        for (int i = 0; i < effects.size(); i++) {
+                            NbtCompound effectTag = effects.getCompound(i);
+                            byte effectId = effectTag.getByte("效果ID");
+                            int effectDuration = effectTag.contains("效果持续时间") ? effectTag.getInt("效果持续时间") : 160;
+                            StatusEffect type = StatusEffect.byRawId(effectId);
+
+                            if (type != null) {
+                                StatusEffectInstance effect = new StatusEffectInstance(type, effectDuration, 0);
+                                event.list.add(1, getStatusText(effect));
+                            }
+                        }
                     }
                 }
-            } else {
-                FoodComponent food = event.itemStack.get(DataComponentTypes.FOOD);
+            }
+            else if (event.itemStack.getItem().isFood()) {
+                FoodComponent food = event.itemStack.getItem().getFoodComponent();
+
                 if (food != null) {
-                    food.effects().forEach(e -> event.list.add(1, getStatusText(e.effect())));
+                    food.getStatusEffects().forEach((e) -> {
+                        StatusEffectInstance effect = e.getFirst();
+                        event.list.add(1, getStatusText(effect));
+                    });
                 }
             }
         }
@@ -254,17 +261,20 @@ public class BetterTooltips extends Module {
         //Beehive
         if (beehive.get()) {
             if (event.itemStack.getItem() == Items.BEEHIVE || event.itemStack.getItem() == Items.BEE_NEST) {
-                ComponentMap components = event.itemStack.getComponents();
-                BlockStateComponent blockStateComponent = components.get(DataComponentTypes.BLOCK_STATE);
-                if (blockStateComponent != null) {
-                    String level = blockStateComponent.properties().get("honey_level");
-                    event.list.add(1, Text.literal(String.format("%sHoney level: %s%s%s.", Formatting.GRAY, Formatting.YELLOW, level, Formatting.GRAY)));
-                }
+                NbtCompound tag = event.itemStack.getNbt();
 
-                NbtComponent nbtComponent = components.get(DataComponentTypes.BLOCK_ENTITY_DATA);
-                if (nbtComponent != null) {
-                    NbtList beesTag = nbtComponent.copyNbt().getList("Bees", 10);
-                    event.list.add(1, Text.literal(String.format("%sBees: %s%d%s.", Formatting.GRAY, Formatting.YELLOW, beesTag.size(), Formatting.GRAY)));
+                if (tag != null) {
+                    NbtCompound blockStateTag = tag.getCompound("方块状态标签");
+                    if (blockStateTag != null) {
+                        int level = blockStateTag.getInt("蜜水平");
+                        event.list.add(1, Text.literal(String.format("%s蜜水平: %s%d%s.", Formatting.GRAY, Formatting.YELLOW, level, Formatting.GRAY)));
+                    }
+
+                    NbtCompound blockEntityTag = tag.getCompound("方块实体标签");
+                    if (blockEntityTag != null) {
+                        NbtList beesTag = blockEntityTag.getList("蜜蜂", 10);
+                        event.list.add(1, Text.literal(String.format("%s蜜蜂: %s%d%s.", Formatting.GRAY, Formatting.YELLOW, beesTag.size(), Formatting.GRAY)));
+                    }
                 }
             }
         }
@@ -272,7 +282,7 @@ public class BetterTooltips extends Module {
         // Item size tooltip
         if (byteSize.get()) {
             try {
-                event.itemStack.encode(mc.player.getRegistryManager()).write(ByteCountDataOutput.INSTANCE);
+                event.itemStack.writeNbt(new NbtCompound()).write(ByteCountDataOutput.INSTANCE);
 
                 int byteCount = ByteCountDataOutput.INSTANCE.getCount();
                 String count;
@@ -280,11 +290,11 @@ public class BetterTooltips extends Module {
                 ByteCountDataOutput.INSTANCE.reset();
 
                 if (byteCount >= 1024) count = String.format("%.2f kb", byteCount / (float) 1024);
-                else count = String.format("%d bytes", byteCount);
+                else count = String.format("%d 字节", byteCount);
 
                 event.list.add(Text.literal(count).formatted(Formatting.GRAY));
-            } catch (Exception e) {
-                event.list.add(Text.literal("Error getting bytes.").formatted(Formatting.RED));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
@@ -296,10 +306,10 @@ public class BetterTooltips extends Module {
             || (event.itemStack.getItem() == Items.WRITTEN_BOOK && books.get() && !previewBooks())
             || (event.itemStack.getItem() instanceof EntityBucketItem && entitiesInBuckets.get() && !previewEntities())
             || (event.itemStack.getItem() instanceof BannerItem && banners.get() && !previewBanners())
-            || (event.itemStack.getItem() instanceof BannerPatternItem && banners.get() && !previewBanners())
+            || (event.itemStack.getItem() instanceof BannerPatternItem && banners.get()  && !previewBanners())
             || (event.itemStack.getItem() == Items.SHIELD && banners.get() && !previewBanners())) {
             event.list.add(Text.literal(""));
-            event.list.add(Text.literal("Hold " + Formatting.YELLOW + keybind + Formatting.RESET + " to preview"));
+            event.list.add(Text.literal("按住 " + Formatting.YELLOW + keybind + Formatting.RESET + " 以预览"));
         }
     }
 
@@ -307,22 +317,21 @@ public class BetterTooltips extends Module {
     private void getTooltipData(TooltipDataEvent event) {
         // Container preview
         if (previewShulkers() && Utils.hasItems(event.itemStack)) {
-            ItemStack[] itemStacks = new ItemStack[27];
-            Utils.getItemsInContainerItem(event.itemStack, itemStacks);
+            NbtCompound compoundTag = event.itemStack.getSubNbt("方块实体标签");
+            DefaultedList<ItemStack> itemStacks = DefaultedList.ofSize(27, ItemStack.EMPTY);
+            Inventories.readNbt(compoundTag, itemStacks);
             event.tooltipData = new ContainerTooltipComponent(itemStacks, Utils.getShulkerColor(event.itemStack));
         }
 
         // EChest preview
         else if (event.itemStack.getItem() == Items.ENDER_CHEST && previewEChest()) {
-            event.tooltipData = EChestMemory.isKnown()
-                ? new ContainerTooltipComponent(EChestMemory.ITEMS.toArray(new ItemStack[27]), ECHEST_COLOR)
-                : new TextTooltipComponent(Text.literal("Unknown ender chest inventory.").formatted(Formatting.DARK_RED));
+            event.tooltipData = new ContainerTooltipComponent(EChestMemory.ITEMS, ECHEST_COLOR);
         }
 
         // Map preview
         else if (event.itemStack.getItem() == Items.FILLED_MAP && previewMaps()) {
-            MapIdComponent mapIdComponent = event.itemStack.get(DataComponentTypes.MAP_ID);
-            if (mapIdComponent != null) event.tooltipData = new MapTooltipComponent(mapIdComponent.id());
+            Integer mapId = FilledMapItem.getMapId(event.itemStack);
+            if (mapId != null) event.tooltipData = new MapTooltipComponent(mapId);
         }
 
         // Book preview
@@ -334,12 +343,14 @@ public class BetterTooltips extends Module {
         // Banner preview
         else if (event.itemStack.getItem() instanceof BannerItem && previewBanners()) {
             event.tooltipData = new BannerTooltipComponent(event.itemStack);
-        } else if (event.itemStack.getItem() instanceof BannerPatternItem && previewBanners()) {
-            BannerPatternsComponent bannerPatternsComponent = event.itemStack.get(DataComponentTypes.BANNER_PATTERNS);
-            if (bannerPatternsComponent != null) {
-                event.tooltipData = new BannerTooltipComponent(createBannerFromLayers(bannerPatternsComponent.layers()));
-            }
-        } else if (event.itemStack.getItem() == Items.SHIELD && previewBanners()) {
+        }
+        else if (event.itemStack.getItem() instanceof BannerPatternItem patternItem && previewBanners()) {
+            boolean present = Registries.BANNER_PATTERN.getEntryList(patternItem.getPattern()).isPresent() && Registries.BANNER_PATTERN.getEntryList(patternItem.getPattern()).get().size() != 0;
+
+            RegistryEntry<BannerPattern> bannerPattern = (present ? Registries.BANNER_PATTERN.getEntryList(patternItem.getPattern()).get().get(0) : null);
+            if (bannerPattern != null) event.tooltipData = new BannerTooltipComponent(createBannerFromPattern(bannerPattern));
+        }
+        else if (event.itemStack.getItem() == Items.SHIELD && previewBanners()) {
             ItemStack banner = createBannerFromShield(event.itemStack);
             if (banner != null) event.tooltipData = new BannerTooltipComponent(banner);
         }
@@ -349,24 +360,36 @@ public class BetterTooltips extends Module {
             EntityType<?> type = ((EntityBucketItemAccessor) bucketItem).getEntityType();
             Entity entity = type.create(mc.world);
             if (entity != null) {
-                ((Bucketable) entity).copyDataFromNbt(event.itemStack.get(DataComponentTypes.BUCKET_ENTITY_DATA).copyNbt());
+                ((Bucketable) entity).copyDataFromNbt(event.itemStack.getOrCreateNbt());
                 ((EntityAccessor) entity).setInWater(true);
                 event.tooltipData = new EntityTooltipComponent(entity);
             }
         }
     }
 
-    public void applyCompactShulkerTooltip(ItemStack shulkerItem, List<Text> tooltip) {
-        NbtComponent nbtComponent = shulkerItem.get(DataComponentTypes.BLOCK_ENTITY_DATA);
+    @EventHandler
+    private void onSectionVisible(SectionVisibleEvent event) {
+        if (enchantments.get() && event.section == ItemStack.TooltipSection.ENCHANTMENTS ||
+            modifiers.get() && event.section == ItemStack.TooltipSection.MODIFIERS ||
+            unbreakable.get() && event.section == ItemStack.TooltipSection.UNBREAKABLE ||
+            canDestroy.get() && event.section == ItemStack.TooltipSection.CAN_DESTROY ||
+            canPlaceOn.get() && event.section == ItemStack.TooltipSection.CAN_PLACE ||
+            additional.get() && event.section == ItemStack.TooltipSection.ADDITIONAL ||
+            dye.get() && event.section == ItemStack.TooltipSection.DYE)
+            event.visible = true;
+    }
 
-        if (nbtComponent != null) {
-            if (nbtComponent.contains("LootTable")) {
+    public void applyCompactShulkerTooltip(ItemStack stack, List<Text> tooltip) {
+        NbtCompound tag = stack.getSubNbt("方块实体标签");
+
+        if (tag != null) {
+            if (tag.contains("战利品表", 8)) {
                 tooltip.add(Text.literal("???????"));
             }
 
-            if (nbtComponent.contains("Items")) {
+            if (tag.contains("物品", 9)) {
                 DefaultedList<ItemStack> items = DefaultedList.ofSize(27, ItemStack.EMPTY);
-                Inventories.readNbt(nbtComponent.copyNbt(), items, DynamicRegistryManager.EMPTY);
+                Inventories.readNbt(tag, items);
 
                 Object2IntMap<Item> counts = new Object2IntOpenHashMap<>();
 
@@ -384,7 +407,7 @@ public class BetterTooltips extends Module {
                 });
 
                 if (counts.size() > 5) {
-                    tooltip.add((Text.translatable("container.shulkerBox.more", counts.size() - 5)).formatted(Formatting.ITALIC));
+                    tooltip.add((Text.translatable("容器.潜影盒.更多", counts.size() - 5)).formatted(Formatting.ITALIC));
                 }
             }
         }
@@ -393,50 +416,52 @@ public class BetterTooltips extends Module {
     private MutableText getStatusText(StatusEffectInstance effect) {
         MutableText text = Text.translatable(effect.getTranslationKey());
         if (effect.getAmplifier() != 0) {
-            text.append(String.format(" %d (%s)", effect.getAmplifier() + 1, StatusEffectUtil.getDurationText(effect, 1, mc.world.getTickManager().getTickRate()).getString()));
-        } else {
-            text.append(String.format(" (%s)", StatusEffectUtil.getDurationText(effect, 1, mc.world.getTickManager().getTickRate()).getString()));
+            text.append(String.format(" %d (%s)", effect.getAmplifier() + 1, StatusEffectUtil.getDurationText(effect, 1).getString()));
+        }
+        else {
+            text.append(String.format(" (%s)", StatusEffectUtil.getDurationText(effect, 1).getString()));
         }
 
-        if (effect.getEffectType().value().isBeneficial()) return text.formatted(Formatting.BLUE);
+        if (effect.getEffectType().isBeneficial()) return text.formatted(Formatting.BLUE);
         return text.formatted(Formatting.RED);
     }
 
-    private Text getFirstPage(ItemStack bookItem) {
-        if (bookItem.get(DataComponentTypes.WRITABLE_BOOK_CONTENT) != null) {
-            List<RawFilteredPair<String>> pages = bookItem.get(DataComponentTypes.WRITABLE_BOOK_CONTENT).pages();
+    private Text getFirstPage(ItemStack stack) {
+        NbtCompound tag = stack.getNbt();
+        if (tag == null) return null;
 
-            if (pages.isEmpty()) return null;
-            return Text.literal(pages.getFirst().get(false));
+        NbtList pages = tag.getList("页数", 8);
+        if (pages.size() < 1) return null;
+        if (stack.getItem() == Items.WRITABLE_BOOK) return Text.literal(pages.getString(0));
+
+        try {
+            return Text.Serializer.fromLenientJson(pages.getString(0));
+        } catch (JsonParseException e) {
+            return Text.literal("无效的书籍数据");
         }
-        else if (bookItem.get(DataComponentTypes.WRITTEN_BOOK_CONTENT) != null) {
-            List<RawFilteredPair<Text>> pages = bookItem.get(DataComponentTypes.WRITTEN_BOOK_CONTENT).pages();
-            if (pages.isEmpty()) return null;
-
-            return pages.getFirst().get(false);
-        }
-
-        return null;
     }
 
-    private ItemStack createBannerFromLayers(List<Layer> pattern) {
-        ItemStack bannerItem = new ItemStack(Items.GRAY_BANNER);
-        BannerPatternsComponent bannerPatterns = bannerItem.get(DataComponentTypes.BANNER_PATTERNS);
-        bannerPatterns.layers().addAll(pattern);
-        bannerItem.set(DataComponentTypes.BANNER_PATTERNS, bannerPatterns);
-        return bannerItem;
+    private ItemStack createBannerFromPattern(RegistryEntry<BannerPattern> pattern) {
+        ItemStack itemStack = new ItemStack(Items.GRAY_BANNER);
+        NbtCompound nbt = itemStack.getOrCreateSubNbt("方块实体标签");
+        NbtList listNbt = new BannerPattern.Patterns().add(BannerPatterns.BASE, DyeColor.BLACK).add(pattern, DyeColor.WHITE).toNbt();
+        nbt.put("图案", listNbt);
+        return itemStack;
     }
 
-    private ItemStack createBannerFromShield(ItemStack shieldItem) {
-        if (!shieldItem.getComponents().isEmpty()
-            || shieldItem.get(DataComponentTypes.BLOCK_ENTITY_DATA) == null
-            || shieldItem.get(DataComponentTypes.BASE_COLOR) == null)
+    private ItemStack createBannerFromShield(ItemStack item) {
+        if (!item.hasNbt()
+            || !item.getNbt().contains("方块实体标签")
+            || !item.getNbt().getCompound("方块实体标签").contains("底座"))
             return null;
+        NbtList listNbt = new BannerPattern.Patterns().add(BannerPatterns.BASE, ShieldItem.getColor(item)).toNbt();
+        NbtCompound nbt = item.getOrCreateSubNbt("方块实体标签");
         ItemStack bannerItem = new ItemStack(Items.GRAY_BANNER);
-        BannerPatternsComponent bannerPatternsComponent = bannerItem.get(DataComponentTypes.BANNER_PATTERNS);
-        BannerPatternsComponent shieldPatternsComponent = shieldItem.get(DataComponentTypes.BANNER_PATTERNS);
-        if (shieldPatternsComponent == null) return bannerItem;
-        bannerPatternsComponent.layers().addAll(shieldPatternsComponent.layers());
+        NbtCompound bannerTag = bannerItem.getOrCreateSubNbt("方块实体标签");
+        bannerTag.put("图案", listNbt);
+        if (!nbt.contains("图案")) return bannerItem;
+        NbtList shieldPatterns = nbt.getList("图案", NbtElement.COMPOUND_TYPE);
+        listNbt.addAll(shieldPatterns);
         return bannerItem;
     }
 

@@ -5,12 +5,12 @@
 
 package meteordevelopment.meteorclient.systems.modules.movement;
 
+import baritone.api.BaritoneAPI;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.mixin.PlayerMoveC2SPacketAccessor;
 import meteordevelopment.meteorclient.mixininterface.IPlayerMoveC2SPacket;
 import meteordevelopment.meteorclient.mixininterface.IVec3d;
-import meteordevelopment.meteorclient.pathing.PathManagers;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.EnumSetting;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -92,7 +92,7 @@ public class NoFall extends Module {
     private boolean placedWater;
     private BlockPos targetPos;
     private int timer;
-    private boolean prePathManagerNoFall;
+    private int preBaritoneFallHeight;
 
     public NoFall() {
         super(Categories.Movement, "无摔伤", "尝试防止你受到摔伤。");
@@ -100,15 +100,14 @@ public class NoFall extends Module {
 
     @Override
     public void onActivate() {
-        prePathManagerNoFall = PathManagers.get().getSettings().getNoFall().get();
-        if (mode.get() == Mode.Packet) PathManagers.get().getSettings().getNoFall().set(true);
-
+        preBaritoneFallHeight = BaritoneAPI.getSettings().maxFallHeightNoWater.value;
+        if (mode.get() == Mode.Packet) BaritoneAPI.getSettings().maxFallHeightNoWater.value = 255;
         placedWater = false;
     }
 
     @Override
     public void onDeactivate() {
-        PathManagers.get().getSettings().getNoFall().set(prePathManagerNoFall);
+        BaritoneAPI.getSettings().maxFallHeightNoWater.value = preBaritoneFallHeight;
     }
 
     @EventHandler

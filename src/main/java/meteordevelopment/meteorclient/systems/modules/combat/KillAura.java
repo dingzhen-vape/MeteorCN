@@ -5,9 +5,9 @@
 
 package meteordevelopment.meteorclient.systems.modules.combat;
 
+import baritone.api.BaritoneAPI;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.pathing.PathManagers;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.friends.Friends;
 import meteordevelopment.meteorclient.systems.modules.Categories;
@@ -30,6 +30,7 @@ import net.minecraft.entity.Tameable;
 import net.minecraft.entity.mob.EndermanEntity;
 import net.minecraft.entity.mob.ZombifiedPiglinEntity;
 import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.LlamaEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.AxeItem;
@@ -55,49 +56,49 @@ public class KillAura extends Module {
 
     private final Setting<Weapon> weapon = sgGeneral.add(new EnumSetting.Builder<Weapon>()
         .name("武器")
-        .description("只在手持指定的武器时攻击实体。")
+        .description("只有在手中持有指定武器时才攻击实体.")
         .defaultValue(Weapon.Both)
         .build()
     );
 
     private final Setting<RotationMode> rotation = sgGeneral.add(new EnumSetting.Builder<RotationMode>()
         .name("旋转")
-        .description("决定何时朝向目标旋转。")
+        .description("决定何时应向目标旋转.")
         .defaultValue(RotationMode.Always)
         .build()
     );
 
     private final Setting<Boolean> autoSwitch = sgGeneral.add(new BoolSetting.Builder()
         .name("自动切换")
-        .description("攻击目标时切换到你选择的武器。")
+        .description("攻击目标时切换到你选择的武器.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> onlyOnClick = sgGeneral.add(new BoolSetting.Builder()
-        .name("仅点击")
-        .description("只在按住左键时攻击。")
+        .name("仅点击时")
+        .description("只有按住左键时才攻击.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> onlyOnLook = sgGeneral.add(new BoolSetting.Builder()
-        .name("仅注视")
-        .description("只在注视实体时攻击。")
+        .name("仅注视时")
+        .description("只有在注视实体时才攻击.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pauseOnCombat = sgGeneral.add(new BoolSetting.Builder()
-        .name("暂停巴音")
-        .description("暂时冻结巴音直到你攻击完实体。")
+        .name("暂停Baritone")
+        .description("在攻击实体时暂时冻结Baritone.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<ShieldMode> shieldMode = sgGeneral.add(new EnumSetting.Builder<ShieldMode>()
-        .name("盾牌模式")
-        .description("会尝试用斧头破坏目标的盾牌。")
+        .name("盾模式")
+        .description("会尝试使用斧头打破目标的盾.")
         .defaultValue(ShieldMode.Break)
         .visible(() -> autoSwitch.get() && weapon.get() != Weapon.Axe)
         .build()
@@ -107,7 +108,7 @@ public class KillAura extends Module {
 
     private final Setting<Set<EntityType<?>>> entities = sgTargeting.add(new EntityTypeListSetting.Builder()
         .name("实体")
-        .description("要攻击的实体。")
+        .description("攻击的实体.")
         .onlyAttackable()
         .defaultValue(EntityType.PLAYER)
         .build()
@@ -115,14 +116,14 @@ public class KillAura extends Module {
 
     private final Setting<SortPriority> priority = sgTargeting.add(new EnumSetting.Builder<SortPriority>()
         .name("优先级")
-        .description("如何筛选范围内的目标。")
+        .description("如何过滤范围内的目标.")
         .defaultValue(SortPriority.ClosestAngle)
         .build()
     );
 
     private final Setting<Integer> maxTargets = sgTargeting.add(new IntSetting.Builder()
-        .name("最大目标")
-        .description("一次可以目标的实体数量。")
+        .name("最大目标数量")
+        .description("一次攻击多少实体.")
         .defaultValue(1)
         .min(1)
         .sliderRange(1, 5)
@@ -132,7 +133,7 @@ public class KillAura extends Module {
 
     private final Setting<Double> range = sgTargeting.add(new DoubleSetting.Builder()
         .name("范围")
-        .description("可以攻击实体的最大距离。")
+        .description("攻击目标的最大距离.")
         .defaultValue(4.5)
         .min(0)
         .sliderMax(6)
@@ -140,38 +141,38 @@ public class KillAura extends Module {
     );
 
     private final Setting<Double> wallsRange = sgTargeting.add(new DoubleSetting.Builder()
-        .name("穿墙范围")
-        .description("可以穿墙攻击实体的最大距离。")
+        .name("墙体范围")
+        .description("穿墙攻击的最大距离.")
         .defaultValue(3.5)
         .min(0)
         .sliderMax(6)
         .build()
     );
 
-    private final Setting<EntityAge> mobAgeFilter = sgTargeting.add(new EnumSetting.Builder<EntityAge>()
+    private final Setting<Boolean> ignoreBabies = sgTargeting.add(new BoolSetting.Builder()
         .name("忽略幼体")
-        .description("是否攻击实体的幼体变种。")
-        .defaultValue(EntityAge.Adult)
+        .description("是否攻击实体的幼体变种.")
+        .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> ignoreNamed = sgTargeting.add(new BoolSetting.Builder()
         .name("忽略命名")
-        .description("是否攻击有名字的生物。")
+        .description("是否攻击有名字的生物.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> ignorePassive = sgTargeting.add(new BoolSetting.Builder()
         .name("忽略被动")
-        .description("只在有时被动的生物攻击你时攻击它们。")
+        .description("如果他们以你为目标，则有时攻击被动生物.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> ignoreTamed = sgTargeting.add(new BoolSetting.Builder()
-        .name("忽略驯服")
-        .description("会避免攻击你驯服的生物。")
+        .name("忽略驯养")
+        .description("避免攻击你驯养的生物.")
         .defaultValue(false)
         .build()
     );
@@ -179,43 +180,43 @@ public class KillAura extends Module {
     // Timing
 
     private final Setting<Boolean> pauseOnLag = sgTiming.add(new BoolSetting.Builder()
-        .name("暂停卡顿")
-        .description("服务器卡顿时暂停。")
+        .name("延迟时暂停")
+        .description("如果服务器延迟则暂停.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> pauseOnUse = sgTiming.add(new BoolSetting.Builder()
-        .name("暂停使用")
-        .description("使用物品时不攻击。")
+        .name("使用时暂停")
+        .description("使用物品时不攻击.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> pauseOnCA = sgTiming.add(new BoolSetting.Builder()
-        .name("暂停CA")
-        .description("CA放置时不攻击。")
+        .name("CA时暂停")
+        .description("CA放置时不攻击.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> tpsSync = sgTiming.add(new BoolSetting.Builder()
         .name("TPS同步")
-        .description("尝试将攻击延迟与服务器的TPS同步。")
+        .description("尝试将攻击延迟与服务器的TPS同步.")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> customDelay = sgTiming.add(new BoolSetting.Builder()
         .name("自定义延迟")
-        .description("使用自定义的延迟而不是原版的冷却。")
+        .description("使用自定义延迟而不是原版冷却.")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Integer> hitDelay = sgTiming.add(new IntSetting.Builder()
         .name("攻击延迟")
-        .description("以刻为单位的攻击实体的速度。")
+        .description("攻击实体的速度（以刻为单位）.")
         .defaultValue(11)
         .min(0)
         .sliderMax(60)
@@ -225,26 +226,25 @@ public class KillAura extends Module {
 
     private final Setting<Integer> switchDelay = sgTiming.add(new IntSetting.Builder()
         .name("切换延迟")
-        .description("切换快捷栏槽位后攻击实体前等待的刻数。")
+        .description("切换快捷栏槽位后攻击实体前等待的刻数.")
         .defaultValue(0)
         .min(0)
         .sliderMax(10)
         .build()
     );
 
+    CrystalAura ca = Modules.get().get(CrystalAura.class);
     private final List<Entity> targets = new ArrayList<>();
     private int switchTimer, hitTimer;
     private boolean wasPathing = false;
-    public boolean attacking;
 
     public KillAura() {
-        super(Categories.Combat, "杀戮光环", "攻击你周围的指定实体。");
+        super(Categories.Combat, "杀戮光环", "攻击周围指定的实体.");
     }
 
     @Override
     public void onDeactivate() {
         targets.clear();
-        attacking = false;
     }
 
     @EventHandler
@@ -253,7 +253,7 @@ public class KillAura extends Module {
         if (pauseOnUse.get() && (mc.interactionManager.isBreakingBlock() || mc.player.isUsingItem())) return;
         if (onlyOnClick.get() && !mc.options.attackKey.isPressed()) return;
         if (TickRate.INSTANCE.getTimeSinceLastTick() >= 1f && pauseOnLag.get()) return;
-        if (pauseOnCA.get() && Modules.get().get(CrystalAura.class).isActive() && Modules.get().get(CrystalAura.class).kaTimer > 0) return;
+        if (pauseOnCA.get() && ca.isActive() && ca.kaTimer > 0) return;
 
         if (onlyOnLook.get()) {
             Entity targeted = mc.targetedEntity;
@@ -269,15 +269,14 @@ public class KillAura extends Module {
         }
 
         if (targets.isEmpty()) {
-            attacking = false;
             if (wasPathing) {
-                PathManagers.get().resume();
+                BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("恢复");
                 wasPathing = false;
             }
             return;
         }
 
-        Entity primary = targets.getFirst();
+        Entity primary = targets.get(0);
 
         if (autoSwitch.get()) {
             Predicate<ItemStack> predicate = switch (weapon.get()) {
@@ -298,10 +297,9 @@ public class KillAura extends Module {
 
         if (!itemInHand()) return;
 
-        attacking = true;
         if (rotation.get() == RotationMode.Always) Rotations.rotate(Rotations.getYaw(primary), Rotations.getPitch(primary, Target.Body));
-        if (pauseOnCombat.get() && PathManagers.get().isPathing() && !wasPathing) {
-            PathManagers.get().pause();
+        if (pauseOnCombat.get() && BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().isPathing() && !wasPathing) {
+            BaritoneAPI.getProvider().getPrimaryBaritone().getCommandManager().execute("暂停");
             wasPathing = true;
         }
 
@@ -329,7 +327,7 @@ public class KillAura extends Module {
 
     private boolean entityCheck(Entity entity) {
         if (entity.equals(mc.player) || entity.equals(mc.cameraEntity)) return false;
-        if ((entity instanceof LivingEntity livingEntity && livingEntity.isDead()) || !entity.isAlive()) return false;
+        if ((entity instanceof LivingEntity && ((LivingEntity) entity).isDead()) || !entity.isAlive()) return false;
 
         Box hitbox = entity.getBoundingBox();
         if (!PlayerUtils.isWithin(
@@ -349,23 +347,17 @@ public class KillAura extends Module {
             ) return false;
         }
         if (ignorePassive.get()) {
-            if (entity instanceof EndermanEntity enderman && !enderman.isAngry()) return false;
-            if (entity instanceof ZombifiedPiglinEntity piglin && !piglin.isAttacking()) return false;
+            if (entity instanceof EndermanEntity enderman && !enderman.isAngryAt(mc.player)) return false;
+            if (entity instanceof ZombifiedPiglinEntity piglin && !piglin.isAngryAt(mc.player)) return false;
             if (entity instanceof WolfEntity wolf && !wolf.isAttacking()) return false;
+            if (entity instanceof LlamaEntity llama && !llama.isAttacking()) return false;
         }
         if (entity instanceof PlayerEntity player) {
             if (player.isCreative()) return false;
             if (!Friends.get().shouldAttack(player)) return false;
             if (shieldMode.get() == ShieldMode.Ignore && player.blockedByShield(mc.world.getDamageSources().playerAttack(mc.player))) return false;
         }
-        if (entity instanceof AnimalEntity animal) {
-            return switch (mobAgeFilter.get()) {
-                case Baby -> animal.isBaby();
-                case Adult -> !animal.isBaby();
-                case Both -> true;
-            };
-        }
-        return true;
+        return !(entity instanceof AnimalEntity animal) || !ignoreBabies.get() || !animal.isBaby();
     }
 
     private boolean delayCheck() {
@@ -406,7 +398,7 @@ public class KillAura extends Module {
     }
 
     public Entity getTarget() {
-        if (!targets.isEmpty()) return targets.getFirst();
+        if (!targets.isEmpty()) return targets.get(0);
         return null;
     }
 
@@ -433,11 +425,5 @@ public class KillAura extends Module {
         Ignore,
         Break,
         None
-    }
-
-    public enum EntityAge {
-        Baby,
-        Adult,
-        Both
     }
 }

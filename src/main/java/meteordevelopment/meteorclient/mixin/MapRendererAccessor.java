@@ -6,7 +6,6 @@
 package meteordevelopment.meteorclient.mixin;
 
 import net.minecraft.client.render.MapRenderer;
-import net.minecraft.component.type.MapIdComponent;
 import net.minecraft.item.map.MapState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -14,5 +13,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(MapRenderer.class)
 public interface MapRendererAccessor {
     @Invoker("getMapTexture")
-    MapRenderer.MapTexture invokeGetMapTexture(MapIdComponent id, MapState state);
+    MapRenderer.MapTexture invokeGetMapTexture(int id, MapState state);
 }

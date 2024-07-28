@@ -22,7 +22,6 @@ import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.LightType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,12 +35,12 @@ public abstract class EntityRendererMixin<T extends Entity> implements IEntityRe
     public abstract Identifier getTexture(Entity entity);
 
     @Inject(method = "renderLabelIfPresent", at = @At("HEAD"), cancellable = true)
-    private void onRenderLabel(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, float tickDelta, CallbackInfo ci) {
-        if (PostProcessShaders.rendering) ci.cancel();
-        if (Modules.get().get(NoRender.class).noNametags()) ci.cancel();
+    private void onRenderLabel(T entity, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo info) {
+        if (PostProcessShaders.rendering) info.cancel();
+        if (Modules.get().get(NoRender.class).noNametags()) info.cancel();
         if (!(entity instanceof PlayerEntity)) return;
         if (Modules.get().get(Nametags.class).playerNametags() && !(EntityUtils.getGameMode((PlayerEntity) entity) == null && Modules.get().get(Nametags.class).excludeBots()))
-            ci.cancel();
+            info.cancel();
     }
 
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
@@ -52,12 +51,7 @@ public abstract class EntityRendererMixin<T extends Entity> implements IEntityRe
 
     @ModifyReturnValue(method = "getSkyLight", at = @At("RETURN"))
     private int onGetSkyLight(int original) {
-        return Math.max(Modules.get().get(Fullbright.class).getLuminance(LightType.SKY), original);
-    }
-
-    @ModifyReturnValue(method = "getBlockLight", at = @At("RETURN"))
-    private int onGetBlockLight(int original) {
-        return Math.max(Modules.get().get(Fullbright.class).getLuminance(LightType.BLOCK), original);
+        return Math.max(Modules.get().get(Fullbright.class).getLuminance(), original);
     }
 
     @Override

@@ -32,9 +32,6 @@ public class RainbowColors {
 
     public static final RainbowColor GLOBAL = new RainbowColor();
 
-    private RainbowColors() {
-    }
-
     @PostInit
     public static void init() {
         MeteorClient.EVENT_BUS.subscribe(RainbowColors.class);

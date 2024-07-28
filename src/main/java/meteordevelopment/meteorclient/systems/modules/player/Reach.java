@@ -10,7 +10,6 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
-import net.minecraft.entity.attribute.EntityAttributes;
 
 public class Reach extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -37,13 +36,13 @@ public class Reach extends Module {
         super(Categories.Player, "触及", "给你超长的手臂。");
     }
 
-    public double blockReach() {
-        if (!isActive()) return mc.player.getAttributeValue(EntityAttributes.PLAYER_BLOCK_INTERACTION_RANGE);
+    public float blockReach() {
+        if (!isActive()) return mc.interactionManager.getCurrentGameMode().isCreative() ? 5.0F : 4.5F;
         return blockReach.get().floatValue();
     }
 
-    public double entityReach() {
-        if (!isActive()) return mc.player.getAttributeValue(EntityAttributes.PLAYER_ENTITY_INTERACTION_RANGE);
+    public float entityReach() {
+        if (!isActive()) return 3;
         return entityReach.get().floatValue();
     }
 }

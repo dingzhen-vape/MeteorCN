@@ -46,7 +46,7 @@ public class HudElementInfo<T extends HudElement> {
     }
 
     public boolean hasPresets() {
-        return !presets.isEmpty();
+        return presets.size() > 0;
     }
 
     public HudElement create() {

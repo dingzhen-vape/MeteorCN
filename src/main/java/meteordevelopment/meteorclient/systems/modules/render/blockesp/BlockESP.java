@@ -96,7 +96,7 @@ public class BlockESP extends Module {
         }
 
         for (Chunk chunk : Utils.chunks()) {
-            searchChunk(chunk);
+            searchChunk(chunk, null);
         }
 
         lastDimension = PlayerUtils.getDimension();
@@ -153,10 +153,10 @@ public class BlockESP extends Module {
 
     @EventHandler
     private void onChunkData(ChunkDataEvent event) {
-        searchChunk(event.chunk());
+        searchChunk(event.chunk, event);
     }
 
-    private void searchChunk(Chunk chunk) {
+    private void searchChunk(Chunk chunk, ChunkDataEvent event) {
         MeteorExecutor.execute(() -> {
             if (!isActive()) return;
             ESPChunk schunk = ESPChunk.searchChunk(chunk, blocks.get());
@@ -173,6 +173,8 @@ public class BlockESP extends Module {
                     updateChunk(chunk.getPos().x, chunk.getPos().z + 1);
                 }
             }
+
+            if (event != null) ChunkDataEvent.returnChunkDataEvent(event);
         });
     }
 

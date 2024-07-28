@@ -94,7 +94,6 @@ public class Hud extends System<Hud> implements Iterable<HudElement> {
     );
 
     // Keybindings
-    @SuppressWarnings("unused")
     private final Setting<Keybind> keybind = sgKeybind.add(new KeybindSetting.Builder()
         .name("bind")
         .defaultValue(Keybind.none())
@@ -225,7 +224,7 @@ public class Hud extends System<Hud> implements Iterable<HudElement> {
         if (Utils.isLoading()) return;
 
         if (!active || shouldHideHud()) return;
-        if ((mc.options.hudHidden || mc.inGameHud.getDebugHud().shouldShowDebugHud()) && !HudEditorScreen.isOpen()) return;
+        if ((mc.options.hudHidden || mc.options.debugEnabled) && !HudEditorScreen.isOpen()) return;
 
         HudRenderer.INSTANCE.begin(event.drawContext);
 

@@ -5,107 +5,72 @@
 
 package meteordevelopment.meteorclient.systems.accounts.types;
 
+import com.mojang.authlib.Agent;
 import com.mojang.authlib.Environment;
+import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
-import de.florianmichael.waybackauthlib.InvalidCredentialsException;
-import de.florianmichael.waybackauthlib.WaybackAuthLib;
+import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.mixin.MinecraftClientAccessor;
 import meteordevelopment.meteorclient.mixin.YggdrasilMinecraftSessionServiceAccessor;
 import meteordevelopment.meteorclient.systems.accounts.Account;
 import meteordevelopment.meteorclient.systems.accounts.AccountType;
-import meteordevelopment.meteorclient.systems.accounts.TokenAccount;
-import meteordevelopment.meteorclient.utils.misc.NbtException;
-import net.minecraft.client.session.Session;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.client.util.Session;
 
 import java.util.Optional;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
-public class TheAlteningAccount extends Account<TheAlteningAccount> implements TokenAccount {
-    private static final Environment ENVIRONMENT = new Environment("http://sessionserver.thealtening.com", "http://authserver.thealtening.com", "The Altening");
-    private static final YggdrasilAuthenticationService SERVICE = new YggdrasilAuthenticationService(((MinecraftClientAccessor) mc).getProxy(), ENVIRONMENT);
-    private String token;
+public class TheAlteningAccount extends Account<TheAlteningAccount> {
+    private static final Environment ENVIRONMENT = Environment.create("http://authserver.thealtening.com", "https://api.mojang.com", "http://sessionserver.thealtening.com", "https://api.minecraftservices.com", "The Altening");
+    private static final YggdrasilAuthenticationService SERVICE = new YggdrasilAuthenticationService(((MinecraftClientAccessor) mc).getProxy(), "", ENVIRONMENT);
 
     public TheAlteningAccount(String token) {
         super(AccountType.TheAltening, token);
-        this.token = token;
     }
 
     @Override
     public boolean fetchInfo() {
-        WaybackAuthLib auth = getAuth();
+        YggdrasilUserAuthentication auth = getAuth();
 
         try {
             auth.logIn();
 
-            cache.username = auth.getCurrentProfile().getName();
-            cache.uuid = auth.getCurrentProfile().getId().toString();
+            cache.username = auth.getSelectedProfile().getName();
+            cache.uuid = auth.getSelectedProfile().getId().toString();
 
             return true;
-        } catch (Exception e) {
+        } catch (AuthenticationException e) {
             return false;
         }
     }
 
     @Override
     public boolean login() {
-        applyLoginEnvironment(SERVICE, YggdrasilMinecraftSessionServiceAccessor.createYggdrasilMinecraftSessionService(SERVICE.getServicesKeySet(), SERVICE.getProxy(), ENVIRONMENT));
+        applyLoginEnvironment(SERVICE, YggdrasilMinecraftSessionServiceAccessor.createYggdrasilMinecraftSessionService(SERVICE, ENVIRONMENT));
 
-        WaybackAuthLib auth = getAuth();
+        YggdrasilUserAuthentication auth = getAuth();
 
         try {
             auth.logIn();
-            setSession(new Session(auth.getCurrentProfile().getName(), auth.getCurrentProfile().getId(), auth.getAccessToken(), Optional.empty(), Optional.empty(), Session.AccountType.MOJANG));
+            setSession(new Session(auth.getSelectedProfile().getName(), auth.getSelectedProfile().getId().toString(), auth.getAuthenticatedToken(), Optional.empty(), Optional.empty(), Session.AccountType.MOJANG));
 
-            cache.username = auth.getCurrentProfile().getName();
+            cache.username = auth.getSelectedProfile().getName();
             cache.loadHead();
 
             return true;
-        } catch (InvalidCredentialsException e) {
-            MeteorClient.LOG.error("Invalid TheAltening credentials.");
-            return false;
-        } catch (Exception e) {
+        } catch (AuthenticationException e) {
             MeteorClient.LOG.error("Failed to login with TheAltening.");
             return false;
         }
     }
 
-    private WaybackAuthLib getAuth() {
-        WaybackAuthLib auth = new WaybackAuthLib(ENVIRONMENT.servicesHost());
+    private YggdrasilUserAuthentication getAuth() {
+        YggdrasilUserAuthentication auth = (YggdrasilUserAuthentication) SERVICE.createUserAuthentication(Agent.MINECRAFT);
 
         auth.setUsername(name);
         auth.setPassword("Meteor on Crack!");
 
         return auth;
-    }
-
-    @Override
-    public String getToken() {
-        return token;
-    }
-
-    @Override
-    public NbtCompound toTag() {
-        NbtCompound tag = new NbtCompound();
-
-        tag.putString("type", type.name());
-        tag.putString("name", name);
-        tag.putString("token", token);
-        tag.put("cache", cache.toTag());
-
-        return tag;
-    }
-
-    @Override
-    public TheAlteningAccount fromTag(NbtCompound tag) {
-        if (!tag.contains("name") || !tag.contains("cache") || !tag.contains("token")) throw new NbtException();
-
-        name = tag.getString("name");
-        token = tag.getString("token");
-        cache.fromTag(tag.getCompound("cache"));
-
-        return this;
     }
 }

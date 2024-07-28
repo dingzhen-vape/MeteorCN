@@ -22,11 +22,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 public class SettingArgumentType implements ArgumentType<String> {
-    private static final SettingArgumentType INSTANCE = new SettingArgumentType();
     private static final DynamicCommandExceptionType NO_SUCH_SETTING = new DynamicCommandExceptionType(name -> Text.literal("No such setting '" + name + "'."));
 
     public static SettingArgumentType create() {
-        return INSTANCE;
+        return new SettingArgumentType();
     }
 
     public static Setting<?> get(CommandContext<?> context) throws CommandSyntaxException {
@@ -38,8 +37,6 @@ public class SettingArgumentType implements ArgumentType<String> {
 
         return setting;
     }
-
-    private SettingArgumentType() {}
 
     @Override
     public String parse(StringReader reader) throws CommandSyntaxException {

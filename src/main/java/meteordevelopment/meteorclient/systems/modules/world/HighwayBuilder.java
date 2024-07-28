@@ -12,11 +12,9 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
-import meteordevelopment.meteorclient.systems.modules.combat.KillAura;
 import meteordevelopment.meteorclient.systems.modules.player.AutoEat;
 import meteordevelopment.meteorclient.systems.modules.player.AutoGap;
 import meteordevelopment.meteorclient.systems.modules.player.AutoTool;
-import meteordevelopment.meteorclient.systems.modules.player.InstaMine;
 import meteordevelopment.meteorclient.utils.misc.HorizontalDirection;
 import meteordevelopment.meteorclient.utils.misc.MBlockPos;
 import meteordevelopment.meteorclient.utils.player.CustomPlayerInput;
@@ -27,7 +25,6 @@ import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.meteorclient.utils.world.BlockUtils;
 import meteordevelopment.meteorclient.utils.world.Dir;
-import meteordevelopment.meteorclient.utils.world.TickRate;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -37,8 +34,10 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.*;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -47,14 +46,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.EmptyBlockView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-@SuppressWarnings("恒定条件")
 public class HighwayBuilder extends Module {
     public enum Floor {
         Replace,
@@ -67,7 +64,7 @@ public class HighwayBuilder extends Module {
         Place(false, true),
         Both(true, true);
 
-        public final boolean mine, place;
+        public boolean mine, place;
 
         Rotation(boolean mine, boolean place) {
             this.mine = mine;
@@ -78,11 +75,8 @@ public class HighwayBuilder extends Module {
     private static final BlockPos ZERO = new BlockPos(0, 0, 0);
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup sgDigging = settings.createGroup("挖掘");
-    private final SettingGroup sgPaving = settings.createGroup("铺设");
-    private final SettingGroup sgInventory = settings.createGroup("库存");
-    private final SettingGroup sgRenderDigging = settings.createGroup("渲染挖掘");
-    private final SettingGroup sgRenderPaving = settings.createGroup("渲染铺设");
+    private final SettingGroup sgRenderMine = settings.createGroup("渲染挖掘");
+    private final SettingGroup sgRenderPlace = settings.createGroup("渲染放置");
 
     // General
 
@@ -106,7 +100,7 @@ public class HighwayBuilder extends Module {
 
     private final Setting<Floor> floor = sgGeneral.add(new EnumSetting.Builder<Floor>()
         .name("地板")
-        .description("使用哪种地板放置模式。")
+        .description("使用什么地板放置模式。")
         .defaultValue(Floor.Replace)
         .build()
     );
@@ -119,8 +113,8 @@ public class HighwayBuilder extends Module {
     );
 
     private final Setting<Boolean> mineAboveRailings = sgGeneral.add(new BoolSetting.Builder()
-        .name("在栏杆上方开采")
-        .description("开采栏杆上方的方块。")
+        .name("挖掘栏杆上方的方块")
+        .description("挖掘栏杆上方的方块。")
         .visible(railings::get)
         .defaultValue(true)
         .build()
@@ -128,190 +122,103 @@ public class HighwayBuilder extends Module {
 
     private final Setting<Rotation> rotation = sgGeneral.add(new EnumSetting.Builder<Rotation>()
         .name("旋转")
-        .description("旋转模式。")
+        .description("旋转的模式。")
         .defaultValue(Rotation.Both)
+        .build()
+    );
+
+    private final Setting<List<Block>> blocksToPlace = sgGeneral.add(new BlockListSetting.Builder()
+        .name("可放置的方块")
+        .description("允许放置的方块。")
+        .defaultValue(Blocks.OBSIDIAN)
+        .filter(block -> Block.isShapeFullCube(block.getDefaultState().getCollisionShape(mc.world, ZERO)))
+        .build()
+    );
+
+    private final Setting<List<Item>> trashItems = sgGeneral.add(new ItemListSetting.Builder()
+        .name("垃圾物品")
+        .description("被认为是垃圾并可以扔掉的物品。")
+        .defaultValue(Items.NETHERRACK, Items.QUARTZ, Items.GOLD_NUGGET, Items.GLOWSTONE_DUST, Items.BLACKSTONE, Items.BASALT)
+        .build()
+    );
+
+    private final Setting<Boolean> dontBreakTools = sgGeneral.add(new BoolSetting.Builder()
+        .name("不要破坏工具")
+        .description("不要破坏工具。")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Boolean> mineEnderChests = sgGeneral.add(new BoolSetting.Builder()
+        .name("挖掘末影箱")
+        .description("挖掘末影箱获取黑曜石。")
+        .defaultValue(true)
         .build()
     );
 
     private final Setting<Boolean> disconnectOnToggle = sgGeneral.add(new BoolSetting.Builder()
         .name("切换时断开连接")
-        .description("当模块关闭时自动断开连接，例如没有足够的方块时。")
+        .description("当模块关闭时自动断开连接，例如没有足够的方块。")
         .defaultValue(false)
         .build()
     );
 
-    private final Setting<Boolean> pauseOnLag = sgGeneral.add(new BoolSetting.Builder()
-        .name("延迟响应时暂停")
-        .description("在服务器停止响应时暂停当前过程。")
+    // Render Mine
+
+    private final Setting<Boolean> renderMine = sgRenderMine.add(new BoolSetting.Builder()
+        .name("渲染要挖掘的方块")
+        .description("渲染要挖掘的方块。")
         .defaultValue(true)
         .build()
     );
 
-    // Digging
-
-    private final Setting<Boolean> dontBreakTools = sgDigging.add(new BoolSetting.Builder()
-        .name("不破坏工具")
-        .description("不破坏工具。")
-        .defaultValue(false)
-        .build()
-    );
-
-    private final Setting<Integer> savePickaxes = sgDigging.add(new IntSetting.Builder()
-        .name("保存稿")
-        .description("确保保存的稿的数量。")
-        .defaultValue(0)
-        .range(0, 36)
-        .sliderRange(0, 36)
-        .visible(() -> !dontBreakTools.get())
-        .build()
-    );
-
-    private final Setting<Integer> breakDelay = sgDigging.add(new IntSetting.Builder()
-        .name("破坏延迟")
-        .description("破坏方块之间的延迟。")
-        .defaultValue(0)
-        .min(0)
-        .build()
-    );
-
-    private final Setting<Integer> blocksPerTick = sgDigging.add(new IntSetting.Builder()
-        .name("每滴答方块数")
-        .description("每滴答可以开采的最大方块数量。仅适用于可以立即破坏的方块。")
-        .defaultValue(1)
-        .range(1, 100)
-        .sliderRange(1, 25)
-        .build()
-    );
-
-    // Paving
-
-    private final Setting<List<Block>> blocksToPlace = sgPaving.add(new BlockListSetting.Builder()
-        .name("允许放置的方块")
-        .description("允许放置的方块。")
-        .defaultValue(Blocks.OBSIDIAN)
-        .filter(block -> Block.isShapeFullCube(block.getDefaultState().getCollisionShape(EmptyBlockView.INSTANCE, ZERO)))
-        .build()
-    );
-
-    private final Setting<Integer> placeDelay = sgPaving.add(new IntSetting.Builder()
-        .name("放置延迟")
-        .description("放置方块之间的延迟。")
-        .defaultValue(0)
-        .min(0)
-        .build()
-    );
-
-    private final Setting<Integer> placementsPerTick = sgPaving.add(new IntSetting.Builder()
-        .name("每滴答放置数")
-        .description("每滴答可以放置的最大方块数量。")
-        .defaultValue(1)
-        .min(1)
-        .build()
-    );
-
-    // Inventory
-
-    private final Setting<List<Item>> trashItems = sgInventory.add(new ItemListSetting.Builder()
-        .name("垃圾物品")
-        .description("被认为是垃圾并可以丢弃的物品。")
-        .defaultValue(
-            Items.NETHERRACK, Items.QUARTZ, Items.GOLD_NUGGET, Items.GOLDEN_SWORD, Items.GLOWSTONE_DUST,
-            Items.GLOWSTONE, Items.BLACKSTONE, Items.BASALT, Items.GHAST_TEAR, Items.SOUL_SAND, Items.SOUL_SOIL,
-            Items.ROTTEN_FLESH
-        )
-        .build()
-    );
-
-    private final Setting<Boolean> mineEnderChests = sgInventory.add(new BoolSetting.Builder()
-        .name("开采末影箱")
-        .description("为了黑曜石而开采末影箱。")
-        .defaultValue(true)
-        .build()
-    );
-
-    private final Setting<Integer> saveEchests = sgInventory.add(new IntSetting.Builder()
-        .name("保存末影箱")
-        .description("确保保存的末影箱数量。")
-        .defaultValue(1)
-        .range(0, 64)
-        .sliderRange(0, 64)
-        .visible(mineEnderChests::get)
-        .build()
-    );
-
-    private final Setting<Boolean> instamineEchests = sgInventory.add(new BoolSetting.Builder()
-        .name("即时开采末影箱")
-        .description("是否使用即时开采漏洞来破坏末影箱。")
-        .defaultValue(false)
-        .visible(mineEnderChests::get)
-        .build()
-    );
-
-    private final Setting<Integer> instamineDelay = sgInventory.add(new IntSetting.Builder()
-        .name("即时开采延迟")
-        .description("即时开采尝试之间的延迟。")
-        .defaultValue(0)
-        .sliderMax(20)
-        .visible(() -> mineEnderChests.get() && instamineEchests.get())
-        .build()
-    );
-
-    // Render Digging
-
-    private final Setting<Boolean> renderMine = sgRenderDigging.add(new BoolSetting.Builder()
-        .name("渲染待开采方块")
-        .description("渲染待开采的方块。")
-        .defaultValue(true)
-        .build()
-    );
-
-    private final Setting<ShapeMode> renderMineShape = sgRenderDigging.add(new EnumSetting.Builder<ShapeMode>()
-        .name("待开采方块形状模式")
-        .description("待开采方块的渲染方式。")
+    private final Setting<ShapeMode> renderMineShape = sgRenderMine.add(new EnumSetting.Builder<ShapeMode>()
+        .name("要挖掘的方块的形状模式")
+        .description("要挖掘的方块的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
-    private final Setting<SettingColor> renderMineSideColor = sgRenderDigging.add(new ColorSetting.Builder()
-        .name("待开采方块侧面颜色")
-        .description("待开采方块的颜色。")
+    private final Setting<SettingColor> renderMineSideColor = sgRenderMine.add(new ColorSetting.Builder()
+        .name("要挖掘的方块的侧面颜色")
+        .description("要挖掘的方块的颜色。")
         .defaultValue(new SettingColor(225, 25, 25, 25))
         .build()
     );
 
-    private final Setting<SettingColor> renderMineLineColor = sgRenderDigging.add(new ColorSetting.Builder()
-        .name("待开采方块线条颜色")
-        .description("待开采方块的颜色。")
+    private final Setting<SettingColor> renderMineLineColor = sgRenderMine.add(new ColorSetting.Builder()
+        .name("要挖掘的方块的线条颜色")
+        .description("要挖掘的方块的颜色。")
         .defaultValue(new SettingColor(225, 25, 25))
         .build()
     );
 
-    // Render Paving
+    // Render Place
 
-    private final Setting<Boolean> renderPlace = sgRenderPaving.add(new BoolSetting.Builder()
-        .name("渲染待放置方块")
-        .description("渲染待放置的方块。")
+    private final Setting<Boolean> renderPlace = sgRenderPlace.add(new BoolSetting.Builder()
+        .name("渲染要放置的方块")
+        .description("渲染要放置的方块。")
         .defaultValue(true)
         .build()
     );
 
-    private final Setting<ShapeMode> renderPlaceShape = sgRenderPaving.add(new EnumSetting.Builder<ShapeMode>()
-        .name("待放置方块形状模式")
-        .description("待放置方块的渲染方式。")
+    private final Setting<ShapeMode> renderPlaceShape = sgRenderPlace.add(new EnumSetting.Builder<ShapeMode>()
+        .name("要放置的方块的形状模式")
+        .description("要放置的方块的渲染方式。")
         .defaultValue(ShapeMode.Both)
         .build()
     );
 
-    private final Setting<SettingColor> renderPlaceSideColor = sgRenderPaving.add(new ColorSetting.Builder()
-        .name("待放置方块侧面颜色")
-        .description("待放置方块的颜色。")
+    private final Setting<SettingColor> renderPlaceSideColor = sgRenderPlace.add(new ColorSetting.Builder()
+        .name("要放置的方块的侧面颜色")
+        .description("要放置的方块的颜色。")
         .defaultValue(new SettingColor(25, 25, 225, 25))
         .build()
     );
 
-    private final Setting<SettingColor> renderPlaceLineColor = sgRenderPaving.add(new ColorSetting.Builder()
-        .name("待放置方块线条颜色")
-        .description("待放置方块的颜色。")
+    private final Setting<SettingColor> renderPlaceLineColor = sgRenderPlace.add(new ColorSetting.Builder()
+        .name("要放置的方块的线条颜色")
+        .description("要放置的方块的颜色。")
         .defaultValue(new SettingColor(25, 25, 225))
         .build()
     );
@@ -328,7 +235,6 @@ public class HighwayBuilder extends Module {
     public int blocksBroken, blocksPlaced;
     private final MBlockPos lastBreakingPos = new MBlockPos();
     private boolean displayInfo;
-    private int placeTimer, breakTimer, count;
 
     private final MBlockPos posRender2 = new MBlockPos();
     private final MBlockPos posRender3 = new MBlockPos();
@@ -336,15 +242,6 @@ public class HighwayBuilder extends Module {
     public HighwayBuilder() {
         super(Categories.World, "高速公路建造者", "自动建造高速公路。");
     }
-
-    /*todo
-        - separate digging and paving more effectively
-        - better inventory management
-            - getting echests and picks from shulker boxes - refactor echest blockade to be more general purpose?
-            - access to your ec
-        - separate walking forwards from the current state to speed up actions
-        - fix issues related to y level changes
-     */
 
     @Override
     public void onActivate() {
@@ -363,15 +260,6 @@ public class HighwayBuilder extends Module {
         blocksBroken = blocksPlaced = 0;
         lastBreakingPos.set(0, 0, 0);
         displayInfo = true;
-
-        placeTimer = 0;
-        breakTimer = 0;
-        count = 0;
-
-        if (blocksPerTick.get() > 1 && rotation.get().mine) warning("启用旋转时，每滴答最多可以破坏1个方块。");
-        if (placementsPerTick.get() > 1 && rotation.get().place) warning("启用旋转时，每滴答最多可以放置1个方块。");
-
-        if (Modules.get().get(InstaMine.class).isActive()) warning("建议禁用即时开采模块，而是使用“即时开采末影箱”以避免错误。");
     }
 
     @Override
@@ -381,9 +269,9 @@ public class HighwayBuilder extends Module {
         mc.player.setYaw(dir.yaw);
 
         if (displayInfo) {
-            info("距离：(突出显示)%.0f", PlayerUtils.distanceTo(start));
-            info("破坏的方块：(突出显示)%d", blocksBroken);
-            info("放置的方块：(突出显示)%d", blocksPlaced);
+            info("距离: (highlight)%.0f", PlayerUtils.distanceTo(start));
+            info("破坏的方块: (highlight)%d", blocksBroken);
+            info("放置的方块: (highlight)%d", blocksPlaced);
         }
     }
 
@@ -413,16 +301,8 @@ public class HighwayBuilder extends Module {
 
         if (Modules.get().get(AutoEat.class).eating) return;
         if (Modules.get().get(AutoGap.class).isEating()) return;
-        if (Modules.get().get(KillAura.class).attacking) return;
-
-        if (pauseOnLag.get() && TickRate.INSTANCE.getTimeSinceLastTick() >= 2.0f) return;
-
-        count = 0;
 
         state.tick(this);
-
-        if (breakTimer > 0) breakTimer--;
-        if (placeTimer > 0) placeTimer--;
     }
 
     @EventHandler
@@ -463,7 +343,7 @@ public class HighwayBuilder extends Module {
                     it.restore();
                 }
 
-                event.renderer.box(posRender2.getBlockPos(), sideColor, lineColor, shapeMode, excludeDir);
+                event.renderer.box(posRender2.getMcPos(), sideColor, lineColor, shapeMode, excludeDir);
             }
         }
     }
@@ -494,11 +374,11 @@ public class HighwayBuilder extends Module {
 
     private boolean canMine(MBlockPos pos, boolean ignoreBlocksToPlace) {
         BlockState state = pos.getState();
-        return BlockUtils.canBreak(pos.getBlockPos(), state) && (ignoreBlocksToPlace || !blocksToPlace.get().contains(state.getBlock()));
+        return BlockUtils.canBreak(pos.getMcPos(), state) && (ignoreBlocksToPlace || !blocksToPlace.get().contains(state.getBlock()));
     }
 
     private boolean canPlace(MBlockPos pos, boolean liquids) {
-        return liquids ? !pos.getState().getFluidState().isEmpty() : BlockUtils.canPlace(pos.getBlockPos());
+        return liquids ? !pos.getState().getFluidState().isEmpty() : pos.getState().isAir();
     }
 
     private void disconnect(String message, Object... args) {
@@ -509,9 +389,9 @@ public class HighwayBuilder extends Module {
     }
 
     public MutableText getStatsText() {
-        MutableText text = Text.literal(String.format("%s距离：%s%.0f\n", Formatting.GRAY, Formatting.WHITE, mc.player == null ? 0.0f : PlayerUtils.distanceTo(start)));
-        text.append(String.format("%s破坏的方块：%s%d\n", Formatting.GRAY, Formatting.WHITE, blocksBroken));
-        text.append(String.format("%s放置的方块：%s%d", Formatting.GRAY, Formatting.WHITE, blocksPlaced));
+        MutableText text = Text.literal(String.format("%s距离: %s%.0f\n", Formatting.GRAY, Formatting.WHITE, mc.player == null ? 0.0f : PlayerUtils.distanceTo(start)));
+        text.append(String.format("%s破坏的方块: %s%d\n", Formatting.GRAY, Formatting.WHITE, blocksBroken));
+        text.append(String.format("%s放置的方块: %s%d", Formatting.GRAY, Formatting.WHITE, blocksPlaced));
 
         return text;
     }
@@ -528,8 +408,6 @@ public class HighwayBuilder extends Module {
                 boolean isZ = Math.abs(z) <= 0.1;
 
                 if (isX && isZ) {
-                    b.input.stop();
-                    b.mc.player.setVelocity(0, 0, 0);
                     b.mc.player.setPosition((int) b.mc.player.getX() + (b.mc.player.getX() < 0 ? -0.5 : 0.5), b.mc.player.getY(), (int) b.mc.player.getZ() + (b.mc.player.getZ() < 0 ? -0.5 : 0.5));
                     b.setState(b.lastState);
                 }
@@ -565,26 +443,16 @@ public class HighwayBuilder extends Module {
 
         Forward {
             @Override
-            protected void start(HighwayBuilder b) {
+            protected void tick(HighwayBuilder b) {
                 b.mc.player.setYaw(b.dir.yaw);
 
-                checkTasks(b);
-            }
-
-            @Override
-            protected void tick(HighwayBuilder b) {
-                checkTasks(b);
-
-                if (b.state == Forward) b.input.pressingForward = true; // Move
-            }
-
-            private void checkTasks(HighwayBuilder b) {
                 if (needsToPlace(b, b.blockPosProvider.getLiquids(), true)) b.setState(FillLiquids); // Fill Liquids
                 else if (needsToMine(b, b.blockPosProvider.getFront(), true)) b.setState(MineFront); // Mine Front
                 else if (b.floor.get() == Floor.Replace && needsToMine(b, b.blockPosProvider.getFloor(), false)) b.setState(MineFloor); // Mine Floor
                 else if (b.railings.get() && needsToMine(b, b.blockPosProvider.getRailings(true), false)) b.setState(MineRailings); // Mine Railings
                 else if (b.railings.get() && needsToPlace(b, b.blockPosProvider.getRailings(false), false)) b.setState(PlaceRailings); // Place Railings
                 else if (needsToPlace(b, b.blockPosProvider.getFloor(), false)) b.setState(PlaceFloor); // Place Floor
+                else b.input.pressingForward = true; // Move
             }
 
             private boolean needsToMine(HighwayBuilder b, MBPIterator it, boolean ignoreBlocksToPlace) {
@@ -617,31 +485,31 @@ public class HighwayBuilder extends Module {
         MineFront {
             @Override
             protected void tick(HighwayBuilder b) {
-                mine(b, b.blockPosProvider.getFront(), true, MineFloor, this);
+                mine(b, b.blockPosProvider.getFront(), true);
             }
         },
 
         MineFloor {
             @Override
-            protected void start(HighwayBuilder b) {
-                mine(b, b.blockPosProvider.getFloor(), false, MineRailings, this);
+            protected void tick(HighwayBuilder b) {
+                mine(b, b.blockPosProvider.getFloor(), false);
             }
+        },
 
+        PlaceFloor {
             @Override
             protected void tick(HighwayBuilder b) {
-                mine(b, b.blockPosProvider.getFloor(), false, MineRailings, this);
+                int slot = findBlocksToPlace(b);
+                if (slot == -1) return;
+
+                place(b, b.blockPosProvider.getFloor(), slot, Forward);
             }
         },
 
         MineRailings {
             @Override
-            protected void start(HighwayBuilder b) {
-                mine(b, b.blockPosProvider.getRailings(true), false, PlaceRailings, this);
-            }
-
-            @Override
             protected void tick(HighwayBuilder b) {
-                mine(b, b.blockPosProvider.getRailings(true), false, PlaceRailings, this);
+                mine(b, b.blockPosProvider.getRailings(true), false);
             }
         },
 
@@ -652,24 +520,6 @@ public class HighwayBuilder extends Module {
                 if (slot == -1) return;
 
                 place(b, b.blockPosProvider.getRailings(false), slot, Forward);
-            }
-        },
-
-        PlaceFloor {
-            @Override
-            protected void start(HighwayBuilder b) {
-                int slot = findBlocksToPlace(b);
-                if (slot == -1) return;
-
-                place(b, b.blockPosProvider.getFloor(), slot, Forward);
-            }
-
-            @Override
-            protected void tick(HighwayBuilder b) {
-                int slot = findBlocksToPlace(b);
-                if (slot == -1) return;
-
-                place(b, b.blockPosProvider.getFloor(), slot, Forward);
             }
         },
 
@@ -715,11 +565,6 @@ public class HighwayBuilder extends Module {
                     return;
                 }
 
-                if (!b.mc.player.currentScreenHandler.getCursorStack().isEmpty()) {
-                    InvUtils.dropHand();
-                    return;
-                }
-
                 for (int i = 0; i < b.mc.player.getInventory().main.size(); i++) {
                     if (i == skipSlot) continue;
 
@@ -755,10 +600,13 @@ public class HighwayBuilder extends Module {
 
         MineEnderChests {
             private static final MBlockPos pos = new MBlockPos();
+
             private int minimumObsidian;
-            private boolean first, primed;
+            private boolean first;
+            private int moveTimer;
+
             private boolean stopTimerEnabled;
-            private int stopTimer, moveTimer, instamineTimer;
+            private int stopTimer;
 
             @Override
             protected void start(HighwayBuilder b) {
@@ -781,7 +629,7 @@ public class HighwayBuilder extends Module {
                 }
 
                 if (emptySlots == 0) {
-                    b.error("没有空位。");
+                    b.error("没有空槽。");
                     return;
                 }
 
@@ -791,7 +639,6 @@ public class HighwayBuilder extends Module {
                 moveTimer = 0;
 
                 stopTimerEnabled = false;
-                primed = false;
             }
 
             @Override
@@ -835,56 +682,35 @@ public class HighwayBuilder extends Module {
                     return;
                 }
 
-                BlockPos bp = pos.getBlockPos();
-
                 // Check block state
-                BlockState blockState = b.mc.world.getBlockState(bp);
+                BlockState blockState = b.mc.world.getBlockState(pos.getMcPos());
 
                 if (blockState.getBlock() == Blocks.ENDER_CHEST) {
-                    if (first) {
-                        moveTimer = 8;
-                        first = false;
-                        return;
-                    }
-
                     // Mine ender chest
-                    int slot = findAndMoveBestToolToHotbar(b, blockState, true);
+                    int slot = findAndMoveBestToolToHotbar(b, blockState, true, false);
                     if (slot == -1) {
-                        b.error("找不到没有丝触采集的稿来开采末影箱。");
+                        b.error("找不到带有精准采集的镐子来挖掘末影箱。");
                         return;
                     }
 
                     InvUtils.swap(slot, false);
-
-                    if (b.instamineEchests.get() && primed) {
-                        if (instamineTimer > 0) {
-                            instamineTimer--;
-                            return;
-                        }
-
-                        PlayerActionC2SPacket p = new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.STOP_DESTROY_BLOCK, bp, BlockUtils.getDirection(bp));
-                        instamineTimer = b.instamineDelay.get();
-
-                        if (b.rotation.get().mine) Rotations.rotate(Rotations.getYaw(bp), Rotations.getPitch(bp), () -> b.mc.getNetworkHandler().sendPacket(p));
-                        else b.mc.getNetworkHandler().sendPacket(p);
-                    }
-                    else {
-                        if (b.rotation.get().mine) Rotations.rotate(Rotations.getYaw(bp), Rotations.getPitch(bp), () -> BlockUtils.breakBlock(bp, true));
-                        else BlockUtils.breakBlock(bp, true);
-                    }
+                    BlockUtils.breakBlock(pos.getMcPos(), true);
                 }
                 else {
                     // Place ender chest
                     int slot = findAndMoveToHotbar(b, itemStack -> itemStack.getItem() == Items.ENDER_CHEST, false);
-                    if (slot == -1 || countItem(b, stack -> stack.getItem().equals(Items.ENDER_CHEST)) <= b.saveEchests.get()) {
+                    if (slot == -1) {
                         stopTimerEnabled = true;
                         stopTimer = 4;
                         return;
                     }
 
-                    if (!first) primed = true;
+                    if (first) {
+                        moveTimer = 8;
+                        first = false;
+                    }
 
-                    BlockUtils.place(bp, Hand.MAIN_HAND, slot, b.rotation.get().place, 0, true, true, false);
+                    BlockUtils.place(pos.getMcPos(), Hand.MAIN_HAND, slot, true, 0, true, true, false);
                 }
             }
         };
@@ -895,69 +721,53 @@ public class HighwayBuilder extends Module {
 
         protected void mine(HighwayBuilder b, MBPIterator it, boolean ignoreBlocksToPlace, State nextState, State lastState) {
             boolean breaking = false;
-            boolean finishedBreaking = false; // if you can multi break this lets you mine blocks between tasks in a single tick
 
             for (MBlockPos pos : it) {
-                if (b.count >= b.blocksPerTick.get()) return;
-                if (b.breakTimer > 0) return;
-
                 BlockState state = pos.getState();
                 if (state.isAir() || (!ignoreBlocksToPlace && b.blocksToPlace.get().contains(state.getBlock()))) continue;
 
-                int slot = findAndMoveBestToolToHotbar(b, state, false);
+                int slot = findAndMoveBestToolToHotbar(b, state, false, true);
                 if (slot == -1) return;
 
                 InvUtils.swap(slot, false);
 
-                BlockPos mcPos = pos.getBlockPos();
+                BlockPos mcPos = pos.getMcPos();
                 if (BlockUtils.canBreak(mcPos)) {
-                    if (b.rotation.get().mine) Rotations.rotate(Rotations.getYaw(mcPos), Rotations.getPitch(mcPos), () -> BlockUtils.breakBlock(mcPos, true));
+                    if (b.rotation.get().mine) Rotations.rotate(Rotations.getYaw(mcPos), Rotations.getPitch(mcPos), () -> BlockUtils.breakBlock(pos.getMcPos(), true));
                     else BlockUtils.breakBlock(mcPos, true);
-                    breaking = true;
 
-                    b.breakTimer = b.breakDelay.get();
+                    breaking = true;
 
                     if (!b.lastBreakingPos.equals(pos)) {
                         b.lastBreakingPos.set(pos);
                         b.blocksBroken++;
                     }
 
-                    b.count++;
-
-                    // can only multi break if we aren't rotating and the block can be instamined
-                    if (b.blocksPerTick.get() == 1 || !BlockUtils.canInstaBreak(mcPos) || b.rotation.get().mine) break;
+                    break;
                 }
-
-                if (!it.hasNext() && BlockUtils.canInstaBreak(mcPos)) finishedBreaking = true;
             }
 
-            if (finishedBreaking || !breaking) {
+            if (!breaking) {
                 b.setState(nextState);
                 b.lastState = lastState;
             }
         }
+        protected void mine(HighwayBuilder b, MBPIterator it, boolean ignoreBlocksToPlace) {
+            mine(b, it, ignoreBlocksToPlace, Forward, b.state);
+        }
 
         protected void place(HighwayBuilder b, MBPIterator it, int slot, State nextState) {
             boolean placed = false;
-            boolean finishedPlacing = false;
 
             for (MBlockPos pos : it) {
-                if (b.count >= b.placementsPerTick.get()) return;
-                if (b.placeTimer > 0) return;
-
-                if (BlockUtils.place(pos.getBlockPos(), Hand.MAIN_HAND, slot, b.rotation.get().place, 0, true, true, true)) {
+                if (BlockUtils.place(pos.getMcPos(), Hand.MAIN_HAND, slot, b.rotation.get().place, 0, true, true, true)) {
                     placed = true;
                     b.blocksPlaced++;
-                    b.placeTimer = b.placeDelay.get();
-
-                    b.count++;
-                    if (b.placementsPerTick.get() == 1) break;
+                    break;
                 }
-
-                if (!it.hasNext()) finishedPlacing = true;
             }
 
-            if (finishedPlacing || !placed) b.setState(nextState);
+            if (!placed) b.setState(nextState);
         }
 
         private int findSlot(HighwayBuilder b, Predicate<ItemStack> predicate, boolean hotbar) {
@@ -971,8 +781,8 @@ public class HighwayBuilder extends Module {
         private int findHotbarSlot(HighwayBuilder b, boolean replaceTools) {
             int thrashSlot = -1;
             int slotsWithBlocks = 0;
-            int slotWithLeastBlocks = -1;
-            int slotWithLeastBlocksCount = Integer.MAX_VALUE;
+            int slotWithLeastBlocks = 65;
+            int slowWithLeastBlocksCount = 0;
 
             // Loop hotbar
             for (int i = 0; i < 9; i++) {
@@ -991,8 +801,8 @@ public class HighwayBuilder extends Module {
                 if (itemStack.getItem() instanceof BlockItem blockItem && b.blocksToPlace.get().contains(blockItem.getBlock())) {
                     slotsWithBlocks++;
 
-                    if (itemStack.getCount() < slotWithLeastBlocksCount) {
-                        slotWithLeastBlocksCount = itemStack.getCount();
+                    if (itemStack.getCount() < slowWithLeastBlocksCount) {
+                        slowWithLeastBlocksCount = itemStack.getCount();
                         slotWithLeastBlocks = i;
                     }
                 }
@@ -1005,7 +815,7 @@ public class HighwayBuilder extends Module {
             if (slotsWithBlocks > 1) return slotWithLeastBlocks;
 
             // No space found in hotbar
-            b.error("快捷栏中没有空位。");
+            b.error("热栏没有空位。");
             return -1;
         }
 
@@ -1015,16 +825,6 @@ public class HighwayBuilder extends Module {
             }
 
             return false;
-        }
-
-        protected int countItem(HighwayBuilder b, Predicate<ItemStack> predicate) {
-            int count = 0;
-            for (int i = 0; i < b.mc.player.getInventory().main.size(); i++) {
-                ItemStack stack = b.mc.player.getInventory().getStack(i);
-                if (predicate.test(stack)) count += stack.getCount();
-            }
-
-            return count;
         }
 
         protected int findAndMoveToHotbar(HighwayBuilder b, Predicate<ItemStack> predicate, boolean required) {
@@ -1055,7 +855,7 @@ public class HighwayBuilder extends Module {
             return hotbarSlot;
         }
 
-        protected int findAndMoveBestToolToHotbar(HighwayBuilder b, BlockState blockState, boolean noSilkTouch) {
+        protected int findAndMoveBestToolToHotbar(HighwayBuilder b, BlockState blockState, boolean noSilkTouch, boolean error) {
             // Check for creative
             if (b.mc.player.isCreative()) return b.mc.player.getInventory().selectedSlot;
 
@@ -1075,15 +875,10 @@ public class HighwayBuilder extends Module {
                 }
             }
 
-            if (bestSlot == -1) return b.mc.player.getInventory().selectedSlot;
-
-            if (b.mc.player.getInventory().getStack(bestSlot).getItem() instanceof PickaxeItem ){
-                int count = countItem(b, stack -> stack.getItem() instanceof PickaxeItem);
-
-                if (count <= b.savePickaxes.get()) {
-                    b.error("找到的稿少于所需的选定数量：" + count + "/" + (b.savePickaxes.get() + 1));
-                    return -1;
-                }
+            // Stop if not found
+            if (bestSlot == -1) {
+                if (error) b.error("找不到适合挖掘的工具。");
+                return -1;
             }
 
             // Check if the tool is already in hotbar
@@ -1104,10 +899,13 @@ public class HighwayBuilder extends Module {
             int slot = findAndMoveToHotbar(b, itemStack -> itemStack.getItem() instanceof BlockItem blockItem && b.blocksToPlace.get().contains(blockItem.getBlock()), false);
 
             if (slot == -1) {
-                if (!b.mineEnderChests.get() || !hasItem(b, Items.ENDER_CHEST) || countItem(b, stack -> stack.getItem().equals(Items.ENDER_CHEST)) <= b.saveEchests.get()) {
-                    b.error("放置的方块用完了。");
+                if (!b.mineEnderChests.get()) {
+                    b.error("没有要放置的方块。");
                 }
-                else b.setState(MineEnderChests);
+                else {
+                    if (hasItem(b, Items.ENDER_CHEST)) b.setState(MineEnderChests);
+                    else b.error("没有要放置的方块。");
+                }
 
                 return -1;
             }
@@ -1373,13 +1171,12 @@ public class HighwayBuilder extends Module {
                         default -> pos.offset(dir.opposite());
                         case 1 -> pos.offset(leftDir);
                         case 2 -> pos.offset(rightDir);
-                        case 3 -> pos.offset(dir, 2);
                     };
                 }
 
                 @Override
                 public boolean hasNext() {
-                    return i < 4 && y < 2;
+                    return i < 3 && y < 2;
                 }
 
                 @Override
@@ -1667,13 +1464,12 @@ public class HighwayBuilder extends Module {
                         default -> pos.offset(dir2);
                         case 1 -> pos.offset(dir2.rotateLeftSkipOne());
                         case 2 -> pos.offset(dir2.rotateLeftSkipOne().opposite());
-                        case 3 -> pos.offset(dir2.opposite(), 2);
                     };
                 }
 
                 @Override
                 public boolean hasNext() {
-                    return i < 4 && y < 2;
+                    return i < 3 && y < 2;
                 }
 
                 @Override

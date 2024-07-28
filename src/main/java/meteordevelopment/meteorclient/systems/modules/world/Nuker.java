@@ -275,7 +275,7 @@ public class Nuker extends Module {
         if (enableRenderBounding.get()){
             // Render bounding box if cube and should break stuff
             if (shape.get() != Shape.Sphere && mode.get() != Mode.Smash) {
-                box = new Box(pos1.toCenterPos(), pos2.toCenterPos());
+                box = new Box(pos1, pos2);
                 event.renderer.box(box, sideColorBox.get(), lineColorBox.get(), shapeModeBox.get(), 0);
             }
         }
@@ -341,7 +341,7 @@ public class Nuker extends Module {
         if (mode.get() == Mode.Flatten){
             pos1.setY((int) Math.floor(pY));
         }
-        box = new Box(pos1.toCenterPos(), pos2.toCenterPos());
+        box = new Box(pos1, pos2);
 
         // Find blocks to break
         BlockIterator.register(Math.max((int) Math.ceil(range.get()+1), maxh), Math.max((int) Math.ceil(range.get()), maxv), (blockPos, blockState) -> {
@@ -389,11 +389,11 @@ public class Nuker extends Module {
             }
 
             // Update timer
-            if (!firstBlock && !lastBlockPos.equals(blocks.getFirst())) {
+            if (!firstBlock && !lastBlockPos.equals(blocks.get(0))) {
                 timer = delay.get();
 
                 firstBlock = false;
-                lastBlockPos.set(blocks.getFirst());
+                lastBlockPos.set(blocks.get(0));
 
                 if (timer > 0) return;
             }

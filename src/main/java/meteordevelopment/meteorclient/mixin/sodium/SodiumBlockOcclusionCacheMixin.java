@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = BlockOcclusionCache.class, remap = false)
-public abstract class SodiumBlockOcclusionCacheMixin {
+public class SodiumBlockOcclusionCacheMixin {
     @Unique
     private Xray xray;
 

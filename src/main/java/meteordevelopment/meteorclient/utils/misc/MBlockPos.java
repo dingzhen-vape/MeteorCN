@@ -51,12 +51,12 @@ public class MBlockPos {
         return this;
     }
 
-    public BlockPos getBlockPos() {
+    public BlockPos getMcPos() {
         return POS.set(x, y, z);
     }
 
     public BlockState getState() {
-        return mc.world.getBlockState(getBlockPos());
+        return mc.world.getBlockState(getMcPos());
     }
 
     @Override
@@ -77,10 +77,5 @@ public class MBlockPos {
         result = 31 * result + y;
         result = 31 * result + z;
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return this.x + ", " + this.y + ", " + this.z;
     }
 }

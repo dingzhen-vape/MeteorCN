@@ -5,10 +5,8 @@
 
 package meteordevelopment.meteorclient.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import meteordevelopment.meteorclient.systems.modules.Modules;
-import meteordevelopment.meteorclient.systems.modules.render.BetterTab;
+import meteordevelopment.meteorclient.systems.modules.misc.BetterTab;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -17,18 +15,12 @@ import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.List;
-
 @Mixin(PlayerListHud.class)
-public abstract class PlayerListHudMixin {
-    @Shadow
-    protected abstract List<PlayerListEntry> collectPlayerEntries();
-
+public class PlayerListHudMixin {
     @ModifyConstant(constant = @Constant(longValue = 80L), method = "collectPlayerEntries")
     private long modifyCount(long count) {
         BetterTab module = Modules.get().get(BetterTab.class);
@@ -50,20 +42,10 @@ public abstract class PlayerListHudMixin {
         return module.isActive() && module.accurateLatency.get() ? width + 30 : width;
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I", shift = At.Shift.BEFORE))
-    private void modifyHeight(CallbackInfo ci, @Local(ordinal = 5)LocalIntRef o, @Local(ordinal = 6)LocalIntRef p) {
+    @ModifyConstant(constant = @Constant(intValue = 20), method = "render")
+    private int modifyHeight(int height) {
         BetterTab module = Modules.get().get(BetterTab.class);
-        if (!module.isActive()) return;
-
-        int newO;
-        int newP = 1;
-        int totalPlayers = newO = this.collectPlayerEntries().size();
-        while (newO > module.tabHeight.get()) {
-            newO = (totalPlayers + ++newP - 1) / newP;
-        }
-
-        o.set(newO);
-        p.set(newP);
+        return module.isActive() ? module.tabHeight.get() : height;
     }
 
     @Inject(method = "renderLatencyIcon", at = @At("HEAD"), cancellable = true)

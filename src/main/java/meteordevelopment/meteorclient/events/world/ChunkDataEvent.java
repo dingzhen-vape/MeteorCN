@@ -5,10 +5,21 @@
 
 package meteordevelopment.meteorclient.events.world;
 
+import meteordevelopment.meteorclient.utils.misc.Pool;
 import net.minecraft.world.chunk.WorldChunk;
 
-/**
- * @implNote Shouldn't be put in a {@link meteordevelopment.meteorclient.utils.misc.Pool} to avoid a race-condition, or in a {@link ThreadLocal} as it is shared between threads.
- * @author Crosby
- */
-public record ChunkDataEvent(WorldChunk chunk) {}
+public class ChunkDataEvent {
+    private static final Pool<ChunkDataEvent> INSTANCE = new Pool<>(ChunkDataEvent::new);
+
+    public WorldChunk chunk;
+
+    public static ChunkDataEvent get(WorldChunk chunk) {
+        ChunkDataEvent event = INSTANCE.get();
+        event.chunk = chunk;
+        return event;
+    }
+
+    public static void returnChunkDataEvent(ChunkDataEvent event) {
+        INSTANCE.free(event);
+    }
+}

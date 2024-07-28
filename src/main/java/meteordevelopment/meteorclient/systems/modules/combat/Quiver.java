@@ -17,7 +17,6 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -26,11 +25,11 @@ import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.potion.PotionUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Quiver extends Module {
@@ -41,7 +40,7 @@ public class Quiver extends Module {
     private final Setting<List<StatusEffect>> effects = sgGeneral.add(new StatusEffectListSetting.Builder()
         .name("效果")
         .description("要给你射出的效果.")
-        .defaultValue(StatusEffects.STRENGTH.value())
+        .defaultValue(StatusEffects.STRENGTH)
         .build()
     );
 
@@ -137,11 +136,11 @@ public class Quiver extends Module {
 
             if (item.getItem() != Items.TIPPED_ARROW)  continue;
 
-            Iterator<StatusEffectInstance> effects = item.getItem().getComponents().get(DataComponentTypes.POTION_CONTENTS).getEffects().iterator();
+            List<StatusEffectInstance> effects = PotionUtil.getPotionEffects(item);
 
-            if (!effects.hasNext()) continue;
+            if (effects.isEmpty()) continue;
 
-            StatusEffect effect = effects.next().getEffectType().value();
+            StatusEffect effect = effects.get(0).getEffectType();
 
             if (this.effects.get().contains(effect)
                 && !usedEffects.contains(effect)
@@ -177,12 +176,12 @@ public class Quiver extends Module {
         boolean charging = mc.options.useKey.isPressed();
 
         if (!charging) {
-            InvUtils.move().from(arrowSlots.getFirst()).to(9);
+            InvUtils.move().from(arrowSlots.get(0)).to(9);
             mc.options.useKey.setPressed(true);
         } else {
             if (BowItem.getPullProgress(mc.player.getItemUseTime()) >= 0.12) {
-                int targetSlot = arrowSlots.getFirst();
-                arrowSlots.removeFirst();
+                int targetSlot = arrowSlots.get(0);
+                arrowSlots.remove(0);
 
                 mc.getNetworkHandler().sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(mc.player.getYaw(), -90, mc.player.isOnGround()));
                 mc.options.useKey.setPressed(false);
@@ -240,7 +239,7 @@ public class Quiver extends Module {
 
     private boolean hasEffect(StatusEffect effect) {
         for (StatusEffectInstance statusEffect : mc.player.getStatusEffects()) {
-            if (statusEffect.getEffectType().value().equals(effect)) return true;
+            if (statusEffect.getEffectType() == effect) return true;
         }
 
         return false;

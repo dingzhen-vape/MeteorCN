@@ -14,9 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MeteorExecutor {
     public static ExecutorService executor;
 
-    private MeteorExecutor() {
-    }
-
     @PreInit
     public static void init() {
         AtomicInteger threadNumber = new AtomicInteger(1);

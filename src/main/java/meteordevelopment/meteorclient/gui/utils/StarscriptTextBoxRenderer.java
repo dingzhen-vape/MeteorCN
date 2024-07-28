@@ -62,11 +62,11 @@ public class StarscriptTextBoxRenderer implements WTextBox.Renderer {
             int charDepth = depth;
 
             if (result.hasErrors()) {
-                if (i == result.errors.getFirst().character) {
+                if (i == result.errors.get(0).character) {
                     sections.add(new Section(sb.toString(), charDepth > 0 ? theme.starscriptTextColor() : defaultColor));
                     sb.setLength(0);
                 }
-                else if (i > result.errors.getFirst().character) {
+                else if (i > result.errors.get(0).character) {
                     sb.append(c);
                     continue;
                 }

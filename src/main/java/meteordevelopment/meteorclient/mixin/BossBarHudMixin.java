@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 @Mixin(BossBarHud.class)
-public abstract class BossBarHudMixin {
+public class BossBarHudMixin {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     private void onRender(CallbackInfo info) {
         if (Modules.get().get(NoRender.class).noBossBar()) info.cancel();

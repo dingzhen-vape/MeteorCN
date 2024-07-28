@@ -10,7 +10,6 @@ import meteordevelopment.meteorclient.mixin.ProjectileInGroundAccessor;
 import meteordevelopment.meteorclient.mixininterface.IVec3d;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.misc.MissHitResult;
-import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.*;
 import net.minecraft.entity.projectile.thrown.*;
@@ -18,7 +17,10 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.*;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
@@ -48,16 +50,16 @@ public class ProjectileEntitySimulator {
         }
         else if (item instanceof CrossbowItem) {
             if (!CrossbowItem.isCharged(itemStack)) return false;
-            if (itemStack.get(DataComponentTypes.CHARGED_PROJECTILES).contains(Items.FIREWORK_ROCKET)) {
-                set(user, 0, CrossbowItemAccessor.getSpeed(itemStack.get(DataComponentTypes.CHARGED_PROJECTILES)), simulated, 0, 0.6, accurate, tickDelta);
+            if (CrossbowItem.hasProjectile(itemStack, Items.FIREWORK_ROCKET)) {
+                set(user, 0, CrossbowItemAccessor.getSpeed(itemStack), simulated, 0, 0.6, accurate, tickDelta);
             }
-            else set(user, 0, CrossbowItemAccessor.getSpeed(itemStack.get(DataComponentTypes.CHARGED_PROJECTILES)), simulated, 0.05, 0.6, accurate, tickDelta);
+            else set(user, 0, CrossbowItemAccessor.getSpeed(itemStack), simulated, 0.05000000074505806, 0.6, accurate, tickDelta);
         }
         else if (item instanceof FishingRodItem) {
             setFishingBobber(user, tickDelta);
         }
         else if (item instanceof TridentItem) {
-            set(user, 0, 2.5, simulated, 0.05, 0.99, accurate, tickDelta);
+            set(user, 0, 2.5, simulated, 0.05000000074505806, 0.99, accurate, tickDelta);
         }
         else if (item instanceof SnowballItem || item instanceof EggItem || item instanceof EnderPearlItem) {
             set(user, 0, 1.5, simulated, 0.03, 0.8, accurate, tickDelta);
@@ -112,30 +114,24 @@ public class ProjectileEntitySimulator {
         this.waterDrag = waterDrag;
     }
 
-    public boolean set(Entity entity, boolean accurate) {
+    public boolean set(Entity entity, boolean accurate, double tickDelta) {
         // skip entities in ground
-        if (entity instanceof ProjectileInGroundAccessor ppe && ppe.getInGround()) return false;
+        if (entity instanceof PersistentProjectileEntity && ((ProjectileInGroundAccessor) entity).getInGround()) return false;
 
-        if (entity instanceof ArrowEntity) {
-            set(entity, 0.05, 0.6, accurate);
+        if (entity instanceof ArrowEntity arrow) {
+            // im not sure if arrow.getVelocity().length() is correct but it works ¯\_(ツ)_/¯
+            set(entity, arrow.getVelocity().length(), 0.05000000074505806, 0.6, accurate, tickDelta);
+        } else if (entity instanceof EnderPearlEntity || entity instanceof SnowballEntity || entity instanceof EggEntity) {
+            set(entity, 1.5, 0.03, 0.8, accurate, tickDelta);
         } else if (entity instanceof TridentEntity) {
-            set(entity, 0.05, 0.99, accurate);
-        }
-
-        else if (entity instanceof EnderPearlEntity || entity instanceof SnowballEntity || entity instanceof EggEntity) {
-            set(entity, 0.03, 0.8, accurate);
+            set(entity, 2.5, 0.05000000074505806, 0.99, accurate, tickDelta);
         } else if (entity instanceof ExperienceBottleEntity) {
-            set(entity,  0.07, 0.8, accurate);
-        } else if (entity instanceof PotionEntity) {
-            set(entity, 0.05, 0.8, accurate);
-        }
-
-        else if (entity instanceof WitherSkullEntity || entity instanceof FireballEntity || entity instanceof DragonFireballEntity || entity instanceof WindChargeEntity) {
-            // drag isn't actually 1, but this provides accurate results in 99.9% in of real situations.
-            set(entity, 0, 1.0, accurate);
-            this.airDrag = 1.0;
-        }
-        else {
+            set(entity, 0.7,  0.07, 0.8, accurate, tickDelta);
+        } else if (entity instanceof ThrownEntity) {
+            set(entity, 0.5, 0.05, 0.8, accurate, tickDelta);
+        } else if (entity instanceof WitherSkullEntity || entity instanceof FireballEntity || entity instanceof DragonFireballEntity) {
+            set(entity, 0.95, 0, 0.8, accurate, tickDelta);
+        }  else {
             return false;
         }
 
@@ -146,10 +142,9 @@ public class ProjectileEntitySimulator {
         return true;
     }
 
-    public void set(Entity entity, double gravity, double waterDrag, boolean accurate) {
-        pos.set(entity.getX(), entity.getY(), entity.getZ());
+    public void set(Entity entity, double speed, double gravity, double waterDrag, boolean accurate, double tickDelta) {
+        Utils.set(pos, entity, tickDelta);
 
-        double speed = entity.getVelocity().length();
         velocity.set(entity.getVelocity().x, entity.getVelocity().y, entity.getVelocity().z).normalize().mul(speed);
 
         if (accurate) {
@@ -196,14 +191,12 @@ public class ProjectileEntitySimulator {
         if (pos.y < mc.world.getBottomY()) return MissHitResult.INSTANCE;
 
         // Check if chunk is loaded
-        int chunkX = ChunkSectionPos.getSectionCoord(pos.x);
-        int chunkZ = ChunkSectionPos.getSectionCoord(pos.z);
+        int chunkX = (int) (pos.x / 16);
+        int chunkZ = (int) (pos.z / 16);
         if (!mc.world.getChunkManager().isChunkLoaded(chunkX, chunkZ)) return MissHitResult.INSTANCE;
 
         // Check for collision
         ((IVec3d) pos3d).set(pos);
-        if (pos3d.equals(prevPos3d)) return MissHitResult.INSTANCE;
-
         HitResult hitResult = getCollision();
 
         return hitResult.getType() == HitResult.Type.MISS ? null : hitResult;

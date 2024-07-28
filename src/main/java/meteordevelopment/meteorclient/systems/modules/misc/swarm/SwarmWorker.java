@@ -5,8 +5,8 @@
 
 package meteordevelopment.meteorclient.systems.modules.misc.swarm;
 
+import baritone.api.BaritoneAPI;
 import meteordevelopment.meteorclient.commands.Commands;
-import meteordevelopment.meteorclient.pathing.PathManagers;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.Block;
 
@@ -41,7 +41,7 @@ public class SwarmWorker extends Thread {
             while (!isInterrupted()) {
                 String read = in.readUTF();
 
-                if (read.startsWith("")) {
+                if (!read.equals("")) {
                     ChatUtils.infoPrefix("Swarm", "收到命令：(高亮)%s", read);
 
                     try {
@@ -68,7 +68,7 @@ public class SwarmWorker extends Thread {
             e.printStackTrace();
         }
 
-        PathManagers.get().stop();
+        BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().cancelEverything();
 
         ChatUtils.infoPrefix("Swarm", "与主机断开连接。");
 
@@ -77,10 +77,8 @@ public class SwarmWorker extends Thread {
 
     public void tick() {
         if (target == null) return;
-
-        PathManagers.get().stop();
-        PathManagers.get().mine(target);
-
+        BaritoneAPI.getProvider().getPrimaryBaritone().getPathingBehavior().cancelEverything();
+        BaritoneAPI.getProvider().getPrimaryBaritone().getMineProcess().mine(target);
         target = null;
     }
 

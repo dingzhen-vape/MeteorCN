@@ -74,7 +74,6 @@ public class ESP extends Module {
     public final Setting<ShapeMode> shapeMode = sgGeneral.add(new EnumSetting.Builder<ShapeMode>()
         .name("形状模式")
         .description("形状的渲染方式。")
-        .visible(() -> mode.get() != Mode.Glow)
         .defaultValue(ShapeMode.Both)
         .build()
     );
@@ -82,7 +81,7 @@ public class ESP extends Module {
     public final Setting<Double> fillOpacity = sgGeneral.add(new DoubleSetting.Builder()
         .name("填充不透明度")
         .description("形状填充的不透明度。")
-        .visible(() -> shapeMode.get() != ShapeMode.Lines && mode.get() != Mode.Glow)
+        .visible(() -> shapeMode.get() != ShapeMode.Lines)
         .defaultValue(0.3)
         .range(0, 1)
         .sliderMax(1)
@@ -315,10 +314,10 @@ public class ESP extends Module {
     }
 
     private double getFadeAlpha(Entity entity) {
-        double dist = PlayerUtils.squaredDistanceToCamera(entity.getX() + entity.getWidth() / 2, entity.getY() + entity.getEyeHeight(entity.getPose()), entity.getZ() + entity.getWidth() / 2);
+        double dist = PlayerUtils.distanceToCamera(entity.getX() + entity.getWidth() / 2, entity.getY() + entity.getEyeHeight(entity.getPose()), entity.getZ() + entity.getWidth() / 2);
         double fadeDist = Math.pow(fadeDistance.get(), 2);
         double alpha = 1;
-        if (dist <= fadeDist * fadeDist) alpha = (float) (Math.sqrt(dist) / fadeDist);
+        if (dist <= fadeDist) alpha = (float) (dist / fadeDist);
         if (alpha <= 0.075) alpha = 0;
         return alpha;
     }
@@ -350,16 +349,11 @@ public class ESP extends Module {
         return isActive() && mode.get() == Mode.Shader;
     }
 
-    public boolean isGlow() {
-        return isActive() && mode.get() == Mode.Glow;
-    }
-
     public enum Mode {
         Box,
         Wireframe,
         _2D,
-        Shader,
-        Glow;
+        Shader;
 
         @Override
         public String toString() {

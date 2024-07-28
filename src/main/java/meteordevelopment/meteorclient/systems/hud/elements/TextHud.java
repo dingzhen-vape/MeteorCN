@@ -89,6 +89,7 @@ public class TextHud extends HudElement {
         .name("condition")
         .description("Condition to check when shown is not Always.")
         .visible(() -> shown.get() != Shown.Always)
+        .defaultValue("")
         .onChanged(s -> recompile())
         .renderer(StarscriptTextBoxRenderer.class)
         .build()
@@ -195,7 +196,7 @@ public class TextHud extends HudElement {
 
             if (result.hasErrors()) {
                 script = null;
-                section = new Section(0, result.errors.getFirst().toString());
+                section = new Section(0, result.errors.get(0).toString());
                 calculateSize(renderer);
             }
             else script = Compiler.compile(result);

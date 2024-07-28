@@ -22,7 +22,6 @@ import meteordevelopment.meteorclient.systems.modules.Categories;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.misc.MeteorIdentifier;
-import meteordevelopment.meteorclient.utils.misc.text.MeteorClickEvent;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
@@ -52,22 +51,22 @@ public class BetterChat extends Module {
     private final SettingGroup sgSuffix = settings.createGroup("后缀");
 
     private final Setting<Boolean> annoy = sgGeneral.add(new BoolSetting.Builder()
-        .name("烦人")
-        .description("使你的消息变得烦人。")
+        .name("恼人")
+        .description("让你的消息aNnOyInG。")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> fancy = sgGeneral.add(new BoolSetting.Builder()
-        .name("花式聊天")
-        .description("使你的消息变得花哨！")
+        .name("精致聊天")
+        .description("让你的消息 ғᴀɴᴄʏ!")
         .defaultValue(false)
         .build()
     );
 
     private final Setting<Boolean> timestamps = sgGeneral.add(new BoolSetting.Builder()
         .name("时间戳")
-        .description("在聊天消息开始处添加客户端时间戳。")
+        .description("在聊天消息的开头添加客户端时间戳。")
         .defaultValue(false)
         .build()
     );
@@ -87,8 +86,8 @@ public class BetterChat extends Module {
     );
 
     private final Setting<Boolean> keepHistory = sgGeneral.add(new BoolSetting.Builder()
-        .name("保持历史")
-        .description("在断开连接时防止聊天历史被清除。")
+        .name("保留历史")
+        .description("断开连接时防止聊天历史被清除。")
         .defaultValue(true)
         .build()
     );
@@ -96,15 +95,15 @@ public class BetterChat extends Module {
     // Filter
 
     private final Setting<Boolean> antiSpam = sgFilter.add(new BoolSetting.Builder()
-        .name("反垃圾邮件")
-        .description("阻止重复消息填满你的聊天。")
+        .name("防刷屏")
+        .description("阻止重复的消息填满你的聊天。")
         .defaultValue(true)
         .build()
     );
 
     private final Setting<Integer> antiSpamDepth = sgFilter.add(new IntSetting.Builder()
         .name("深度")
-        .description("要过滤多少条消息。")
+        .description("要过滤的消息数量。")
         .defaultValue(20)
         .min(1)
         .sliderMin(1)
@@ -114,7 +113,7 @@ public class BetterChat extends Module {
 
     private final Setting<Boolean> filterRegex = sgFilter.add(new BoolSetting.Builder()
         .name("过滤正则表达式")
-        .description("过滤掉与正则表达式匹配的聊天消息。")
+        .description("过滤掉与正则表达式过滤器匹配的聊天消息。")
         .defaultValue(false)
         .build()
     );
@@ -145,11 +144,11 @@ public class BetterChat extends Module {
     );
 
     private final Setting<Integer> longerChatLines = sgLongerChat.add(new IntSetting.Builder()
-        .name("额外行数")
-        .description("额外聊天行数。")
+        .name("额外的行数")
+        .description("额外的聊天行数。")
         .defaultValue(1000)
-        .min(0)
-        .sliderRange(0, 1000)
+        .min(100)
+        .sliderRange(100, 1000)
         .visible(longerChatHistory::get)
         .build()
     );
@@ -172,15 +171,15 @@ public class BetterChat extends Module {
 
     private final Setting<String> prefixText = sgPrefix.add(new StringSetting.Builder()
         .name("文本")
-        .description("添加到你的前缀的文本。")
+        .description("要添加为前缀的文本。")
         .defaultValue("> ")
         .visible(() -> !prefixRandom.get())
         .build()
     );
 
     private final Setting<Boolean> prefixSmallCaps = sgPrefix.add(new BoolSetting.Builder()
-        .name("小型大写字母")
-        .description("在前缀中使用小型大写字母。")
+        .name("小写字母")
+        .description("在前缀中使用小写字母。")
         .defaultValue(false)
         .visible(() -> !prefixRandom.get())
         .build()
@@ -204,15 +203,15 @@ public class BetterChat extends Module {
 
     private final Setting<String> suffixText = sgSuffix.add(new StringSetting.Builder()
         .name("文本")
-        .description("添加到你的后缀的文本。")
-        .defaultValue(" | 流星破裂！")
+        .description("要添加为后缀的文本。")
+        .defaultValue(" | meteor on crack!")
         .visible(() -> !suffixRandom.get())
         .build()
     );
 
     private final Setting<Boolean> suffixSmallCaps = sgSuffix.add(new BoolSetting.Builder()
-        .name("小型大写字母")
-        .description("在后缀中使用小型大写字母。")
+        .name("小写字母")
+        .description("在后缀中使用小写字母。")
         .defaultValue(true)
         .visible(() -> !suffixRandom.get())
         .build()
@@ -220,7 +219,6 @@ public class BetterChat extends Module {
 
     private static final Pattern antiSpamRegex = Pattern.compile(" \\(([0-9]+)\\)$");
     private static final Pattern timestampRegex = Pattern.compile("^(<[0-9]{2}:[0-9]{2}>\\s)");
-    private static final Pattern usernameRegex = Pattern.compile("^(?:<[0-9]{2}:[0-9]{2}>\\s)?<(.*?)>.*");
 
     private final Char2CharMap SMALL_CAPS = new Char2CharOpenHashMap();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
@@ -334,7 +332,7 @@ public class BetterChat extends Module {
         message = getPrefix() + message + getSuffix();
 
         if (coordsProtection.get() && containsCoordinates(message)) {
-            MutableText warningMessage = Text.literal("看起来你的消息中有坐标！ ");
+            MutableText warningMessage = Text.literal("你的消息中似乎有坐标！ ");
 
             MutableText sendButton = getSendButton(message);
             warningMessage.append(sendButton);
@@ -362,8 +360,8 @@ public class BetterChat extends Module {
     }
 
     static {
-        registerCustomHead("[流星]", new MeteorIdentifier("textures/icons/chat/meteor.png"));
-        registerCustomHead("[巴里通]", new MeteorIdentifier("textures/icons/chat/baritone.png"));
+        registerCustomHead("[Meteor]", new MeteorIdentifier("textures/icons/chat/meteor.png"));
+        registerCustomHead("[Baritone]", new MeteorIdentifier("textures/icons/chat/baritone.png"));
     }
 
     public int modifyChatWidth(int width) {
@@ -396,8 +394,7 @@ public class BetterChat extends Module {
         int startOffset = 0;
 
         try {
-            Matcher m = TIMESTAMP_REGEX.matcher(text);
-            if (m.find()) startOffset = m.end() + 1;
+            startOffset = TIMESTAMP_REGEX.matcher(text).end();
         }
         catch (IllegalStateException ignored) {}
 
@@ -416,7 +413,7 @@ public class BetterChat extends Module {
         PlayerListEntry entry = mc.getNetworkHandler().getPlayerListEntry(sender.getId());
         if (entry == null) return;
 
-        Identifier skin = entry.getSkinTextures().texture();
+        Identifier skin = entry.getSkinTexture();
 
         context.drawTexture(skin, 0, y, 8, 8, 8, 8, 8, 8, 64, 64);
         context.drawTexture(skin, 0, y, 8, 8, 40, 8, 8, 8, 64, 64);
@@ -427,10 +424,11 @@ public class BetterChat extends Module {
 
         // If the packet did not contain a sender field then try to get the sender from the message
         if (sender == null) {
-            Matcher usernameMatcher = usernameRegex.matcher(text);
+            int openingI = text.indexOf('<');
+            int closingI = text.indexOf('>');
 
-            if (usernameMatcher.matches()) {
-                String username = usernameMatcher.group(1);
+            if (openingI != -1 && closingI != -1 && closingI > openingI) {
+                String username = text.substring(openingI + 1, closingI);
 
                 PlayerListEntry entry = mc.getNetworkHandler().getPlayerListEntry(username);
                 if (entry != null) sender = entry.getProfile();
@@ -478,7 +476,7 @@ public class BetterChat extends Module {
                 filterRegexList.add(Pattern.compile(regexFilters.get().get(i)));
             } catch (PatternSyntaxException e) {
                 String removed = regexFilters.get().remove(i);
-                error("移除无效的正则表达式：%s", removed);
+                error("移除无效的正则表达式: %s", removed);
             }
         }
     }
@@ -508,10 +506,10 @@ public class BetterChat extends Module {
     }
 
     private MutableText getSendButton(String message) {
-        MutableText sendButton = Text.literal("[无论如何发送]");
+        MutableText sendButton = Text.literal("[无视坐标发送]");
         MutableText hintBaseText = Text.literal("");
 
-        MutableText hintMsg = Text.literal("即使消息中有坐标，也将你的消息发送到全球聊天：");
+        MutableText hintMsg = Text.literal("即使消息中有坐标，也将其发送到全局聊天：");
         hintMsg.setStyle(hintBaseText.getStyle().withFormatting(Formatting.GRAY));
         hintBaseText.append(hintMsg);
 
@@ -519,9 +517,9 @@ public class BetterChat extends Module {
 
         sendButton.setStyle(sendButton.getStyle()
             .withFormatting(Formatting.DARK_RED)
-            .withClickEvent(new MeteorClickEvent(
+            .withClickEvent(new ClickEvent(
                 ClickEvent.Action.RUN_COMMAND,
-                Commands.get("说").toString(message)
+                Commands.get("say").toString(message)
             ))
             .withHoverEvent(new HoverEvent(
                 HoverEvent.Action.SHOW_TEXT,
@@ -542,7 +540,7 @@ public class BetterChat extends Module {
 
     public boolean keepHistory() { return isActive() && keepHistory.get(); }
 
-    public int getExtraChatLines() {
+    public int getChatLength() {
         return longerChatLines.get();
     }
 }

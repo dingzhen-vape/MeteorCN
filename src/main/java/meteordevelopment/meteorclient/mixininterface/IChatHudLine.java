@@ -11,10 +11,8 @@ public interface IChatHudLine {
     String meteor$getText();
 
     int meteor$getId();
-
     void meteor$setId(int id);
 
     GameProfile meteor$getSender();
-
     void meteor$setSender(GameProfile profile);
 }

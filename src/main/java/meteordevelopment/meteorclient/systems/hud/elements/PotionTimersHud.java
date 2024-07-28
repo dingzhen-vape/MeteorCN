@@ -5,8 +5,6 @@
 
 package meteordevelopment.meteorclient.systems.hud.elements;
 
-import it.unimi.dsi.fastutil.Pair;
-import it.unimi.dsi.fastutil.objects.ObjectObjectImmutablePair;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.hud.*;
 import meteordevelopment.meteorclient.utils.misc.Names;
@@ -16,7 +14,6 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static meteordevelopment.meteorclient.MeteorClient.mc;
@@ -155,8 +152,9 @@ public class PotionTimersHud extends HudElement {
         .build()
     );
 
-    private final List<Pair<StatusEffectInstance, String>> texts = new ArrayList<>();
-    private double rainbowHue;
+    private final Color rainbow = new Color(255, 255, 255);
+    private double rainbowHue1;
+    private double rainbowHue2;
 
     public PotionTimersHud() {
         super(INFO);
@@ -182,14 +180,10 @@ public class PotionTimersHud extends HudElement {
         double width = 0;
         double height = 0;
 
-        texts.clear();
-
         for (StatusEffectInstance statusEffectInstance : mc.player.getStatusEffects()) {
-            if (hiddenEffects.get().contains(statusEffectInstance.getEffectType().value())) continue;
+            if (hiddenEffects.get().contains(statusEffectInstance.getEffectType())) continue;
             if (!showAmbient.get() && statusEffectInstance.isAmbient()) continue;
-            String text = getString(statusEffectInstance);
-            texts.add(new ObjectObjectImmutablePair<>(statusEffectInstance, text));
-            width = Math.max(width, renderer.textWidth(text, shadow.get(), getScale()));
+            width = Math.max(width, renderer.textWidth(getString(statusEffectInstance), shadow.get(), getScale()));
             height += renderer.textHeight(shadow.get(), getScale());
         }
 
@@ -210,30 +204,39 @@ public class PotionTimersHud extends HudElement {
             return;
         }
 
-        rainbowHue += rainbowSpeed.get() * renderer.delta;
-        if (rainbowHue > 1) rainbowHue -= 1;
-        else if (rainbowHue < -1) rainbowHue += 1;
+        rainbowHue1 += rainbowSpeed.get() * renderer.delta;
+        if (rainbowHue1 > 1) rainbowHue1 -= 1;
+        else if (rainbowHue1 < -1) rainbowHue1 += 1;
 
-        double localRainbowHue = rainbowHue;
+        rainbowHue2 = rainbowHue1;
 
-        for (Pair<StatusEffectInstance, String> potionEffectEntry : texts) {
-            Color color = switch (colorMode.get()) {
+        for (StatusEffectInstance statusEffectInstance : mc.player.getStatusEffects()) {
+            if (hiddenEffects.get().contains(statusEffectInstance.getEffectType())) continue;
+            if (!showAmbient.get() && statusEffectInstance.isAmbient()) continue;
+            Color color = new Color(255, 255, 255);
+
+            switch (colorMode.get()) {
                 case Effect -> {
-                    int c = potionEffectEntry.left().getEffectType().value().getColor();
-                    yield new Color(c).a(255);
+                    int c = statusEffectInstance.getEffectType().getColor();
+                    color.r = Color.toRGBAR(c);
+                    color.g = Color.toRGBAG(c);
+                    color.b = Color.toRGBAB(c);
                 }
                 case Flat -> {
+                    color = flatColor.get();
                     flatColor.get().update();
-                    yield flatColor.get();
                 }
                 case Rainbow -> {
-                    localRainbowHue += rainbowSpread.get();
-                    int c = java.awt.Color.HSBtoRGB((float) localRainbowHue, rainbowSaturation.get().floatValue(), rainbowBrightness.get().floatValue());
-                    yield new Color(c);
+                    rainbowHue2 += rainbowSpread.get();
+                    int c = java.awt.Color.HSBtoRGB((float) rainbowHue2, rainbowSaturation.get().floatValue(), rainbowBrightness.get().floatValue());
+                    rainbow.r = Color.toRGBAR(c);
+                    rainbow.g = Color.toRGBAG(c);
+                    rainbow.b = Color.toRGBAB(c);
+                    color = rainbow;
                 }
-            };
+            }
 
-            String text = potionEffectEntry.right();
+            String text = getString(statusEffectInstance);
             renderer.text(text, x + alignX(renderer.textWidth(text, shadow.get(), getScale()), alignment.get()), y, color, shadow.get(), getScale());
 
             y += renderer.textHeight(shadow.get(), getScale());
@@ -241,7 +244,7 @@ public class PotionTimersHud extends HudElement {
     }
 
     private String getString(StatusEffectInstance statusEffectInstance) {
-        return String.format("%s %d (%s)", Names.get(statusEffectInstance.getEffectType().value()), statusEffectInstance.getAmplifier() + 1, StatusEffectUtil.getDurationText(statusEffectInstance, 1, mc.world.getTickManager().getTickRate()).getString());
+        return String.format("%s %d (%s)", Names.get(statusEffectInstance.getEffectType()), statusEffectInstance.getAmplifier() + 1, statusEffectInstance.isInfinite() ? "inf" : StatusEffectUtil.getDurationText(statusEffectInstance, 1).getString()); //todo remove "inf" when font rendering can use symbols
     }
 
     private double getScale() {
@@ -250,7 +253,7 @@ public class PotionTimersHud extends HudElement {
 
     private boolean hasNoVisibleEffects() {
         for (StatusEffectInstance statusEffectInstance : mc.player.getStatusEffects()) {
-            if (hiddenEffects.get().contains(statusEffectInstance.getEffectType().value())) continue;
+            if (hiddenEffects.get().contains(statusEffectInstance.getEffectType())) continue;
             if (!showAmbient.get() && statusEffectInstance.isAmbient()) continue;
             return false;
         }

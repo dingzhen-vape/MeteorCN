@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(targets = "net/minecraft/screen/PlayerScreenHandler$1")
-public abstract class PlayerArmorSlotMixin {
+public class PlayerArmorSlotMixin {
     @ModifyReturnValue(method = "getMaxItemCount", at = @At("RETURN"))
     private int onGetMaxItemCount(int original) {
         if (Modules.get().get(InventoryTweaks.class).armorStorage()) return 64;

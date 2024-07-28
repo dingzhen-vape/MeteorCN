@@ -22,18 +22,15 @@ import java.util.concurrent.CompletableFuture;
 import static net.minecraft.command.CommandSource.suggestMatching;
 
 public class FriendArgumentType implements ArgumentType<String> {
-    private static final FriendArgumentType INSTANCE = new FriendArgumentType();
     private static final Collection<String> EXAMPLES = List.of("seasnail8169", "MineGame159");
 
     public static FriendArgumentType create() {
-        return INSTANCE;
+        return new FriendArgumentType();
     }
 
     public static Friend get(CommandContext<?> context) {
         return Friends.get().get(context.getArgument("friend", String.class));
     }
-
-    private FriendArgumentType() {}
 
     @Override
     public String parse(StringReader reader) throws CommandSyntaxException {

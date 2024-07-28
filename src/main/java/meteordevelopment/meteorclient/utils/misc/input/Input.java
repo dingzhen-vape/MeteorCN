@@ -6,7 +6,6 @@
 package meteordevelopment.meteorclient.utils.misc.input;
 
 import meteordevelopment.meteorclient.gui.GuiKeyEvents;
-import meteordevelopment.meteorclient.mixin.KeyBindingAccessor;
 import meteordevelopment.meteorclient.utils.misc.CursorStyle;
 import net.minecraft.client.option.KeyBinding;
 import org.lwjgl.glfw.GLFW;
@@ -19,9 +18,6 @@ public class Input {
 
     private static CursorStyle lastCursorStyle = CursorStyle.Default;
 
-    private Input() {
-    }
-
     public static void setKeyState(int key, boolean pressed) {
         if (key >= 0 && key < keys.length) keys[key] = pressed;
     }
@@ -30,16 +26,12 @@ public class Input {
         if (button >= 0 && button < buttons.length) buttons[button] = pressed;
     }
 
-    public static int getKey(KeyBinding bind) {
-        return ((KeyBindingAccessor) bind).getKey().getCode();
-    }
-
     public static void setKeyState(KeyBinding bind, boolean pressed) {
-        setKeyState(getKey(bind), pressed);
+        setKeyState(KeyBinds.getKey(bind), pressed);
     }
 
     public static boolean isPressed(KeyBinding bind) {
-        return isKeyPressed(getKey(bind));
+        return isKeyPressed(KeyBinds.getKey(bind));
     }
 
     public static boolean isKeyPressed(int key) {

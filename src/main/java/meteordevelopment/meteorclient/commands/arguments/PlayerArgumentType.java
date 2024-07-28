@@ -23,20 +23,17 @@ import java.util.concurrent.CompletableFuture;
 import static meteordevelopment.meteorclient.MeteorClient.mc;
 
 public class PlayerArgumentType implements ArgumentType<PlayerEntity> {
-    private static final PlayerArgumentType INSTANCE = new PlayerArgumentType();
     private static final DynamicCommandExceptionType NO_SUCH_PLAYER = new DynamicCommandExceptionType(name -> Text.literal("Player with name " + name + " doesn't exist."));
 
     private static final Collection<String> EXAMPLES = List.of("seasnail8169", "MineGame159");
 
     public static PlayerArgumentType create() {
-        return INSTANCE;
+        return new PlayerArgumentType();
     }
 
     public static PlayerEntity get(CommandContext<?> context) {
         return context.getArgument("player", PlayerEntity.class);
     }
-
-    private PlayerArgumentType() {}
 
     @Override
     public PlayerEntity parse(StringReader reader) throws CommandSyntaxException {
@@ -44,7 +41,7 @@ public class PlayerArgumentType implements ArgumentType<PlayerEntity> {
         PlayerEntity playerEntity = null;
 
         for (PlayerEntity p : mc.world.getPlayers()) {
-            if (p.getName().getString().equalsIgnoreCase(argument)) {
+            if (p.getEntityName().equalsIgnoreCase(argument)) {
                 playerEntity = p;
                 break;
             }
@@ -56,7 +53,7 @@ public class PlayerArgumentType implements ArgumentType<PlayerEntity> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        return CommandSource.suggestMatching(mc.world.getPlayers().stream().map(abstractClientPlayerEntity -> abstractClientPlayerEntity.getName().getString()), builder);
+        return CommandSource.suggestMatching(mc.world.getPlayers().stream().map(PlayerEntity::getEntityName), builder);
     }
 
     @Override

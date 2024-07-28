@@ -33,9 +33,6 @@ public class BlockIterator {
 
     private static boolean disableCurrent;
 
-    private BlockIterator() {
-    }
-
     @PreInit
     public static void init() {
         MeteorClient.EVENT_BUS.subscribe(BlockIterator.class);
