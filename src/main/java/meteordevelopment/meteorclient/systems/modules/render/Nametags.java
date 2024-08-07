@@ -7,6 +7,7 @@ package meteordevelopment.meteorclient.systems.modules.render;
 
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
+import meteordevelopment.meteorclient.renderer.Fonts;
 import meteordevelopment.meteorclient.renderer.Renderer2D;
 import meteordevelopment.meteorclient.renderer.text.TextRenderer;
 import meteordevelopment.meteorclient.settings.*;
@@ -380,7 +381,7 @@ public class Nametags extends Module {
     }
 
     private void renderNametagPlayer(Render2DEvent event, PlayerEntity player, boolean shadow) {
-        TextRenderer text = TextRenderer.get();
+        TextRenderer text = Fonts.RENDERER;
         NametagUtils.begin(pos, event.drawContext);
 
         // Gamemode
@@ -571,7 +572,7 @@ public class Nametags extends Module {
     }
 
     private void renderNametagItem(ItemStack stack, boolean shadow) {
-        TextRenderer text = TextRenderer.get();
+        TextRenderer text = Fonts.RENDERER;
         NametagUtils.begin(pos);
 
         String name = Names.get(stack);
@@ -599,7 +600,7 @@ public class Nametags extends Module {
     }
 
     private void renderGenericNametag(LivingEntity entity, boolean shadow) {
-        TextRenderer text = TextRenderer.get();
+        TextRenderer text = Fonts.RENDERER;
         NametagUtils.begin(pos);
 
         //Name
@@ -639,7 +640,7 @@ public class Nametags extends Module {
     }
 
     private void renderTntNametag(TntEntity entity, boolean shadow) {
-        TextRenderer text = TextRenderer.get();
+        TextRenderer text = Fonts.RENDERER;
         NametagUtils.begin(pos);
 
         String fuseText = ticksToTime(entity.getFuse());
