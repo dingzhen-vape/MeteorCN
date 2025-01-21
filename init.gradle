@@ -1,0 +1,33 @@
+/*
+ * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+ * Copyright (c) Meteor Development.
+ */
+
+settingsEvaluated { settings ->
+    println "aliyun pluginManagement"
+    settings.pluginManagement {
+        repositories {
+            maven { url "https://maven.aliyun.com/repository/gradle-plugin" }
+            maven { url "https://maven.aliyun.com/repository/spring-plugin" }
+            gradlePluginPortal()
+        }
+    }
+}
+
+buildscript {
+    repositories {
+        println "aliyun repositories"
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+    }
+
+    allprojects {
+        println "aliyun allprojects ${project.name}"
+        repositories {
+            maven { url 'https://maven.aliyun.com/repository/google' }
+            maven { url 'https://maven.aliyun.com/repository/central' }
+            maven { url 'https://maven.aliyun.com/repository/public' }
+        }
+    }
+}
