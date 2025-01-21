@@ -24,4 +24,6 @@
 
 密码:7wgn
 
-https://star-history.com/#dingzhen-vape/MeteorCN&Timeline
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=dingzhen-vape/MeteorCN&type=Timeline)](https://star-history.com/#dingzhen-vape/MeteorCN&Timeline)
