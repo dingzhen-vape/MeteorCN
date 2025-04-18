@@ -1,0 +1,26 @@
+name: Issue automatic actions
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  issue-moderator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Automatically close issues that don't follow the issue template
+        uses: lucasbento/auto-close-issues@v1.0.2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-close-message: |
+            @${issue.user.login}: hello! :wave:
+            This issue is being automatically closed because it does not follow the issue template."
+          closed-issues-label: "invalid"

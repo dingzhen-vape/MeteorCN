@@ -1,0 +1,66 @@
+name: Build
+
+concurrency:
+  group: "build"
+  cancel-in-progress: false
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Set up Node JS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Get current build number
+        id: build-number
+        run: |
+          cd .github/builds
+          npm install
+          npm run --silent get_number >> $GITHUB_OUTPUT
+
+      - name: Build
+        run: ./gradlew build -Pcommit=${{ github.sha }} -Pbuild_number=${{ steps.build-number.outputs.number }}
+
+      - name: Webhook Failure
+        if: ${{ failure() }}
+        run: |
+          cd .github/builds
+          npm run webhook -- ${{ steps.build-number.outputs.number }} ${{ github.ref_name }} https://api.github.com/repos/MeteorDevelopment/meteor-client/compare/${{ github.event.before }}...${{ github.event.after }} false
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Publish
+        run: ./gradlew publish -Pcommit=${{ github.sha }} -Pbuild_number=${{ steps.build-number.outputs.number }}
+        env:
+          MAVEN_METEOR_ALIAS: ${{ secrets.MAVEN_METEOR_ALIAS }}
+          MAVEN_METEOR_TOKEN: ${{ secrets.MAVEN_METEOR_TOKEN }}
+
+      - name: Discord webhook
+        run: |
+          cd .github/builds
+          npm run webhook -- ${{ steps.build-number.outputs.number }} ${{ github.ref_name }} https://api.github.com/repos/MeteorDevelopment/meteor-client/compare/${{ github.event.before }}...${{ github.event.after }} true
+        env:
+          SERVER_TOKEN: ${{ secrets.SERVER_TOKEN }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
