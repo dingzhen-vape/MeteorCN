@@ -30,4 +30,4 @@
 
 ## 杂项
 如果你厌倦了硬编码汉化，你可以去看看这个开源插件！
-[meteor-translation-addon](https://github.com/dingzhen-vape/meteor-translation-addon)
+[meteor-translation-addon](https://github.com/Nippaku-Zanmu/meteor-translation-addon)
