@@ -27,3 +27,7 @@
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=dingzhen-vape/MeteorCN&type=Timeline)](https://star-history.com/#dingzhen-vape/MeteorCN&Timeline)
+
+## 杂项
+如果你厌倦了硬编码汉化，你可以去看看这个开源插件！
+[meteor-translation-addon](https://github.com/dingzhen-vape/meteor-translation-addon)
