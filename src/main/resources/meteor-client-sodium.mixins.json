@@ -1,0 +1,18 @@
+{
+  "required": false,
+  "package": "meteordevelopment.meteorclient.mixin.sodium",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "meteordevelopment.meteorclient.MixinPlugin",
+  "client": [
+    "MeshVertexConsumerMixin",
+    "SodiumBlockOcclusionCacheMixin",
+    "SodiumBlockRendererMixin",
+    "SodiumFluidRendererImplDefaultRenderContextMixin",
+    "SodiumFluidRendererImplMixin",
+    "SodiumLightDataAccessMixin",
+    "SodiumWorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
