@@ -18,16 +18,14 @@
 </div>
 
 ## 提示
-由于我还有另一个汉化的模组正在维护，此项目可能不会更新的很快
-
-下载可以在这里下载[https://wwfb.lanzouu.com/b0336wsha]
-
-密码:7wgn
+此仓库停止更新 但是你可以使用下面这个Meteor插件
+[Meteor-I18n-Support](https://github.com/dingzhen-vape/Meteor-I18n-Support-plugin) 
 
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=dingzhen-vape/MeteorCN&type=Timeline)](https://star-history.com/#dingzhen-vape/MeteorCN&Timeline)
 
 ## 杂项
-如果你厌倦了硬编码汉化，你可以去看看这个开源插件！
+如果你厌倦了硬编码汉化，你可以去看看这些个开源插件！
 [meteor-translation-addon](https://github.com/Nippaku-Zanmu/meteor-translation-addon)
+
