@@ -1,4 +1,35 @@
 
+<div align="right">
+  <details>
+    <summary >🌐 Language</summary>
+    <div>
+      <div align="center">
+        <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=en">English</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=zh-CN">简体中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=zh-TW">繁體中文</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=ja">日本語</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=ko">한국어</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=hi">हिन्दी</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=th">ไทย</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=fr">Français</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=de">Deutsch</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=es">Español</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=it">Italiano</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=ru">Русский</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=pt">Português</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=nl">Nederlands</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=pl">Polski</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=ar">العربية</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=fa">فارسی</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=tr">Türkçe</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=vi">Tiếng Việt</a>
+        | <a href="https://openaitx.github.io/view.html?user=dingzhen-vape&project=MeteorCN&lang=id">Bahasa Indonesia</a>
+      </div>
+    </div>
+  </details>
+</div>
+
+
 <p align="center">
 <img src="https://meteorclient.com/icon.png" alt="meteor-client-logo" width="15%"/>
 </p>
